@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-Ruleset -->
+<ruleset name="AcquiaMigrate">
+
+  <description>PHP CodeSniffer configuration for the Acquia Migrate module.</description>
+
+  <!-- Set extensions to scan (taken from Coder 8.3.6). -->
+  <!-- @see https://git.drupalcode.org/project/coder/blob/8.3.6/coder_sniffer/Drupal/ruleset.xml#L8 -->
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme,css,info,txt,md,yml"/>
+
+  <arg name="colors"/>
+  <arg name="cache" value=".phpcs-cache"/>
+  <arg name="parallel" value="10"/>
+
+  <file>.</file>
+
+  <exclude-pattern>drivers/</exclude-pattern>
+  <exclude-pattern>vendor/*</exclude-pattern>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>docroot/</exclude-pattern>
+
+  <rule ref="AcquiaDrupalStrict">
+  </rule>
+
+</ruleset>

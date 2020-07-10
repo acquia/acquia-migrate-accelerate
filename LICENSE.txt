@@ -1,0 +1,3 @@
+All files in the "ui" subdirectory of this directory are copyrighted by Acquia, Inc. See ui/COPYRIGHT.txt for details.
+
+All other files in this directory are licensed under the GPL2+ license, as is the case for all Drupal modules. Per  https://www.drupal.org/about/licensing#project-licensing, the full license text can be found at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.

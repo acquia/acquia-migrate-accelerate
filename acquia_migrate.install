@@ -1,0 +1,144 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Acquia Migrate module.
+ */
+
+use Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface;
+use Drupal\Core\Config\Config;
+
+/**
+ * Implements hook_install().
+ */
+function acquia_migrate_install() {
+  $config = \Drupal::service('config.factory')->getEditable('system.site');
+  assert($config instanceof Config);
+  $config->set('page.front', '/upgrade/get-started');
+  $config->save();
+  $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
+  $role->grantPermission('view the administration theme');
+  $role->trustData()->save();
+
+  // @see \Drupal\acquia_migrate\Theme\ThemeNegotiator
+  \Drupal::service('theme_installer')->install(['claro']);
+
+  // Also set Claro as the default admin theme.
+  \Drupal::configFactory()->getEditable('system.theme')
+    ->set('admin', 'claro')
+    ->save();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function acquia_migrate_schema() {
+  $schema['acquia_migrate_migration_flags'] = [
+    'description' => 'Stores the "completed" and "skipped" flags for migrations.',
+    'fields' => [
+      'migration_id' => [
+        'type' => 'varchar_ascii',
+        'length' => 192,
+        'not null' => TRUE,
+        'description' => 'A migration ID, see MigrationRepository.',
+      ],
+      'preselection' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+      ],
+      'completed' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'tiny',
+      ],
+      'skipped' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'tiny',
+      ],
+      'last_import_timestamp' => [
+        'type' => 'int',
+        'description' => 'Last import start date + time.',
+      ],
+      'last_import_duration' => [
+        'type' => 'int',
+        'description' => 'Last import duration (if finished).',
+      ],
+    ],
+    'indexes' => [],
+    'primary key' => ['migration_id'],
+  ];
+
+  $schema[RollbackableInterface::ROLLBACK_DATA_TABLE] = [
+    'description' => 'Stores the previous config values for migration rollback',
+    'fields' => [
+      RollbackableInterface::ROLLBACK_MIGRATION_PLUGIN_ID_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 192,
+        'not null' => TRUE,
+        'description' => 'The ID of the migration plugin',
+      ],
+      RollbackableInterface::ROLLBACK_CONFIG_ID_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'The ID of the configuration',
+      ],
+      RollbackableInterface::ROLLBACK_CONFIG_LANGCODE_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The language code for this data item.',
+      ],
+      RollbackableInterface::ROLLBACK_DISPLAY_FIELD_NAME_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The name of the field',
+      ],
+      RollbackableInterface::ROLLBACK_DATA_COL => [
+        'type' => 'blob',
+        'size' => 'big',
+        'description' => 'The previous state of the changed configuration values',
+      ],
+    ],
+    'indexes' => [],
+    'primary key' => [
+      RollbackableInterface::ROLLBACK_MIGRATION_PLUGIN_ID_COL,
+      RollbackableInterface::ROLLBACK_CONFIG_ID_COL,
+      RollbackableInterface::ROLLBACK_CONFIG_LANGCODE_COL,
+      RollbackableInterface::ROLLBACK_DISPLAY_FIELD_NAME_COL,
+    ],
+  ];
+
+  $schema[RollbackableInterface::ROLLBACK_STATE_TABLE] = [
+    'description' => 'Stores those configuration IDs that where created by a rollbackable migration',
+    'fields' => [
+      RollbackableInterface::ROLLBACK_CONFIG_ID_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 192,
+        'not null' => TRUE,
+        'description' => 'The ID of the configuration',
+      ],
+      RollbackableInterface::ROLLBACK_CONFIG_LANGCODE_COL => [
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The language code of the configuration',
+      ],
+    ],
+    'indexes' => [],
+    'primary key' => [
+      RollbackableInterface::ROLLBACK_CONFIG_ID_COL,
+      RollbackableInterface::ROLLBACK_CONFIG_LANGCODE_COL,
+    ],
+  ];
+
+  return $schema;
+}

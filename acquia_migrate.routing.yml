@@ -1,0 +1,242 @@
+# API routes.
+acquia_migrate.api.module.info:
+  path: &module_info_api_source /upgrade/api/module-info
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:moduleInformation
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migrations.get:
+  path: &migrations_api_source /upgrade/api/migrations
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationsCollection
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migrations.bulk_update:
+  path: *migrations_api_source
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:bulkUpdateMigrations
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migration.get:
+  path: &migrations_api_individual /upgrade/api/migrations/{migration}
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationGet
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+acquia_migrate.api.migration.patch:
+  path: *migrations_api_individual
+  methods: ['PATCH']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationPatch
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+acquia_migrate.api.migration.import.initial:
+  path: /upgrade/api/migration/import/initial
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationImportInitial
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migration.import:
+  path: /upgrade/api/migration/import
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationStart
+    migration_action: 'import'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migration.rollback:
+  path: /upgrade/api/migration/rollback
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationStart
+    migration_action: 'rollback'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migration.rollback_import:
+  path: /upgrade/api/migration/rollback-and-import
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationStart
+    migration_action: 'rollback-and-import'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.migration.preview:
+  path: /upgrade/api/migrations/{migration}/preview
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationRowPreview
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+acquia_migrate.api.migration.mapping:
+  path: &mapping_api /upgrade/api/migrations/{migration}/mapping
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationMappingGet
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+acquia_migrate.api.migration.mapping.patch:
+  path: *mapping_api
+  methods: ['PATCH']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationMappingPatch
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+acquia_migrate.api.migration.mapping.drop_source_field:
+  path: /upgrade/api/migrations/{migration}/mapping/override/drop_source_field/{destination_field_name}
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationMappingDropSourceField
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+      destination_field_name: '[\w_]+'
+acquia_migrate.api.migration.mapping.revert_field_overrides:
+  path: /upgrade/api/migrations/{migration}/mapping/revert/{destination_field_name}
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationMappingRevertOverrides
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+    parameters:
+      migration:
+        type: 'migration'
+      destination_field_name: '[\w_]+'
+acquia_migrate.api.migration.process:
+  path: /upgrade/api/migration/process/{process_id}
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationProcess
+  requirements:
+    _permission: 'administer migrations'
+    process_id: '\d+'
+  options:
+    no_cache: 'TRUE'
+acquia_migrate.api.messages.get:
+  path: &messages_api_source /upgrade/api/messages
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:messagesCollection
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
+
+# UI routes.
+acquia_migrate.get_started:
+  path: /upgrade/get-started
+  defaults:
+    _controller: Drupal\acquia_migrate\Controller\GetStarted:build
+  requirements:
+    # Any user should be able to see the getting started page.
+    _access: 'TRUE'
+  options:
+    no_cache: 'TRUE'
+    _admin_route: 'TRUE'
+acquia_migrate.migrations.dashboard:
+  path: &migrations_ui_basepath /upgrade/migrations
+  defaults:
+    _decoupled_page_main: acquia_migrate/dashboard
+    _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
+    _decoupled_page_data:
+      source: *migrations_api_source
+      basepath: *migrations_ui_basepath
+    _title: 'Migrations Dashboard'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    _decoupled_page_paths:
+      page: /upgrade/migrations/{page}
+      migration_detail: /upgrade/migrations/migration/{migration}
+      migration_detail_tab: /upgrade/migrations/migration/{migration}/{tab}
+    _admin_route: TRUE
+acquia_migrate.migrations.messages:
+  path: &migrations_ui_messages_basepath /upgrade/messages
+  defaults:
+    _decoupled_page_main: acquia_migrate/messages
+    _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
+    _decoupled_page_data:
+      source: *messages_api_source
+      basepath: *migrations_ui_messages_basepath
+      basepath-dashboard: *migrations_ui_basepath
+    _title: 'Migrations Messages'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    _admin_route: TRUE
+acquia_migrate.migrations.preselect:
+  path: &migrations_ui_preselect_basepath /upgrade/preselect
+  defaults:
+    _decoupled_page_main: acquia_migrate/preselect
+    _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
+    _decoupled_page_data:
+      source: *migrations_api_source
+      basepath: *migrations_ui_preselect_basepath
+    _title: 'Import data from source'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    _admin_route: TRUE
+acquia_migrate.migrations.module.info:
+  path: &migrations_ui_module_info_basepath /upgrade/modules
+  defaults:
+    _decoupled_page_main: acquia_migrate/modules
+    _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
+    _decoupled_page_data:
+      source: *module_info_api_source
+      basepath: *migrations_ui_module_info_basepath
+      basepath-dashboard: *migrations_ui_basepath
+    _title: 'Modules'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    _admin_route: TRUE

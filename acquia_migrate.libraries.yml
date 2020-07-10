@@ -1,0 +1,46 @@
+toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/acquia_migrate.icons.css: {}
+
+styles:
+  version: VERSION
+  css:
+    component:
+      ui/dist/main.css: {}
+
+common:
+  version: VERSION
+  js:
+    ui/dist/common.bundle.js: { minified: true }
+  dependencies:
+    - acquia_migrate/styles
+
+dashboard:
+  version: VERSION
+  js:
+    ui/dist/dashboard.js: { minified: true }
+  dependencies:
+    - acquia_migrate/common
+
+messages:
+  version: VERSION
+  js:
+    ui/dist/messages.js: { minified: true }
+  dependencies:
+    - acquia_migrate/common
+
+preselect:
+  version: VERSION
+  js:
+    ui/dist/preselect.js: { minified: true }
+  dependencies:
+    - acquia_migrate/common
+
+modules:
+  version: VERSION
+  js:
+    ui/dist/modules.js: { minified: true }
+  dependencies:
+    - acquia_migrate/common

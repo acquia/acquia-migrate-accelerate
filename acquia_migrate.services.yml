@@ -1,0 +1,160 @@
+parameters:
+  acquia_migrate.tracking_api_key: ''
+
+services:
+  # Controllers.
+  controller.acquia_migrate.http_api:
+    class: Drupal\acquia_migrate\Controller\HttpApi
+    arguments:
+      - '@acquia_migrate.migration_repository'
+      - '@acquia_migrate.batch_manager'
+      - '@database'
+      - '@acquia_migrate.previewer'
+      - '@acquia_migrate.mapping_viewer'
+      - '@acquia_migrate.mapping_manipulator'
+      - '@acquia_migrate.message_analyzer'
+      - '@config.factory'
+      - '@state'
+
+  # Migration action supporting services: preview, mapping viewer, mapping manipulator.
+  acquia_migrate.previewer:
+    class: Drupal\acquia_migrate\MigrationPreviewer
+    arguments:
+      - '@entity_type.manager'
+      - '@renderer'
+      - '@http_kernel'
+      - '@event_dispatcher'
+  acquia_migrate.mapping_viewer:
+    class: Drupal\acquia_migrate\MigrationMappingViewer
+    arguments:
+      - '@entity_type.manager'
+      - '@entity_field.manager'
+      - '@acquia_migrate.mapping_manipulator'
+  acquia_migrate.mapping_manipulator:
+    class: Drupal\acquia_migrate\MigrationMappingManipulator
+    arguments:
+      - '@entity_type.manager'
+      - '@logger.channel.acquia_migrate'
+      - '@plugin.manager.migration'
+
+  # Manages migration batch processes.
+  acquia_migrate.batch_manager:
+    class: \Drupal\acquia_migrate\Batch\MigrationBatchManager
+    arguments:
+      - '@http_kernel'
+      - '@batch.storage'
+      - '@app.root'
+      - '@acquia_migrate.migration_repository'
+      - '@plugin.manager.migration'
+
+  # Migration message supporting services: analysis, more things later.
+  acquia_migrate.message_analyzer:
+    class: Drupal\acquia_migrate\MessageAnalyzer
+
+  # We decorate the plugin.manager.migration service because it's impossible to decorate through a ServiceProvider.
+  # (ServiceProviders are invoked in alphabetical order by ModifyServiceDefinitionsPass, not by priority. Which means
+  # acquia_migrate's service provider is invoked *before* migrate_drupal's, and there's no way for us to fix that!)
+  # Somehow, using Symfony's decoration infrastructure allows us to work around this <shrug>
+  plugin.manager.migration.acquia_migrate:
+    public: false
+    class: Drupal\acquia_migrate\Plugin\MigrationPluginManager
+    decorates: plugin.manager.migration
+    arguments:
+      - '@plugin.manager.migration.acquia_migrate.inner'
+      - '@module_handler'
+      - '@cache.discovery_migration'
+      - '@language_manager'
+      - '@plugin.manager.migrate.source'
+      - '@config.factory'
+
+  acquia_migrate.clusterer:
+    public: false
+    class: Drupal\acquia_migrate\MigrationClusterer
+    arguments:
+      - '@plugin.manager.migration'
+      - '@entity_type.manager'
+      - '@module_handler'
+
+  acquia_migrate.migration_repository:
+    class: Drupal\acquia_migrate\MigrationRepository
+    arguments:
+      - '@acquia_migrate.clusterer'
+      - '@database'
+      - '@cache.migrate'
+
+  paramconverter.acquia_migrate.migration:
+    class: Drupal\acquia_migrate\ParamConverter\MigrationConverter
+    arguments: ['@acquia_migrate.migration_repository']
+    tags:
+      - { name: paramconverter }
+
+  logger.channel.acquia_migrate:
+    parent: logger.channel_base
+    arguments: ['acquia_migrate']
+  logger.channel.acquia_migrate_message:
+    parent: logger.channel_base
+    arguments: ['acquia_migrate_message']
+  logger.channel.acquia_migrate_statistics:
+    parent: logger.channel_base
+    arguments: ['acquia_migrate_statistics']
+
+  # Event subscribers.
+  controller.acquia_migrate.http_api.response_validator:
+    class: \Drupal\acquia_migrate\EventSubscriber\HttpApiResponseValidator
+    arguments:
+      - '@logger.channel.acquia_migrate'
+      - '@app.root'
+    calls:
+      - [setValidator, []]
+    tags:
+      - { name: event_subscriber, priority: 1000 }
+  acquia_migrate.post_entity_save_validator:
+    class: Drupal\acquia_migrate\EventSubscriber\PostEntitySaveValidator
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+  acquia_migrate.cacheable_response_subscriber:
+    class: Drupal\acquia_migrate\EventSubscriber\CacheableAcquiaMigrateResponseSubscriber
+    arguments:
+      - '@current_route_match'
+      - '@cache_tags.invalidator'
+    tags:
+      - { name: event_subscriber }
+  acquia_migrate.api_exception_subscriber:
+    class: Drupal\acquia_migrate\Exception\AcquiaMigrateApiExceptionSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  # Migration Alterer
+  acquia_migrate.migration_alterer:
+    class: Drupal\acquia_migrate\MigrationAlterer
+    arguments:
+      - '@entity_type.manager'
+
+  # Service decorator
+  acquia_migrate.cache_tags.invalidator:
+    decorates: cache_tags.invalidator
+    parent: cache_tags.invalidator
+    class: Drupal\acquia_migrate\Cache\AcquiaMigrateCacheTagsInvalidator
+  acquia_migrate.logger.localhost_to_acquia_sumologic:
+    public: false
+    class: Drupal\acquia_migrate\Logger\LocalhostToAcquiaSumologic
+    decorates: logger.syslog
+    arguments:
+      - '@config.factory'
+      - '@logger.log_message_parser'
+      - '@http_client'
+
+  acquia_migrate.decoupled_pages_data_provider:
+    class: Drupal\acquia_migrate\DecoupledPages\DataProvider
+    arguments:
+      - '%acquia_migrate.tracking_api_key%'
+      - '@module_handler'
+      - '@config.factory'
+    tags:
+      - { name: decoupled_pages_data_provider }
+
+  theme.negotiator.acquia_migrate:
+    class: Drupal\acquia_migrate\Theme\ThemeNegotiator
+    tags:
+      - { name: theme_negotiator, priority: 1000 }

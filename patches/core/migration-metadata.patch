@@ -1,0 +1,42 @@
+ core/modules/migrate/src/Plugin/Migration.php          | 16 ++++++++++++++++
+ core/modules/migrate/src/Plugin/MigrationInterface.php |  4 ++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/core/modules/migrate/src/Plugin/Migration.php b/core/modules/migrate/src/Plugin/Migration.php
+index 607ef5eaa8..c39a8918d1 100644
+--- a/core/modules/migrate/src/Plugin/Migration.php
++++ b/core/modules/migrate/src/Plugin/Migration.php
+@@ -705,4 +705,20 @@ public function isAuditable() {
+     return (bool) $this->audit;
+   }
+
++  protected $metadata = [];
++
++  public function getMetadata($key = NULL) {
++    if ($key) {
++      return isset($this->metadata[$key]) ? $this->metadata[$key] : NULL;
++    }
++    else {
++      return $this->metadata;
++    }
++  }
++
++  public function setMetadata($key, $value) {
++    $this->metadata[$key] = $value;
++    return $this;
++  }
++
+ }
+diff --git a/core/modules/migrate/src/Plugin/MigrationInterface.php b/core/modules/migrate/src/Plugin/MigrationInterface.php
+index 0ac9e335d3..7c9aa91ce2 100644
+--- a/core/modules/migrate/src/Plugin/MigrationInterface.php
++++ b/core/modules/migrate/src/Plugin/MigrationInterface.php
+@@ -329,4 +329,8 @@ public function getMigrationTags();
+    */
+   public function isAuditable();
+
++  public function getMetadata($key = NULL);
++
++  public function setMetadata($key, $value);
++
+ }

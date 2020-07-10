@@ -1,0 +1,35 @@
+{
+    "name": "acquia/acquia-migrate-accelerate",
+    "type": "drupal-module",
+    "description": "An enhanced UI and assistant for Drupal migrations. See https://www.acquia.com/drupal9/accelerate-your-migration.",
+    "homepage": "https://www.acquia.com/drupal9/accelerate-your-migration",
+    "require": {
+        "php": "^7.3",
+        "acquia/drupal-environment-detector": "^1.1.0",
+        "drupal/decoupled_pages": "^1.0-beta0",
+        "drupal/migrate_plus": "^5",
+        "league/uri": "^6.2.1",
+        "league/uri-components": "^2.2.1"
+    },
+    "require-dev": {
+        "acquia/coding-standards": "dev-master",
+        "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
+        "ergebnis/composer-normalize": "^2.0.0",
+        "squizlabs/php_codesniffer": "^3.0@dev"
+    },
+    "extra": {
+        "patches": {
+            "drupal/core": {
+                "Avoid https://www.drupal.org/project/drupal/issues/2796755 breaking this module": "https://gist.githubusercontent.com/wimleers/4c8742d5efb74ea5dad1475b4478bd40/raw/99e35617a292b730fdbb36be4f3ce48d5c9863a1/migration-metadata.patch"
+            }
+        },
+        "phpcodesniffer-search-depth": 4
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "composer-normalize": "composer normalize '--indent-size=4' '--indent-style=space' --ansi",
+        "composer-normalize-check": "composer normalize '--indent-size=4' '--indent-style=space' '--dry-run' --ansi",
+        "sniffs": "./vendor/bin/phpcs --standard=./phpcs.xml -p --cache=./.phpcs-cache"
+    }
+}

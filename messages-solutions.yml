@@ -1,0 +1,232 @@
+# ARCHITECTURE
+# - Top-level keys are migration base plugin IDs. This improves both maintainability and performance.
+# - For each migration base plugin ID, an array of possible message matches can be specified. Each is evaluated in order
+#   and as soon as a match is found, the subsequent ones are not evaluated.
+# - For each possible message match, at minimum a `regexp` and a `generic_solution` must be specified.
+# - Optional: more granular suggestions are possible by specifying a "named capture group"
+#   (syntax: `(?<name>EXPRESSION)`) and specifying that named group in the `specific_solution_per` key. This enables
+#   `specific_solution`. If a `generic_solution` is specified, this is considered the fallback.
+# - Optional: even more granular solutions are possible by also specifying the `computed_specific_solution` key and
+#   setting the `callback` and `args` subkeys. This allows one to compute a solution per `specific_solution_per` value.
+#   Currently, the following callbacks are supported:
+#   1. `source_db_table_row_has_empty_column`, possible outcomes: `is_empty`, `is_not_empty`
+#   2. `source_db_table_row_has_null_column`, possible outcomes: `is_null`, `is_not_null`
+#   3. `source_db_table_row_exists`, possible outcomes: `exists`, `does_not_exist`
+#
+# There is no validation yet. There is no UI for this yet. This is designed to require as little custom code as
+# possible and to maximally reuse existing concepts.
+#
+# Plenty of examples to be found below!
+migration_plugin_id:
+  -
+    message:
+      regexp: >-
+        This is a regular expression that the message must match. The opening and closing delimiters are slashes. Apply
+        the corresponding necessary escaping for the regular expression. If there are identifiers that determine the
+        appropriate solution, capture them using `(<some_identifier>EXPRESSION)`.
+      specific_solution_per: "~ (YAML's null) or a named group — in this example: `some_identifier`."
+      computed_specific_solution: ~
+    generic_solution: "~ (YAML's null) or a string."
+    specific_solution:
+      match_a: "The solution string when 'specific_solution_per_'s value is 'match_a'."
+      match_b: 'In YAML, single-quoted strings DO NOT need backslashes escaped. This will show a backslash: /.'
+      match_c: "In YAML, double-quoted strings DO need backslashes escaped. This will show a backslash: //."
+      match_d: >-
+        In YAML, multi-line strings are supported as well. Any newlines are converted to spaces automatically, so this
+        text will not trigger a newline. And here again backslashes do NOT need to be escaped.
+      match_z: "The solution string when 'specific_solution_per_'s value is 'match_z'."
+    computed_specific_solution: ~
+
+d7_comment:
+  -
+    message:
+      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: name=You have to specify a valid author."
+      specific_solution_per: src_comment_id
+      computed_specific_solution:
+        callback: 'source_db_table_row_has_empty_column'
+        args:
+          - 'comment'
+          - 'name'
+          - '@src_comment_id'
+    generic_solution: ~
+    specific_solution: ~
+    computed_specific_solution:
+      is_empty: >-
+        This comment (@src_comment_id) is missing a value for the 'name' column. This is wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.
+      is_not_empty: >-
+        This comment (@src_comment_id) is pointing to a user that no longer exists. This is wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.
+  -
+    message:
+      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: comment_body=This value should not be null."
+      specific_solution_per: src_comment_id
+      computed_specific_solution:
+        callback: 'source_db_table_row_exists'
+        args:
+          - 'field_data_comment_body'
+          - 'entity_id'
+          - '@src_comment_id'
+    generic_solution: "This comment (@src_comment_id) is corrupted."
+    specific_solution: ~
+    computed_specific_solution:
+      does_not_exist: >-
+        This comment (@src_comment_id) has a row in the 'comment' table but no corresponding row in the
+        'field_data_comment_body' table. This is wrong in the Drupal 7 source database too, please fix it there, refresh
+        the source database and rollback & import this migration. Fix it either by deleting the 'comment' table row with
+        cid=@src_comment_id or by creating a 'field_data_comment_body' table row with entity_id=@src_comment_id.
+
+d7_field:
+  -
+    message:
+      regexp: >-
+        Can't migrate the '(?<src_field_name>\w+)' field storage for '(?<src_entity_type_id>\w+)' entities\, because the
+        field's type '(?<src_field_type>\w+)' is not available on the destination site.
+      specific_solution_per: src_field_type
+    generic_solution: ~
+    specific_solution:
+      location: >-
+        The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
+        can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+
+d7_field_instance:
+  -
+    message:
+      regexp: >-
+        Can't migrate the '(?<field_label>\w+)' \((?<src_field_name>\w+)\) field instance for
+        '(?<src_entity_type_id>\w+)' entities of type '(?<src_entity_bundle>\w+)', because the field's type
+        '(?<src_field_type>\w+)' is not available on the destination site.
+      specific_solution_per: src_field_type
+    generic_solution: ~
+    specific_solution:
+      location: >-
+        The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
+        can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+
+d7_field_formatter_settings:
+  -
+    message:
+      regexp: >-
+        The field formatter plugin ID (?<src_field_formatter_plugin_id>\w+) \(used on field type
+        (?<src_field_type>\w+)\) could not be mapped to an existing formatter plugin; defaulting to
+        (?<dst_field_formatter_plugin_id>\\w+) and dropping all formatter settings. Either redo the migration with the
+        module installed that provides an equivalent formatter plugin, or modify the entity view display after the
+        migration and manually choose the right field formatter.
+      specific_solution_per: src_field_formatter_plugin_id
+    generic_solution: ~
+    specific_solution:
+      hs_taxonomy_term_reference_hierarchical_text: >-
+        Hierarchical Select never got a stable Drupal 7 or 8 release. No equivalent formatter exists in Drupal 7 or 8.
+        The default formatter should suffice. Otherwise, install the https://www.drupal.org/project/shs module and use
+        its entity_reference_shs field formatter."
+
+d7_file:
+  - message:
+      regexp: 'File ''.*(?<hardcoded_and_double_slash>sites\/[\w\._-]+\/\/).*'' does not exist'
+    generic_solution: >-
+      There is a hardcoded files directory in the file path followed by a double slash. This is wrong in the Drupal 7
+      source database too, please fix it there, refresh the source database and rollback & import this migration.
+  - message:
+      regexp: 'File ''.*(?<hardcoded_files_directory>sites\/[\w\._-]+\/).*'' does not exist'
+    generic_solution: >-
+      There is a hardcoded files directory in the file path. This is wrong in the Drupal 7 source database too, please
+      fix it there, refresh the source database and rollback & import this migration.
+  - message:
+      regexp: 'File ''.*(?<double_slash>\/\/).*'' does not exist'
+    generic_solution: >-
+      There is a double slash in the file path. This is wrong in the Drupal 7 source database too, please fix it there,
+      refresh the source database and rollback & import this migration.
+  -
+    message:
+      regexp: >-
+        \[file: (?<src_file_id>\d+)\]: uid\.0\.target_id=The referenced entity \(user: (?<src_user_id>\d+)\) does not
+        exist.
+      specific_solution_per: src_file_id
+      computed_specific_solution:
+        callback: 'source_db_table_row_exists'
+        args:
+          - 'users'
+          - 'uid'
+          - '@src_user_id'
+    generic_solution: ~
+    specific_solution: ~
+    computed_specific_solution:
+      does_not_exist: >-
+        This file (@src_file_id) is owned by a user that no longer exists. This is wrong in the Drupal 7 source database
+        too, please fix it there, refresh the source database and rollback & import this migration.
+
+d7_filter_format:
+  -
+    message:
+      regexp: >-
+        Filter (?<source_filter_plugin_id>\w+) could not be mapped to an existing filter plugin; defaulting to
+        filter_null and dropping all settings. Either redo the migration with the module installed that provides an
+        equivalent filter, or modify the text format after the migration to remove this filter if it is no longer
+        necessary.
+      specific_solution_per: source_filter_plugin_id
+    generic_solution: ~
+    specific_solution:
+      php_code: >-
+        Stop using the php_code filter! It was a bad practice in Drupal 7 too. Either modify your Drupal 7 site to stop
+        using it, otherwise it's recommended to not migrate any content that is actively using this filter."
+  -
+    message:
+      regexp: >-
+        Filter (?<source_filter_plugin_id>\w+) could not be mapped to an existing filter plugin; omitted since it is a
+        transformation-only filter. Install and configure a successor after the migration.
+      specific_solution_per: source_filter_plugin_id
+    generic_solution: ~
+    specific_solution:
+      image_resize_filter: >-
+        Use Drupal 9 core's media_embed filter and configure a view mode corresponding to the various typical image
+        dimensions that were used on the Drupal 7 site.
+      # Drupal 7's token_filter module's filter ID is `filter_tokens`
+      filter_tokens: >-
+        Install the Drupal 9 port of the token_filter module. Preferably, reassess whether it still makes sense to use:
+        if it's used to embed media, you should instead use Drupal 9 core's media_embed filter.
+      typogrify: "Install the typogrify module. It has a Drupal 9-compatible release. Then re-run this migration."
+
+d7_menu_links:
+  - message:
+      regexp: >-
+        The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
+    generic_solution: This menu link points to a path that no longer exists or possibly never existed. Perhaps it
+      points to a View that hasn't been manually recreated?
+
+d7_url_alias:
+  -
+    message:
+      regexp: >-
+        \[path_alias: (?<src_path_alias_id>\d+), revision: (?<src_path_alias_revision_id>\d+)\]: path.0.value=Either the
+        path '\/user\/(?<src_user_id>\d+)' is invalid or you do not have access to it.
+      specific_solution_per: src_path_alias_id
+      computed_specific_solution:
+        callback: 'source_db_table_row_exists'
+        args:
+          - 'users'
+          - 'uid'
+          - '@src_user_id'
+    generic_solution: ~
+    specific_solution: ~
+    computed_specific_solution:
+      does_not_exist: >-
+        This path alias (@src_path_alias_id) points to a user that no longer exists. This is wrong in the Drupal 7
+        source database too, please fix it there (potentially be deleting this path alias), refresh the source database
+        and rollback & import this migration.
+  -
+    message:
+      regexp: >-
+        \[path_alias: (?<src_path_alias_id>\d+), revision: (?<src_path_alias_revision_id>\d+)\]: path.0.value=Either the
+        path '(?<src_invalid_path_source>.+)' is invalid or you do not have access to it.
+    generic_solution: This path alias points to a path that no longer exists or possibly never existed. Perhaps it
+      points to a View that hasn't been manually recreated?
+
+FALLBACK:
+  - message:
+      regexp: >-
+        This value should not be null.
+    generic_solution: >-
+      A new field was added to this entity type after entities had already been created. This new field was marked as
+      required, but the entities that already existed were not updated with values for this new required field. This is
+      wrong in the Drupal 7 source database too, please fix it there, refresh the source database and rollback & import
+      this migration!

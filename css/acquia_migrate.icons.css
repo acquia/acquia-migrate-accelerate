@@ -1,0 +1,27 @@
+.toolbar-bar .toolbar-icon-acquia-migrate:before {
+  background-image: url("../icons/bebebe/double-chevron-up.svg");
+}
+.toolbar-bar .toolbar-icon-acquia-migrate:active:before {
+  background-image: url("../icons/ffffff/double-chevron-up.svg");
+}
+.toolbar-icon-acquia-migrate-dashboard:before {
+  background-image: url("../icons/787878/four-square.svg");
+}
+.toolbar-icon-acquia-migrate-dashboard:active:before,
+.toolbar-icon-acquia-migrate-dashboard.is-active:before {
+  background-image: url("../icons/000000/four-square.svg");
+}
+.toolbar-icon-acquia-migrate-messages:before {
+  background-image: url("../icons/787878/mail.svg");
+}
+.toolbar-icon-acquia-migrate-messages:active:before,
+.toolbar-icon-acquia-migrate-messages.is-active:before {
+  background-image: url("../icons/000000/mail.svg");
+}
+.toolbar-icon-acquia-migrate-modules:before {
+  background-image: url("../icons/787878/qbert.svg");
+}
+.toolbar-icon-acquia-migrate-modules:active:before,
+.toolbar-icon-acquia-migrate-modules.is-active:before {
+  background-image: url("../icons/000000/qbert.svg");
+}

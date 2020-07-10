@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * I wish we did not need this file 🙈.
+ */
+
+use Drupal\acquia_migrate\MigrationAlterer;
+use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_toolbar().
+ */
+function acquia_migrate_toolbar() {
+  $items['acquia_migrate'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => t('Acquia Migrate'),
+      '#url' => Url::fromRoute('acquia_migrate.migrations.dashboard'),
+      '#attributes' => [
+        'title' => t('Acquia Migrate'),
+        'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate'],
+      ],
+    ],
+    'tray' => [
+      '#heading' => t('Acquia Migrate actions'),
+      'links' => [
+        '#theme' => 'links__toolbar_acquia_migrate',
+        '#links' => [
+          'migrations-dashboard' => [
+            'type' => 'link',
+            'title' => t('Migrations'),
+            'url' => Url::fromRoute('acquia_migrate.migrations.dashboard'),
+            'attributes' => [
+              'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-dashboard'],
+            ],
+          ],
+          'migration-messages' => [
+            'type' => 'link',
+            'title' => t('Messages'),
+            'url' => Url::fromRoute('acquia_migrate.migrations.messages'),
+            'attributes' => [
+              'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-messages'],
+            ],
+          ],
+          'migration-module-info' => [
+            'type' => 'link',
+            'title' => t('Modules'),
+            'url' => Url::fromRoute('acquia_migrate.migrations.module.info'),
+            'attributes' => [
+              'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-modules'],
+            ],
+          ],
+        ],
+        '#attributes' => [
+          'class' => ['toolbar-menu'],
+        ],
+      ],
+    ],
+    '#attached' => [
+      'library' => [
+        'acquia_migrate/toolbar'
+      ]
+    ]
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_migrate_id_map_info_alter().
+ */
+function acquia_migrate_migrate_id_map_info_alter(array &$definitions) {
+  $definitions['sql']['class'] = SqlWithCentralizedMessageStorage::class;
+}
+
+/**
+ * Implements hook_migration_plugins_alter().
+ */
+function acquia_migrate_migration_plugins_alter(array &$migrations) {
+  $migration_alterer = \Drupal::service('acquia_migrate.migration_alterer');
+  // @codingStandardsIgnoreStart
+  // Coding standards can be re-enabled for this next line once
+  // https://github.com/acquia/coding-standards-php/pull/8 is merged.
+  assert($migration_alterer instanceof MigrationAlterer);
+  // @codingStandardsIgnoreEnd
+  $migration_alterer->refineMigrationsLabels($migrations);
+  $migration_alterer->convertToRollbackableConfig($migrations);
+  $migration_alterer->convertToRollbackableEntityDisplay($migrations);
+  $migration_alterer->refineMediaEntityMigrations($migrations);
+  $migration_alterer->addDiscoveredTaxonomyDependencies($migrations);
+  $migration_alterer->addFieldTypePluginChecker($migrations);
+}
