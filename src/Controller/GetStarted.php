@@ -5,6 +5,7 @@ namespace Drupal\acquia_migrate\Controller;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\SourceDatabase;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -76,7 +77,7 @@ final class GetStarted extends ControllerBase {
         'label' => [
           '#type' => 'link',
           '#title' => $this->t('Configure your source database.'),
-          '#url' => Url::fromUri('https://github.com/acquia/acquia_migrate#specifying-source-database-and-files'),
+          '#url' => Url::fromUri('https://packagist.org/packages/acquia/acquia-migrate-accelerate#user-content-specifying-source-database-and-files'),
           '#attributes' => [
             'class' => 'text-primary',
             'target' => '_blank',
@@ -84,6 +85,27 @@ final class GetStarted extends ControllerBase {
         ],
         'description' => [
           '#markup' => $this->t("Follow the link above for instructions on how to configure your source site's database in this site's <code>settings.php</code> file."),
+        ],
+      ],
+    ];
+    $source_public_files_path = Settings::get('migrate_source_base_path');
+    $source_private_files_path = Settings::get('migrate_source_private_file_path');
+    $files_configured = !is_null($source_public_files_path) && file_exists($source_public_files_path) && (is_null($source_private_files_path) || file_exists($source_private_files_path));
+    $steps['configure-files'] = [
+      'completed' => $files_configured,
+      'active' => !$files_configured,
+      'content' => [
+        'label' => [
+          '#type' => 'link',
+          '#title' => $this->t('Configure your files directory.'),
+          '#url' => Url::fromUri('https://packagist.org/packages/acquia/acquia-migrate-accelerate#user-content-specifying-source-database-and-files'),
+          '#attributes' => [
+            'class' => 'text-primary',
+            'target' => '_blank',
+          ],
+        ],
+        'description' => [
+          '#markup' => $this->t("Follow the link above for instructions on how to configure your source site's public files directory in this site's <code>settings.php</code> file. (And optionally the private files directory.)"),
         ],
       ],
     ];
@@ -137,12 +159,12 @@ final class GetStarted extends ControllerBase {
       ],
     ];
     $build = [
-      '#type' => 'page',
+      '#template' => 'page',
+      '#title' => $this->t('Welcome to <em>Acquia Migrate: Accelerate</em>'),
       'content' => [
         '#type' => 'inline_template',
-        '#template' => '<div class="d-flex line-items-center justify-content-center"><div class="card my-4"><div class="card-header"><h1 class="card-header-title">{{title}}</h1></div><div class="card-body">{{checklist}}</div></div>',
+        '#template' => '{{checklist}}',
         '#context' => [
-          'title' => $this->t('Welcome to <em>Acquia Migrate: Accelerate</em>'),
           'checklist' => $checklist,
         ],
       ],

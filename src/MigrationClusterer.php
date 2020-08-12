@@ -58,8 +58,6 @@ class MigrationClusterer {
    * @var array
    */
   const MEDIA_MIGRATION_SPECIAL_SHARED_SRC_PLUGIN_IDS = [
-    // @see \Drupal\media_migration\Plugin\migrate\source\d7\MediaSourceFieldInstance
-    'd7_media_source_field_instance',
     // @see \Drupal\media_migration\Plugin\migrate\source\d7\MediaViewMode
     'd7_media_view_mode',
   ];
@@ -802,6 +800,14 @@ class MigrationClusterer {
     if ($destination_plugin_id === 'entity:menu_link_content' && array_key_exists('entity_type_id', $migration->getSourceConfiguration())) {
       return FALSE;
     }
+
+    // Exclude redirect content entities as well, except for the derivative
+    // that contains the 'every other' redirects.
+    // @see https://www.drupal.org/project/redirect/issues/3082364
+    if ($destination_plugin_id === 'entity:redirect' && array_key_exists('entity_type_id', $migration->getSourceConfiguration())) {
+      return FALSE;
+    }
+
     return in_array('Content', $migration->getMigrationTags(), TRUE) && (strpos($destination_plugin_id, 'entity_complete:') === 0 || strpos($destination_plugin_id, 'entity:') === 0 || strpos($destination_plugin_id, 'entity_revision:') === 0);
   }
 

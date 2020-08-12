@@ -38,6 +38,9 @@ final class SourceDatabase {
     catch (ConnectionNotDefinedException $e) {
       return FALSE;
     }
+    catch (\Exception $e) {
+      return FALSE;
+    }
     return TRUE;
   }
 

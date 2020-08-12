@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\MigrationDeriverTrait;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
@@ -237,6 +238,23 @@ final class MigrationAlterer {
           ], $new_label_options);
           break;
 
+        case 'media':
+          $source_scheme = $migration['source']['scheme'] ?? NULL;
+          $args = [
+            '@category' => $general_category,
+            '@entity-type-plural' => $entity_type->getPluralLabel(),
+          ];
+          switch ($source_scheme) {
+            case 'public':
+            case NULL:
+              $migration['label'] = $this->t('@category @entity-type-plural', $args, $new_label_options);
+              break;
+
+            default:
+              $migration['label'] = $this->t('@category @entity-type-plural (@scheme)', $args + ['@scheme' => $source_scheme], $new_label_options);
+          }
+          break;
+
         default:
           $migration['label'] = $this->t('@category @entity-type-plural', [
             '@category' => $general_category,
@@ -327,50 +345,77 @@ final class MigrationAlterer {
       }
 
       $destination = isset($migration_data['destination']['plugin']) ? $migration_data['destination']['plugin'] : NULL;
-      $source_type = isset($migration_data['source']['type']) ? $migration_data['source']['type'] : NULL;
+      $source_type = $migration_data['source']['type'] ?? $migration_data['source']['source_field_type'] ?? NULL;
+      $source_scheme = $migration_data['source']['scheme'] ?? NULL;
+      $source_plugin_is_media_source = in_array($migration_data['source']['plugin'], ['d7_file_entity_item', 'd7_file_plain'], TRUE);
 
-      if (($migration_data['id'] !== 'd7_file_entity' && $destination !== 'entity:media') || !$source_type) {
+      if (!$source_plugin_is_media_source || $destination !== 'entity:media' || !$source_type) {
         continue;
       }
 
-      $migration_data['migration_dependencies'] += [
-        'required' => [],
+      // Media entities cannot be saved without an existing owner. Although this
+      // is the fault of the source data, it might block the migration  to media
+      // entities, which would lead to data loss since the original file
+      // references cannot been transformed to media references without the
+      // corresponding media entity. So for every media entity migration we add
+      // uid "0" as default owner when the original user ID does not exist.
+      $uid_process = self::convertProcessToArrayOfProcesses($migration_data['process']['uid']);
+      $uid_process[] = [
+        'plugin' => 'entity_exists',
+        'entity_type' => 'user',
       ];
-      unset($migration_data['migration_dependencies']['optional']);
+      $uid_process[] = [
+        'plugin' => 'default_value',
+        'default_value' => 0,
+      ];
+      $migration_data['process']['uid'] = $uid_process;
 
-      // With the core patches that Acquia Migrate Assistant requires, the
-      // following migrations are derived by entity type, and some of them also
-      // by source bundle. We have to remove them and add the ID of the
-      // corresponding migration derivative instead.
-      $migration_dependencies_to_remove = [
-        'd7_file_entity_type',
-        'd7_view_modes',
-        'd7_field',
-        'd7_field_instance',
-        'd7_field_instance_widget_settings',
-        'd7_field_formatter_settings',
-      ];
-      foreach ($migration_dependencies_to_remove as $migration_dependency_to_remove) {
-        $dependency_key = array_search($migration_dependency_to_remove, $migration_data['migration_dependencies']['required']);
-        if ($dependency_key !== FALSE) {
-          unset($migration_data['migration_dependencies']['required'][$dependency_key]);
+      if ($migration_data['source']['plugin'] === 'd7_file_entity_item') {
+        $migration_data['migration_dependencies'] += [
+          'required' => [],
+        ];
+        unset($migration_data['migration_dependencies']['optional']);
+
+        // With the core patches that Acquia Migrate Assistant requires, the
+        // following migrations are derived by entity type, and some of them
+        // also by source bundle. We have to remove them and add the ID of the
+        // corresponding migration derivative instead.
+        $migration_dependencies_to_remove = [
+          'd7_file_entity_type',
+          'd7_view_modes',
+          'd7_field',
+          'd7_field_instance',
+          'd7_field_instance_widget_settings',
+          'd7_field_formatter_settings',
+          'd7_media_source_field_config',
+        ];
+        foreach ($migration_dependencies_to_remove as $migration_dependency_to_remove) {
+          $dependency_key = array_search($migration_dependency_to_remove, $migration_data['migration_dependencies']['required']);
+          if ($dependency_key !== FALSE) {
+            unset($migration_data['migration_dependencies']['required'][$dependency_key]);
+          }
         }
-      }
 
-      $migration_data['migration_dependencies']['required'] = array_unique(array_values($migration_data['migration_dependencies']['required']) + [
-        'd7_user',
-        'd7_media_view_modes',
-        'd7_view_modes:file',
-        'd7_field:file',
-        "d7_file_entity_type:$source_type",
-        "d7_field_instance_widget_settings:file:$source_type",
-        "d7_field_formatter_settings:file:$source_type",
-        "d7_field_instance:file:$source_type",
-        // Right now, Media Migration only migrates media entities whose file
-        // scheme is 'public', so we assume that these migrations depend on the
-        // 'd7_file' migration as well.
-        'd7_file',
-      ]);
+        // When a media migration migrates private files, it should depend on
+        // the private file migration.
+        $private_files_migration_id = $source_scheme === 'private' ? 'd7_file_private' : NULL;
+
+        $migration_data['migration_dependencies']['required'] = array_unique(array_values($migration_data['migration_dependencies']['required']) + array_filter([
+          'd7_user',
+          'd7_media_view_modes',
+          'd7_view_modes:file',
+          'd7_field:file',
+          "d7_media_source_field_config:$source_type:$source_scheme",
+          "d7_file_entity_type:$source_type:$source_scheme",
+          "d7_field_instance_widget_settings:file:$source_type",
+          "d7_field_formatter_settings:file:$source_type",
+          "d7_field_instance:file:$source_type",
+          // Every media migration should depend on the public files migration
+          // since the media thumbnails will be public files.
+          'd7_file',
+          $private_files_migration_id,
+        ]));
+      }
 
       $migrations[$migration_id] = $migration_data;
     }
@@ -472,6 +517,15 @@ final class MigrationAlterer {
       return [];
     }
     assert($vocabulary_source instanceof DrupalSqlBase);
+
+    try {
+      $vocabulary_source->checkRequirements();
+    }
+    catch (RequirementsException $e) {
+      // The taxonomy module can be unused on the source – we don't have to do
+      // anything.
+      return [];
+    }
 
     $vocabulary_info = [];
     foreach ($vocabulary_source as $vocabulary_row) {
@@ -600,13 +654,13 @@ final class MigrationAlterer {
   /**
    * Converts a migration process definition to an array of processes.
    *
-   * @param array $process
+   * @param array|string $process
    *   The property migration process definition from a migration.
    *
    * @return array
    *   The process definition as array of process definitions.
    */
-  protected static function convertProcessToArrayOfProcesses(array $process): array {
+  protected static function convertProcessToArrayOfProcesses($process): array {
     if (is_string($process)) {
       $process = [
         [
