@@ -7,6 +7,7 @@ use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\acquia_migrate\Exception\RowNotFoundException;
 use Drupal\acquia_migrate\Exception\RowPreviewException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityType;
@@ -131,7 +132,44 @@ final class MigrationPreviewer {
     // Process the row (to populate the row's "destination" fields) so we can
     // build a preview for it.
     $executable = new DryRunMigrateExecutable($migration_plugin);
-    $executable->processRow($preview_row);
+    try {
+      $executable->processRow($preview_row);
+    }
+    catch (\Exception $e) {
+      $raw_mapping = [];
+      $source = $preview_row->getSource();
+      foreach (array_keys($migration_plugin->getProcessPlugins()) as $destination_field_name) {
+        $source_field_name = static::getSourceFieldName($destination_field_name, $migration_plugin);
+        if (!isset($source[$source_field_name])) {
+          continue;
+        }
+        $source_value = $source[$source_field_name];
+        $raw_mapping[] = [
+          'sourceFieldName' => $source_field_name,
+          'destinationFieldName' => $destination_field_name,
+          'sourceValue' => $source_value,
+          'destinationValue' => NULL,
+          'sourceValueSimplified' => static::simplifyRawEntityFieldValue($source_value),
+          'destinationValueSimplified' => NULL,
+        ];
+      }
+      return [
+        'type' => 'migrationPreview',
+        'id' => 'ephemeral',
+        'attributes' => [
+          'raw' => $raw_mapping,
+          'html' => sprintf('<p>The preview failed due to a <code>%s</code> exception, with the following message:</p><pre><code>%s</code></pre>', get_class($e), Html::escape($e->getMessage())),
+        ],
+        'relationships' => [
+          'sourceMigration' => [
+            'data' => [
+              'type' => 'migration',
+              'id' => $migration->id(),
+            ],
+          ],
+        ],
+      ];
+    }
     $raw_mapping = [];
     $source = $preview_row->getSource();
     foreach (array_keys($migration_plugin->getProcessPlugins()) as $destination_field_name) {

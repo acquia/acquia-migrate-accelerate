@@ -190,6 +190,7 @@ acquia_migrate.migrations.dashboard:
     _decoupled_page_data:
       source: *migrations_api_source
       basepath: *migrations_ui_basepath
+      basepath-preselect: &migrations_ui_preselect_basepath /upgrade/preselect
     _title: 'Migrations Dashboard'
   requirements:
     _permission: 'administer migrations'
@@ -214,7 +215,7 @@ acquia_migrate.migrations.messages:
   options:
     _admin_route: TRUE
 acquia_migrate.migrations.preselect:
-  path: &migrations_ui_preselect_basepath /upgrade/preselect
+  path: *migrations_ui_preselect_basepath
   defaults:
     _decoupled_page_main: acquia_migrate/preselect
     _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider

@@ -5,7 +5,6 @@ namespace Drupal\acquia_migrate\Batch;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\Plugin\MigrationPluginManager;
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Site\Settings;
@@ -118,36 +117,14 @@ final class MigrationBatchManager {
    * @todo Remove or rewrite this once the "Content structure" screen is built.
    */
   public function createInitialMigrationBatch() : BatchStatus {
-    $inital_migration_plugin_ids = [];
+    $inital_migration_plugin_ids = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess();
     $config = [];
 
     $migrations = $this->repository->getMigrations();
     $all_instances = [];
     foreach ($migrations as $migration) {
-      $non_data_migration_plugin_ids = array_diff($migration->getMigrationPluginIds(), $migration->getDataMigrationPluginIds());
-
-      // Also include all dependencies of non-data migration plugins.
-      // For example, d7_field_instance:node:blog depends on d7_field:node, and
-      // that is *not* a non-data migration plugin, so without this dependency
-      // resolution, it would not be picked up.
-      $dependencies = [];
       $instances = $migration->getMigrationPluginInstances();
       $all_instances += $instances;
-      foreach ($non_data_migration_plugin_ids as $id) {
-        $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $inital_migration_plugin_ids));
-      }
-
-      // Also include all dependencies of data migration plugins if they live in
-      // a "Shared structure for <entity type>" migration that we depend upon.
-      $shared_structure_dependencies = array_filter($migration->getDependenciesWithReasons(), function ($k) {
-        return strpos($k, 'Shared structure for ') !== FALSE;
-      }, ARRAY_FILTER_USE_KEY);
-      $shared_structure_migration_plugin_ids = NestedArray::mergeDeepArray($shared_structure_dependencies);
-      foreach ($migration->getDataMigrationPluginIds() as $id) {
-        $dependencies = array_merge($dependencies, array_intersect($instances[$id]->getMigrationDependencies()['required'], $shared_structure_migration_plugin_ids));
-      }
-
-      $inital_migration_plugin_ids = array_merge($inital_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids);
     }
 
     // We cannot trust that the required migration dependencies are listed in

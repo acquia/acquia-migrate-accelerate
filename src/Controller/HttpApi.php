@@ -29,7 +29,6 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\migrate\Plugin\MigrationInterface;
 use League\Uri\Components\Query;
 use League\Uri\Contracts\QueryInterface;
 use League\Uri\Uri;
@@ -331,35 +330,20 @@ final class HttpApi {
       $total_import_count = array_reduce($resource_objects, function (int $sum, array $resource_object) : int {
         return $sum + $resource_object['attributes']['importedCount'];
       }, 0);
-      // As soon as *some* imports have occurred, we can assume that the initial
-      // migration has run. We check that heuristic first because we can
-      // calculate that very efficiently.
-      if ($total_import_count === 0) {
-        // But the real proof that the initial import ran is whether the first
-        // of the migration plugins that we are running as part of
-        // MigrationBatchManager::createInitialMigrationBatch() actually
-        // *started* to run.
-        $first_migration_plugin = NULL;
-        foreach ($migrations as $migration) {
-          $non_data_migration_plugin_ids = array_diff($migration->getMigrationPluginIds(), $migration->getDataMigrationPluginIds());
-          if (!empty($non_data_migration_plugin_ids)) {
-            $first_migration_plugin_id = reset($non_data_migration_plugin_ids);
-            $first_migration_plugin = $migration->getMigrationPluginInstances()[$first_migration_plugin_id];
-            assert($first_migration_plugin instanceof MigrationInterface);
-            break;
-          }
-        }
-        if ($first_migration_plugin->getIdMap()->importedCount() === 0) {
-          $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
-            ->setAbsolute()
-            ->toString(TRUE);
-          $cacheability->addCacheableDependency($initial_import_url);
-          $document['links']['initial-import'] = [
-            "href" => $initial_import_url->getGeneratedUrl(),
-            "title" => "Initial import",
-            "rel" => "https://github.com/acquia/acquia_migrate#link-rel-start-batch-process",
-          ];
-        }
+
+      if ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess()) {
+        $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
+          ->setAbsolute()
+          ->toString(TRUE);
+        $cacheability->addCacheableDependency($initial_import_url);
+        $title = $total_import_count === 0
+          ? "Initial import"
+          : sprintf("Re-importing supporting configuration (%d) after a rollback…", count($todo));
+        $document['links']['initial-import'] = [
+          "href" => $initial_import_url->getGeneratedUrl(),
+          "title" => $title,
+          "rel" => "https://github.com/acquia/acquia_migrate#link-rel-start-batch-process",
+        ];
       }
     }
     $total_message_count = $this->getTotalMigrationMessageCount();

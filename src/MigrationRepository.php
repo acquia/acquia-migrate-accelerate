@@ -3,6 +3,7 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -159,6 +160,87 @@ class MigrationRepository {
     }
 
     return $migrations;
+  }
+
+  /**
+   * Returns all initial migration plugins: non-data migration plugins and deps.
+   *
+   * @return string[]
+   *   A set of plugin IDs.
+   */
+  public function getInitialMigrationPluginIds() : array {
+    $inital_migration_plugin_ids = [];
+
+    $migrations = $this->getMigrations();
+    $all_instances = [];
+    foreach ($migrations as $migration) {
+      $non_data_migration_plugin_ids = array_diff($migration->getMigrationPluginIds(), $migration->getDataMigrationPluginIds());
+
+      // Also include all dependencies of non-data migration plugins.
+      // For example, d7_field_instance:node:blog depends on d7_field:node, and
+      // that is *not* a non-data migration plugin, so without this dependency
+      // resolution, it would not be picked up.
+      $dependencies = [];
+      $instances = $migration->getMigrationPluginInstances();
+      $all_instances += $instances;
+      foreach ($non_data_migration_plugin_ids as $id) {
+        $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $inital_migration_plugin_ids));
+      }
+
+      // Also include all dependencies of data migration plugins if they live in
+      // a "Shared structure for <entity type>" migration that we depend upon.
+      $shared_structure_dependencies = array_filter($migration->getDependenciesWithReasons(), function ($k) {
+        return strpos($k, 'Shared structure for ') !== FALSE;
+      }, ARRAY_FILTER_USE_KEY);
+      $shared_structure_migration_plugin_ids = NestedArray::mergeDeepArray($shared_structure_dependencies);
+      foreach ($migration->getDataMigrationPluginIds() as $id) {
+        $dependencies = array_merge($dependencies, array_intersect($instances[$id]->getMigrationDependencies()['required'], $shared_structure_migration_plugin_ids));
+      }
+
+      $inital_migration_plugin_ids = array_merge($inital_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids);
+    }
+
+    return $inital_migration_plugin_ids;
+  }
+
+  /**
+   * Returns a subset of initial migration plugins: those with rows to process.
+   *
+   * @return string[]
+   *   A set of plugin IDs.
+   */
+  public function getInitialMigrationPluginIdsWithRowsToProcess() : array {
+    $initial_migration_plugin_ids = $this->getInitialMigrationPluginIds();
+    $migrations = $this->getMigrations();
+
+    $todo = [];
+
+    $all_instances = [];
+
+    // All migration plugins in migrations which have finished importing do not
+    // need any further processing. This metadata is tracked by acquia_migrate,
+    // and is hence much faster to retrieve than invoking ::allRowsProcessed()
+    // on an instance of every migration plugin.
+    // IOW: this is a performance optimization because it lives in the critical
+    // path.
+    // @see \Drupal\acquia_migrate\Controller\HttpApi::migrationsCollection()
+    $ignore = [];
+    foreach ($migrations as $migration) {
+      $all_instances += $migration->getMigrationPluginInstances();
+      if ($migration->isImported()) {
+        $ignore += array_combine($migration->getMigrationPluginIds(), $migration->getMigrationPluginIds());
+      }
+    }
+
+    // Determine which of the initial migration plugins still have rows that
+    // need to be processed.
+    foreach (array_diff($initial_migration_plugin_ids, $ignore) as $id) {
+      if (!$all_instances[$id]->allRowsProcessed()) {
+        $todo[] = $id;
+      }
+    }
+
+    return $todo;
   }
 
   /**
