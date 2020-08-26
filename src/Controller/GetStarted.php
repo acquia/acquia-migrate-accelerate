@@ -109,6 +109,29 @@ final class GetStarted extends ControllerBase {
         ],
       ],
     ];
+
+    $expected_file_public_path = !SourceDatabase::isConnected() ? FALSE : unserialize(SourceDatabase::getConnection()
+      ->select('variable')
+      ->fields(NULL, ['value'])
+      ->condition('name', 'file_public_path', 'LIKE')
+      ->execute()
+      ->fetchField());
+    if ($expected_file_public_path && $expected_file_public_path !== 'sites/default/files') {
+      $expected_file_public_path_exists = $expected_file_public_path !== FALSE && $files_configured && file_exists($expected_file_public_path) && is_writable($expected_file_public_path);
+      $steps['create-destination-files-directory'] = [
+        'completed' => $expected_file_public_path_exists,
+        'active' => !$expected_file_public_path_exists,
+        'content' => [
+          'label' => $this->t('Create matching files directory'),
+          'description' => [
+            '#markup' => $expected_file_public_path_exists
+            ? $this->t("The source site uses a non-default directory for serving publicly accessible files. <code>@absolute-path</code> exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path])
+            : $this->t("The source site uses a non-default directory for serving publicly accessible files. Ensure the <code>@absolute-path</code> directory exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path]),
+          ],
+        ],
+      ];
+    }
+
     $steps['preselect'] = [
       'completed' => $this->migrationRepository->migrationsHaveBeenPreselected(),
       'active' => end($steps)['completed'] && !$this->migrationRepository->migrationsHaveBeenPreselected(),
@@ -144,7 +167,7 @@ final class GetStarted extends ControllerBase {
       ],
     ];
     $unlink_inactive_labels = function (array $step) : array {
-      if (!$step['active']) {
+      if (!$step['active'] && is_array($step['content']['label']) && $step['content']['label']['#type'] === 'link') {
         $step['content']['label'] = [
           '#markup' => $step['content']['label']['#title'],
         ];

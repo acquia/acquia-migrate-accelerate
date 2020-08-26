@@ -464,7 +464,7 @@ final class Migration {
         'migrationId' => $this->id(),
       ]);
     }
-    if ($this->getImportedCount() > 0) {
+    if ($this->getProcessedCount() > 0) {
       $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
         return $migration_plugin->getDestinationPlugin()->supportsRollback()
           ? array_merge($rollback_capable_plugins, [$migration_plugin])

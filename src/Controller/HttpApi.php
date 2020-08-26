@@ -17,6 +17,7 @@ use Drupal\acquia_migrate\MigrationMappingManipulator;
 use Drupal\acquia_migrate\MigrationMappingViewer;
 use Drupal\acquia_migrate\MigrationPreviewer;
 use Drupal\acquia_migrate\MigrationRepository;
+use Drupal\acquia_migrate\ModuleAuditor;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\acquia_migrate\UriDefinitions;
 use Drupal\Component\Serialization\Json;
@@ -26,7 +27,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Logger\RfcLogLevel;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use League\Uri\Components\Query;
@@ -192,11 +192,11 @@ final class HttpApi {
   protected $configFactory;
 
   /**
-   * The state service.
+   * The module auditor.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var \Drupal\acquia_migrate\ModuleAuditor
    */
-  protected $state;
+  protected $moduleAuditor;
 
   /**
    * HttpApi constructor.
@@ -215,12 +215,12 @@ final class HttpApi {
    *   The migration mapping manipulator.
    * @param \Drupal\acquia_migrate\MessageAnalyzer $message_analyzer
    *   The migration message analyzer.
+   * @param \Drupal\acquia_migrate\ModuleAuditor $module_auditor
+   *   The module auditor.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
    */
-  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ConfigFactoryInterface $config_factory, StateInterface $state) {
+  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, ConfigFactoryInterface $config_factory) {
     $this->repository = $repository;
     $this->migrationBatchManager = $batch_manager;
     $this->connection = $connection;
@@ -228,8 +228,8 @@ final class HttpApi {
     $this->migrationMappingViewer = $migration_mapping_viewer;
     $this->migrationMappingManipulator = $migration_mapping_manipulator;
     $this->messageAnalyzer = $message_analyzer;
+    $this->moduleAuditor = $module_auditor;
     $this->configFactory = $config_factory;
-    $this->state = $state;
   }
 
   /**
@@ -240,28 +240,15 @@ final class HttpApi {
    */
   public function moduleInformation(Request $request): JsonResponse {
     $this->validateRequest($request);
-    // This key should be set during the initial installation of the site using
-    // this module. The value should be the output of the ah-migrate-info
-    // command. The migrate-quickstart command does this automatically.
-    // @see https://github.com/acquia/ah-migrate-utils
-    $initial_info = $this->state->get('acquia_migrate.initial_info', []);
-    $resource_objects = array_map(function (array $module) {
-      return [
-        'type' => 'sourceModule',
-        'id' => $module['name'],
-        'attributes' => [
-          'humanName' => $module['humanName'],
-          'version' => $module['version'],
-        ],
-        'relationships' => [
-          'replacementCandidates' => [
-            'data' => [],
-          ],
-        ],
-      ];
-    }, $initial_info['sourceModules'] ?? []);
+
+    // This concatentates all resource objects, source modules and
+    // recommendations into a single array and remove all the array keys so that
+    // they will be serialized as a JSON array instead of an object.
     return JsonResponse::create([
-      'data' => $resource_objects,
+      'data' => array_merge(
+        $this->moduleAuditor->getSourceModules(),
+        $this->moduleAuditor->getRecommendations()
+      ),
       'links' => [
         'self' => [
           'href' => $request->getUri(),

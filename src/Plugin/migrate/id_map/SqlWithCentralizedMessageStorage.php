@@ -378,6 +378,7 @@ final class SqlWithCentralizedMessageStorage extends Sql {
    *
    * @return int
    *   One of:
+   *   - \Drupal\Core\Logger\RfcLogLevel::CRITICAL;
    *   - \Drupal\Core\Logger\RfcLogLevel::ERROR;
    *   - \Drupal\Core\Logger\RfcLogLevel::WARNING;
    *   - \Drupal\Core\Logger\RfcLogLevel::NOTICE;
@@ -396,6 +397,11 @@ final class SqlWithCentralizedMessageStorage extends Sql {
 
       case MigrationInterface::MESSAGE_INFORMATIONAL:
         return RfcLogLevel::INFO;
+
+      // @todo change to MigrationInterface::MESSAGE_CRITICAL once we can assume
+      // that #3167267-8 has been applied to Drupal core.
+      case 5:
+        return RfcLogLevel::CRITICAL;
 
       default:
         throw new \InvalidArgumentException('Migration message has an unofficial type!');

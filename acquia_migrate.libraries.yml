@@ -23,6 +23,7 @@ dashboard:
     ui/dist/dashboard.js: { minified: true }
   dependencies:
     - acquia_migrate/common
+    - core/drupal.dialog
 
 messages:
   version: VERSION

@@ -27,6 +27,12 @@ function acquia_migrate_install() {
   \Drupal::configFactory()->getEditable('system.theme')
     ->set('admin', 'claro')
     ->save();
+
+  // Turn on verbose error logging: migration sites aren't production sites, so
+  // hiding errors only slows things down.
+  \Drupal::configFactory()->getEditable('system.logging')
+    ->set('error_level', 'verbose')
+    ->save();
 }
 
 /**

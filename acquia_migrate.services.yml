@@ -13,8 +13,8 @@ services:
       - '@acquia_migrate.mapping_viewer'
       - '@acquia_migrate.mapping_manipulator'
       - '@acquia_migrate.message_analyzer'
+      - '@acquia_migrate.module_auditor'
       - '@config.factory'
-      - '@state'
 
   # Migration action supporting services: preview, mapping viewer, mapping manipulator.
   acquia_migrate.previewer:
@@ -50,6 +50,16 @@ services:
   # Migration message supporting services: analysis, more things later.
   acquia_migrate.message_analyzer:
     class: Drupal\acquia_migrate\MessageAnalyzer
+
+  # Audits a source site to provide module info and associated recommendations.
+  acquia_migrate.module_auditor:
+    public: false
+    class: \Drupal\acquia_migrate\ModuleAuditor
+    arguments:
+      - '@extension.list.module'
+      - '@module_handler'
+      - '@state'
+      - '@string_translation'
 
   # We decorate the plugin.manager.migration service because it's impossible to decorate through a ServiceProvider.
   # (ServiceProviders are invoked in alphabetical order by ModifyServiceDefinitionsPass, not by priority. Which means
