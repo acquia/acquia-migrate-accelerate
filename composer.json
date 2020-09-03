@@ -4,7 +4,6 @@
     "description": "An enhanced UI and assistant for Drupal migrations. See https://www.acquia.com/drupal9/accelerate-your-migration.",
     "homepage": "https://www.acquia.com/drupal9/accelerate-your-migration",
     "require": {
-        "php": "^7.3",
         "acquia/drupal-environment-detector": "^1.1.0",
         "drupal/decoupled_pages": "^1.0-beta0",
         "drupal/migrate_plus": "^5",

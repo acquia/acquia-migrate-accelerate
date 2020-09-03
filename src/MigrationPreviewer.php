@@ -17,6 +17,7 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Row;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,6 +33,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @internal
  */
 final class MigrationPreviewer {
+
+  use StringTranslationTrait;
 
   /**
    * The offset-based migration row selection.

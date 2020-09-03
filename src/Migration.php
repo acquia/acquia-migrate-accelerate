@@ -21,6 +21,27 @@ use Drupal\migrate\Plugin\MigrationInterface;
 final class Migration {
 
   /**
+   * Nothing is happening for this migration.
+   *
+   * @var string
+   */
+  const ACTIVITY_IDLE = 'idle';
+
+  /**
+   * This migration is being imported.
+   *
+   * @var string
+   */
+  const ACTIVITY_IMPORTING = 'importing';
+
+  /**
+   * This migration is being rolled back.
+   *
+   * @var string
+   */
+  const ACTIVITY_ROLLING_BACK = 'rollingBack';
+
+  /**
    * The migration ID: an opaque identifier, without meaning.
    *
    * @var string
@@ -442,6 +463,11 @@ final class Migration {
    *   An array of link URLs.
    */
   protected function getAvailableLinkUrls() : array {
+    // If this migration is not idle, do not allow any other activities.
+    if ($this->getActivity() !== self::ACTIVITY_IDLE) {
+      return [];
+    }
+
     $urls = [];
 
     $update_resource_url = Url::fromRoute('acquia_migrate.api.migration.patch')
@@ -595,6 +621,39 @@ final class Migration {
   }
 
   /**
+   * Gets the current activity of the migration.
+   *
+   * @return string
+   *   Either:
+   *   - Migration::ACTIVITY_IDLE
+   *   - Migration::ACTIVITY_IMPORTING
+   *   - Migration::ACTIVITY_ROLLING_BACK
+   */
+  public function getActivity() : string {
+    $max_migration_plugin_status = array_reduce($this->dataMigrationPluginIds, function (int $max, string $id) {
+      $max = max($max, $this->migrationPlugins[$id]->getStatus());
+      return $max;
+    }, MigrationInterface::STATUS_IDLE);
+
+    switch ($max_migration_plugin_status) {
+      case MigrationInterface::STATUS_IMPORTING:
+        return self::ACTIVITY_IMPORTING;
+
+      case MigrationInterface::STATUS_ROLLING_BACK:
+        return self::ACTIVITY_ROLLING_BACK;
+
+      default:
+        // Note that MigrationInterface::STATUS_STOPPING is irrelevant to us,
+        // since it is used by MigrateUpgradeImportBatch to signal the end of
+        // the processing within a single batch request.
+        // Note that MigrationInterface::STATUS_DISABLED is irrelevant to us,
+        // since we do not use this functionality and it does not actually
+        // reflect an activity.
+        return self::ACTIVITY_IDLE;
+    }
+  }
+
+  /**
    * Maps a Migration object to JSON:API resource object array.
    *
    * @param \Drupal\acquia_migrate\Migration $migration
@@ -650,6 +709,7 @@ final class Migration {
         'completed' => $migration->isCompleted(),
         'skipped' => $migration->isSkipped(),
         'lastImported' => NULL,
+        'activity' => $migration->getActivity(),
       ],
       'relationships' => [
         'dependencies' => [

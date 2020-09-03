@@ -332,6 +332,40 @@
   padding: 0.25rem 1.5rem;
 }
 
+.datagrid,
+.datagrid__inner,
+.datagrid__header,
+.datagrid__body {
+  display: grid;
+}
+
+.datagrid__header {
+  background: var(--color-whitesmoke);
+}
+
+.datagrid__header-item {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  height: 3rem;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #222330;
+}
+
+.datagrid__row {
+  display: grid;
+  border-bottom: 1px solid var(--color-lightgray);
+}
+
+.datagrid__item {
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+}
+
 :root {
   --offset-top: 0;
   --header-height: 0px;
@@ -500,17 +534,17 @@ iframe {
   padding: .15rem;
 }
 
-.migrations_view td {
+.migrations__list td {
   vertical-align: top;
 }
 
-.migrations_view .migration__title {
+.migrations__list .migration__title {
   padding: 2px 5px 37px 5px;
   width: 20rem;
 }
 
-.migrations_view .migration__title,
-.migrations_view .migration_progress .progress__label {
+.migrations__list .migration__title,
+.migrations__list .migration_progress .progress__label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -550,6 +584,10 @@ iframe {
   height: 1.5em;
   content: '';
   background: transparent no-repeat 50% 50%;
+}
+
+.migration__working:before {
+  background-image: url(/core/themes/claro/images/core/787878/cog.svg);
 }
 
 .migration__success:before {
@@ -732,12 +770,116 @@ iframe {
   flex: 1;
 }
 
-.migrations_view {
+:root {
+  --fixed-width: 300px;
+}
+
+.module-recommendations__header {
+  grid-template-columns: var(--fixed-width) 1fr var(--fixed-width);
+}
+
+.module-recommendations__row {
+  grid-template-columns: var(--fixed-width) 1fr;
+  position: relative;
+}
+
+.module-recommendations__row .dropdown-toggle {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+}
+
+.module-recommendations__recommendation {
+  position: relative;
+}
+
+.module-recommendations__recommendation_status {
+  font-size: .8rem;
+  margin: 0;
+  position: absolute;
+  top: -1rem;
+  left: -24px;
+}
+
+.module-recommendations__recommendation-note {
+  margin: -2rem 0 0 0;
+}
+
+.module-recommendations__module-list {
+  margin: 0;
+  padding: 0;
+}
+
+.module-recommendations__row-inner {
+  display: grid;
+  grid-template-columns: 1fr var(--fixed-width);
+}
+
+.module-recommendations__install-instructions {
+  grid-column-start: 2;
+  margin: 1.5rem 0;
+  display: none;
+}
+
+.is-expanded .module-recommendations__install-instructions {
+  display: block;
+}
+
+.module-recommendations__install-status {
+  position: relative;
+  display: inline-block;
+  padding-left: 1.5em;
+  text-decoration: none;
+  cursor: help;
+}
+
+.module-recommendations__install-status:before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 1em;
+  height: 1.5em;
+  content: '';
+  background: transparent no-repeat 50% 50%;
+}
+
+.module-recommendations__install-status--installed:before {
+  background-image: url(/core/themes/claro/images/core/73b355/check.svg);
+}
+
+.module-recommendations__install-status--not-installed:before {
+  background-image: url(/core/themes/claro/images/core/e32700/error.svg);
+}
+
+.module-recommendations__install-status--not-enabled:before {
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='%23E12A18' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM13.2606 6.67461H2.86924V9.45722H13.2606V6.67461Z' /%3E%3C/svg%3E%0A");
+}
+
+.source-module__title,
+.recommendation-module__title {
+  font-weight: bold;
+}
+
+.recommendation-module__title {
+  display: flex;
+  align-items: center;
+}
+
+.recommendation-module__title .title__badge {
+  margin-left: .5rem;
+}
+
+.title__badge[title]:not([title=""]) {
+  cursor: help;
+}
+
+.tabbed_page__view {
   transition: opacity .2s ease-out;
 }
 
-.migrations_view-enter,
-.migrations_view-exit-active {
+.tabbed_page__view-enter,
+.tabbed_page__view-exit-active {
   opacity: 0;
 }
 

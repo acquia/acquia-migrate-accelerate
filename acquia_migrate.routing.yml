@@ -240,4 +240,6 @@ acquia_migrate.migrations.module.info:
   requirements:
     _permission: 'administer migrations'
   options:
+    _decoupled_page_paths:
+      page: /upgrade/modules/{page}
     _admin_route: TRUE

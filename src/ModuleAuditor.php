@@ -136,10 +136,6 @@ final class ModuleAuditor {
       $attributes['note'] = $recommendation['attributes']['note'];
     }
 
-    if (!empty($recommendation['attributes']['installModules'])) {
-      $attributes['installModules'] = array_map([$this, 'getModuleInformation'], $recommendation['attributes']['installModules']);
-    }
-
     $recognized_modules = static::getRecognizedModules([$recommendation]);
 
     $relationships['recommendedFor']['data'] = array_map(function ($module_name) {
@@ -152,12 +148,18 @@ final class ModuleAuditor {
       // If the package name begins with `drupal/` but not `drupal/core` then
       // assume it is a project on d.o and link to it.
       $package_name = $package_info['name'];
-      if (strpos($package_name, 'drupal/') === 0 && strpos($package_name, 'drupal/core') !== 0) {
+      if (static::isLikelyDrupalProjectPackage($package_name)) {
+        $project_name = substr($package_name, strlen('drupal/'));
         $links['about'] = [
-          'href' => 'https://www.drupal.org/project/' . substr($package_name, strlen('drupal/')),
+          'href' => 'https://www.drupal.org/project/' . $project_name,
           'type' => 'text/html',
         ];
+        $attributes['modules'] = [$this->getModuleInformation($project_name)];
       }
+    }
+
+    if (!empty($recommendation['attributes']['installModules'])) {
+      $attributes['modules'] = array_map([$this, 'getModuleInformation'], $recommendation['attributes']['installModules']);
     }
 
     // Sorting makes fields deterministic for testing.
@@ -205,6 +207,7 @@ final class ModuleAuditor {
     return [
       'displayName' => $display_name,
       'machineName' => $module_machine_name,
+      'availableToInstall' => $module_in_codebase,
       'installed' => $module_in_codebase && $this->moduleHandler->moduleExists($module_machine_name),
     ];
   }
@@ -222,6 +225,20 @@ final class ModuleAuditor {
     return array_unique(array_reduce($recommendations, function (array $recognized, array $recommendation) {
       return array_merge($recognized, array_column($recommendation['relationships']['recommendedFor']['data'] ?? [], 'id'));
     }, []));
+  }
+
+  /**
+   * Whether it is likely that the given package is a Drupal.org project.
+   *
+   * @param string $package_name
+   *   The composer package name.
+   *
+   * @return bool
+   *   TRUE if the package name begins with 'drupal/' and is not 'drupal/core';
+   *   FALSE otherwise.
+   */
+  protected static function isLikelyDrupalProjectPackage(string $package_name) : bool {
+    return strpos($package_name, 'drupal/') === 0 && strpos($package_name, 'drupal/core') !== 0;
   }
 
 }

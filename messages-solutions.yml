@@ -76,6 +76,13 @@ d7_comment:
         the source database and rollback & import this migration. Fix it either by deleting the 'comment' table row with
         cid=@src_comment_id or by creating a 'field_data_comment_body' table row with entity_id=@src_comment_id.
 
+d7_comment_type:
+  - message:
+      regexp: Attempt to create a bundle with an ID longer than
+    generic_solution: >-
+      Due to the very long bundle name on the Drupal 7 source site and the architecture of the Drupal 9 config system,
+      a shortened
+
 d7_field:
   -
     message:
@@ -88,6 +95,13 @@ d7_field:
       location: >-
         The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
         can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+  -
+    message:
+      regexp: >-
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+    generic_solution: >-
+      No further actions needed The @property property is migrated into the @field, so there is no need for a separate
+      field.
 
 d7_field_instance:
   -
@@ -102,6 +116,13 @@ d7_field_instance:
       location: >-
         The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
         can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+  -
+    message:
+      regexp: >-
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+    generic_solution: >-
+      No further actions needed The @property property is migrated into the @field, so there is no need for a separate
+      field.
 
 d7_field_formatter_settings:
   -
@@ -119,6 +140,21 @@ d7_field_formatter_settings:
         Hierarchical Select never got a stable Drupal 7 or 8 release. No equivalent formatter exists in Drupal 7 or 8.
         The default formatter should suffice. Otherwise, install the https://www.drupal.org/project/shs module and use
         its entity_reference_shs field formatter."
+  -
+    message:
+      regexp: >-
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+    generic_solution: >-
+      No further actions needed The @property property is migrated into the @field, so there is no need for a separate
+      field.
+
+d7_field_instance_widget_settings:
+  - message:
+      regexp: >-
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+    generic_solution: >-
+      No further actions needed The @property property is migrated into the @field, so there is no need for a separate
+      field.
 
 d7_file:
   - message:
@@ -155,6 +191,25 @@ d7_file:
         This file (@src_file_id) is owned by a user that no longer exists. This is wrong in the Drupal 7 source database
         too, please fix it there, refresh the source database and rollback & import this migration.
 
+d7_file_entity:
+  - message:
+      regexp: 'field_media_oembed_video=The provided URL does not represent a valid oEmbed resource.'
+    generic_solution: >-
+      oEmbed does not support private videos — perhaps that is the case?
+
+d7_file_plain:
+  - message:
+      regexp: '\[media: \d+, revision: \d+\]: thumbnail\.0=Only files with the following extensions are allowed: .*'
+    generic_solution: >-
+      An SVG file was migrated into the Drupal 9 media library. But Drupal has only minimal support for SVG right now —
+      see https://www.drupal.org/project/drupal/issues/3060504 for more information.
+  - message:
+      regexp: 'exceeding the maximum file size of'
+    generic_solution: >-
+      The max_filesize setting is not yet being automatically inferred for the generated media source field. For now,
+      tweak the configuration manually. Or, you can help improve this aspect of this migration at
+      https://www.drupal.org/project/media_migration/issues/3168920.
+
 d7_filter_format:
   -
     message:
@@ -186,12 +241,39 @@ d7_filter_format:
         if it's used to embed media, you should instead use Drupal 9 core's media_embed filter.
       typogrify: "Install the typogrify module. It has a Drupal 9-compatible release. Then re-run this migration."
 
+d7_image_styles:
+  - message:
+      regexp: The "manualcrop_crop_and_scale" plugin does not exist.
+    generic_solution: >-
+      The https://www.drupal.org/project/manualcrop module for Drupal 7 is obsolete, its successor is
+      https://www.drupal.org/project/image_widget_crop, but https://www.drupal.org/project/focal_point is a viable
+      alternative too.
+
 d7_menu_links:
   - message:
       regexp: >-
         The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
     generic_solution: This menu link points to a path that no longer exists or possibly never existed. Perhaps it
       points to a View that hasn't been manually recreated?
+
+d7_path_redirect:
+  - message:
+      regexp: >-
+        \[redirect: (?<src_redirect_id>\d+)\]: uid\.0\.target_id=The referenced entity \(user: (?<src_user_id>\d+)\)
+        does not exist.
+      specific_solution_per: src_redirect_id
+      computed_specific_solution:
+        callback: 'source_db_table_row_exists'
+        args:
+          - 'users'
+          - 'uid'
+          - '@src_user_id'
+    generic_solution: ~
+    specific_solution: ~
+    computed_specific_solution:
+      does_not_exist: >-
+        This redirect (@src_redirect_id) is owned by a user that no longer exists. This is wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.
 
 d7_url_alias:
   -
@@ -230,3 +312,44 @@ FALLBACK:
       required, but the entities that already existed were not updated with values for this new required field. This is
       wrong in the Drupal 7 source database too, please fix it there, refresh the source database and rollback & import
       this migration!
+  - message:
+      regexp: The "(?<src_entity_type_id>\w+)" entity type does not exist.
+      specific_solution_per: src_entity_type_id
+    generic_solution: ~
+    specific_solution:
+      biblio: >-
+        The "Bibliography" (biblio) module has no Drupal 9 port. The Drupal 9 successor is "Bibliography & Citation"
+        (bibcite). It is run by an enthusiastic team, follow them at https://twitter.com/BibCite. You can help finish
+        this migration at https://www.drupal.org/project/bibcite_migrate.
+      field_collection_item: We are working on providing a reliable migration path to Paragraphs. Stay tuned.
+      menu_fields: >-
+        The "Menu Item Fields" (menu_fields) module has no Drupal 9 port. The Drupal 9 successor is "Menu Item Extras"
+        (menu_item_extras).
+  - message:
+      regexp: Attempt to create a field \w+ that does not exist on entity type (?<src_entity_type_id>\w+).
+      specific_solution_per: src_entity_type_id
+    generic_solution: ~
+    specific_solution:
+      biblio: >-
+        The "Bibliography" (biblio) module has no Drupal 9 port. The Drupal 9 successor is "Bibliography & Citation"
+        (bibcite). It is run by an enthusiastic team, follow them at https://twitter.com/BibCite. You can help finish
+        this migration at https://www.drupal.org/project/bibcite_migrate.
+      field_collection_item: We are working on providing a reliable migration path to Paragraphs. Stay tuned.
+  -
+    message:
+      regexp: >-
+        \[.*\]: \w+\.\d+\.target_id=The referenced entity \((?<referenced_entity_type_id>\w+): \d+\) does not exist.
+      specific_solution_per: referenced_entity_type_id
+    generic_solution: >-
+      Either the referenced entity does not exist anymore on the source site or the migration of the referenced entity
+      failed. If the referenced entity does not exist anymore in the Drupal 7 source database either, please fix it
+      there, refresh the source database and rollback & import this migration.
+    specific_solution:
+      file: >-
+        Either the referenced file does not exist anymore on the source site or the file failed to migrate successfully.
+        If there is no message for the file with this fid in the "Public files" or "Private files" migration, the Drupal
+        7 source database is wrong, please fix it there, refresh the source database and rollback & import this
+        migration.
+      user: >-
+        This entity is referencing a user that probably no longer exists. This is likely wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.

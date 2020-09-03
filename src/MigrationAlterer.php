@@ -346,7 +346,6 @@ final class MigrationAlterer {
 
       $destination = isset($migration_data['destination']['plugin']) ? $migration_data['destination']['plugin'] : NULL;
       $source_type = $migration_data['source']['type'] ?? $migration_data['source']['source_field_type'] ?? NULL;
-      $source_scheme = $migration_data['source']['scheme'] ?? NULL;
       $source_plugin_is_media_source = in_array($migration_data['source']['plugin'], ['d7_file_entity_item', 'd7_file_plain'], TRUE);
 
       if (!$source_plugin_is_media_source || $destination !== 'entity:media' || !$source_type) {
@@ -381,13 +380,11 @@ final class MigrationAlterer {
         // also by source bundle. We have to remove them and add the ID of the
         // corresponding migration derivative instead.
         $migration_dependencies_to_remove = [
-          'd7_file_entity_type',
           'd7_view_modes',
           'd7_field',
           'd7_field_instance',
           'd7_field_instance_widget_settings',
           'd7_field_formatter_settings',
-          'd7_media_source_field_config',
         ];
         foreach ($migration_dependencies_to_remove as $migration_dependency_to_remove) {
           $dependency_key = array_search($migration_dependency_to_remove, $migration_data['migration_dependencies']['required']);
@@ -396,24 +393,14 @@ final class MigrationAlterer {
           }
         }
 
-        // When a media migration migrates private files, it should depend on
-        // the private file migration.
-        $private_files_migration_id = $source_scheme === 'private' ? 'd7_file_private' : NULL;
-
-        $migration_data['migration_dependencies']['required'] = array_unique(array_values($migration_data['migration_dependencies']['required']) + array_filter([
+        $migration_data['migration_dependencies']['required'] = array_unique(array_merge(array_values($migration_data['migration_dependencies']['required']), [
           'd7_user',
           'd7_media_view_modes',
           'd7_view_modes:file',
           'd7_field:file',
-          "d7_media_source_field_config:$source_type:$source_scheme",
-          "d7_file_entity_type:$source_type:$source_scheme",
           "d7_field_instance_widget_settings:file:$source_type",
           "d7_field_formatter_settings:file:$source_type",
           "d7_field_instance:file:$source_type",
-          // Every media migration should depend on the public files migration
-          // since the media thumbnails will be public files.
-          'd7_file',
-          $private_files_migration_id,
         ]));
       }
 
