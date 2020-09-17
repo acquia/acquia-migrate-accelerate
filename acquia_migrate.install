@@ -5,6 +5,7 @@
  * Install, update, and uninstall functions for the Acquia Migrate module.
  */
 
+use Drupal\acquia_migrate\MigrationFingerprinter;
 use Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface;
 use Drupal\Core\Config\Config;
 
@@ -64,6 +65,20 @@ function acquia_migrate_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'size' => 'tiny',
+      ],
+      'last_computed_fingerprint' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => MigrationFingerprinter::FINGERPRINT_NOT_COMPUTED,
+        'description' => 'Last computed fingerprint.',
+      ],
+      'last_import_fingerprint' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => MigrationFingerprinter::FINGERPRINT_NOT_COMPUTED,
+        'description' => 'Last import fingerprint.',
       ],
       'last_import_timestamp' => [
         'type' => 'int',
@@ -147,4 +162,35 @@ function acquia_migrate_schema() {
   ];
 
   return $schema;
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Adds migration fingerprint columns to the migration flags table.
+ */
+function acquia_migrate_update_9100() {
+  $fingerprint_schemas = [
+    'last_computed_fingerprint' => [
+      'type' => 'varchar_ascii',
+      'length' => 64,
+      'not null' => TRUE,
+      'default' => MigrationFingerprinter::FINGERPRINT_NOT_COMPUTED,
+      'description' => 'Last computed fingerprint.',
+    ],
+    'last_import_fingerprint' => [
+      'type' => 'varchar_ascii',
+      'length' => 64,
+      'not null' => TRUE,
+      'default' => MigrationFingerprinter::FINGERPRINT_NOT_COMPUTED,
+      'description' => 'Last import fingerprint.',
+    ],
+  ];
+
+  /* @var \Drupal\Core\Database\Schema $spec */
+  $schema = \Drupal\Core\Database\Database::getConnection()->schema();
+
+  foreach ($fingerprint_schemas as $field_name => $spec) {
+    $schema->addField('acquia_migrate_migration_flags', $field_name, $spec);
+  }
 }

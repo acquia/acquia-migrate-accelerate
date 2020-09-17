@@ -3,6 +3,7 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -120,6 +121,8 @@ class MigrationRepository {
         'migration_id',
         'completed',
         'skipped',
+        'last_import_fingerprint',
+        'last_computed_fingerprint',
         'last_import_timestamp',
         'last_import_duration',
       ])
@@ -141,17 +144,17 @@ class MigrationRepository {
    * @see \Drupal\acquia_migrate\Migration::__sleep()
    * @see \Drupal\acquia_migrate\Migration::__wakeup()
    */
-  public function getMigrations() : array {
+  public function getMigrations(bool $reset = FALSE) : array {
     // Static caching added only for the to-JSON:API-normalization logic,
     // because it can potentially call this many times.
     // @see \Drupal\acquia_migrate\Migration::toResourceObject()
     static $migrations;
-    if (isset($migrations)) {
+    if (!$reset && isset($migrations)) {
       return $migrations;
     }
 
     $cached = $this->cache->get(static::CID);
-    if (!$cached) {
+    if ($reset || !$cached) {
       $migrations = $this->doGetMigrations();
       $this->cache->set(static::CID, $migrations, Cache::PERMANENT, ['migration_plugins']);
     }
@@ -169,10 +172,28 @@ class MigrationRepository {
    *   A set of plugin IDs.
    */
   public function getInitialMigrationPluginIds() : array {
-    $inital_migration_plugin_ids = [];
+    $initial_migration_plugin_ids = [];
 
     $migrations = $this->getMigrations();
     $all_instances = [];
+
+    // Gather the list of all data migration plugin IDs in non-data-only
+    // migrations, as well as all migration plugin IDs in "Shared data"
+    // migrations. These migration plugins should be not be imported initially,
+    // because they are for content entities with supporting configuration, and
+    // we should never import content entity migrations automatically.
+    // Note: inspecting the destination plugin seems more logical, except that
+    // we do not have a reliable way to determine which entity destinations are
+    // for content entity types.
+    $data_migration_plugin_ids_of_content_entity_migrations = array_reduce($migrations, function (array $result, Migration $migration) {
+      $is_shared_data_migration = strpos($migration->label(), 'Shared data for ') === 0;
+      $is_data_only_migration = count($migration->getDataMigrationPluginIds()) == count($migration->getMigrationPluginIds());
+      if ($is_shared_data_migration || !$is_data_only_migration) {
+        $result = array_merge($result, $migration->getDataMigrationPluginIds());
+      }
+      return $result;
+    }, []);
+
     foreach ($migrations as $migration) {
       $non_data_migration_plugin_ids = array_diff($migration->getMigrationPluginIds(), $migration->getDataMigrationPluginIds());
 
@@ -184,7 +205,7 @@ class MigrationRepository {
       $instances = $migration->getMigrationPluginInstances();
       $all_instances += $instances;
       foreach ($non_data_migration_plugin_ids as $id) {
-        $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $inital_migration_plugin_ids));
+        $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $initial_migration_plugin_ids, $data_migration_plugin_ids_of_content_entity_migrations));
       }
 
       // Also include all dependencies of data migration plugins if they live in
@@ -197,10 +218,10 @@ class MigrationRepository {
         $dependencies = array_merge($dependencies, array_intersect($instances[$id]->getMigrationDependencies()['required'], $shared_structure_migration_plugin_ids));
       }
 
-      $inital_migration_plugin_ids = array_merge($inital_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids);
+      $initial_migration_plugin_ids = array_merge($initial_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids);
     }
 
-    return $inital_migration_plugin_ids;
+    return $initial_migration_plugin_ids;
   }
 
   /**
@@ -234,8 +255,8 @@ class MigrationRepository {
 
     // Determine which of the initial migration plugins still have rows that
     // need to be processed.
-    foreach (array_diff($initial_migration_plugin_ids, $ignore) as $id) {
-      if (!$all_instances[$id]->allRowsProcessed()) {
+    foreach (array_unique(array_diff($initial_migration_plugin_ids, $ignore)) as $id) {
+      if (isset($all_instances[$id]) && !$all_instances[$id]->allRowsProcessed()) {
         $todo[] = $id;
       }
     }
@@ -272,7 +293,12 @@ class MigrationRepository {
       $is_data_migration_plugin = TRUE;
       if (strpos($cluster, 'LIFTED-') === 0) {
         $cluster = substr($cluster, 7);
-        $is_data_migration_plugin = FALSE;
+        // Treat lifted content migrations as data migrations. This is
+        // particularly the case for Paragraphs-based content types.
+        if (!in_array('Content', $drupal_migration->getMigrationTags(), TRUE)) {
+          assert(!in_array(explode(PluginBase::DERIVATIVE_SEPARATOR, $id)[0], MigrationClusterer::PARAGRAPHS_MIGRATION_BASE_PLUGIN_IDS, TRUE), sprintf('A non-paragraphs-based lifted content migration has been discovered: "%s"', $id));
+          $is_data_migration_plugin = FALSE;
+        }
       }
 
       // Create a temporary data structure for this cluster if it doesn't exist
@@ -311,6 +337,8 @@ class MigrationRepository {
           'data_migration_plugin_ids' => [],
           'completed' => (bool) $flags[$migration_id]->completed,
           'skipped' => (bool) $flags[$migration_id]->skipped,
+          'last_import_fingerprint' => $flags[$migration_id]->last_import_fingerprint,
+          'last_computed_fingerprint' => $flags[$migration_id]->last_computed_fingerprint,
           'last_import_timestamp' => $flags[$migration_id]->last_import_timestamp ? (int) $flags[$migration_id]->last_import_timestamp : NULL,
           'last_import_duration' => $flags[$migration_id]->last_import_duration ? (int) $flags[$migration_id]->last_import_duration : NULL,
         ];
@@ -324,7 +352,13 @@ class MigrationRepository {
       if ($is_data_migration_plugin) {
         $migration_info[$cluster]['data_migration_plugin_ids'][] = $id;
       }
+    }
 
+    // Resolve inter-cluster dependencies.
+    $cluster_id_to_cluster_label = array_combine(array_column($migration_info, 'id'), array_column($migration_info, 'label'));
+    foreach ($drupal_migrations_with_cluster_metadata as $id => $drupal_migration) {
+      $cluster_id = $lookup_table[$id];
+      $cluster = $cluster_id_to_cluster_label[$cluster_id];
       foreach ($drupal_migration->getMigrationDependencies()['required'] as $dependency) {
         // Some required migration dependencies may not exist because they were
         // explicitly omitted by the migration plugin manager due to their
@@ -372,6 +406,8 @@ class MigrationRepository {
         $info['data_migration_plugin_ids'],
         $info['completed'],
         $info['skipped'],
+        $info['last_import_fingerprint'],
+        $info['last_computed_fingerprint'],
         $info['last_import_timestamp'],
         $info['last_import_duration']
       );

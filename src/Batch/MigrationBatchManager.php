@@ -235,11 +235,18 @@ final class MigrationBatchManager {
    */
   public static function calculateCompleteness(string $migration_id) {
     $migration_repository = \Drupal::service('acquia_migrate.migration_repository');
+    /* @var \Drupal\acquia_migrate\MigrationFingerprinter $migration_fingerprinter */
+    $migration_fingerprinter = \Drupal::service('acquia_migrate.migration_fingerprinter');
     assert($migration_repository instanceof MigrationRepository);
     $migration = $migration_repository->getMigration($migration_id);
     $is_completed = $migration->allRowsProcessed() && $migration->getMessageCount() === 0;
+    $fingerprint = $migration_fingerprinter->getMigrationFingerprint($migration);
     \Drupal::database()->update('acquia_migrate_migration_flags')
-      ->fields(['completed' => (int) $is_completed])
+      ->fields([
+        'completed' => (int) $is_completed,
+        'last_import_fingerprint' => $fingerprint,
+        'last_computed_fingerprint' => $fingerprint,
+      ])
       ->condition('migration_id', $migration->id())
       ->execute();
   }

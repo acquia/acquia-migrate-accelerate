@@ -227,6 +227,11 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
         // @see \Drupal\acquia_migrate\MigrationMappingManipulator::convertMigrationPluginInstanceToConfigEntity()
         $definitions[$original_migration_plugin_id] = $definitions[$overriding_migration_plugin_id];
         $definitions['original___' . $original_migration_plugin_id] = $pre_alter_definitions[$original_migration_plugin_id];
+        // Override the ID of the generated migrate_plus Migration config entity
+        // to be the base plugin ID, just like for all other migration
+        // definitions, hence undoing what migrate_plus picks as the ID.
+        // @see \Drupal\migrate_plus\Entity\Migration::createEntityFromPlugin()
+        $definitions[$original_migration_plugin_id]['id'] = explode('__', $overriding_migration_plugin_id)[0];
       }
     }
   }

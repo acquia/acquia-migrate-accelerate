@@ -98,6 +98,20 @@ final class Migration {
   protected $skipped;
 
   /**
+   * The source data fingerprint taken when the migration was last imported.
+   *
+   * @var string
+   */
+  protected $lastImportFingerprint;
+
+  /**
+   * The source data fingerprint that was most recently computed.
+   *
+   * @var string
+   */
+  protected $lastComputedFingerprint;
+
+  /**
    * The UNIX timestamp when the last import started, if any.
    *
    * @var int|null
@@ -132,12 +146,16 @@ final class Migration {
    *   Whether this migration is marked as completed.
    * @param bool $skipped
    *   Whether this migration is marked as skipped.
+   * @param string $last_import_fingerprint
+   *   The data fingerprint taken when the migration was last imported.
+   * @param string $last_computed_fingerprint
+   *   The data fingerprint that was most recently computed.
    * @param int|null $last_import_timestamp
    *   The UNIX timestamp when the last import started, if any.
    * @param int|null $last_import_duration
    *   The duration in seconds of the last import, if any.
    */
-  public function __construct(string $id, string $label, array $dependencies, array $migration_plugins, array $data_migration_plugin_ids, bool $completed, bool $skipped, ?int $last_import_timestamp, ?int $last_import_duration) {
+  public function __construct(string $id, string $label, array $dependencies, array $migration_plugins, array $data_migration_plugin_ids, bool $completed, bool $skipped, string $last_import_fingerprint, string $last_computed_fingerprint, ?int $last_import_timestamp, ?int $last_import_duration) {
     $this->id = $id;
     $this->label = $label;
     assert(Inspector::assertAllStrings(array_keys($dependencies)));
@@ -145,10 +163,12 @@ final class Migration {
     assert(Inspector::assertAllObjects($migration_plugins, MigrationPlugin::class));
     $this->migrationPlugins = $migration_plugins;
     assert(Inspector::assertAllStrings($data_migration_plugin_ids));
-    assert(array_diff(array_keys(array_splice($migration_plugins, count($migration_plugins) - count($data_migration_plugin_ids))), $data_migration_plugin_ids) === [], 'The data migration plugin are executed last.');
+    assert(array_diff(array_keys(array_splice($migration_plugins, count($migration_plugins) - count($data_migration_plugin_ids))), $data_migration_plugin_ids) === [], 'The data migration plugin are executed last for migration ' . $id . ' — (all migration plugins: ' . implode(', ', array_keys($migration_plugins)) . ', data migration plugins: ' . implode(', ', $data_migration_plugin_ids) . '.');
     $this->dataMigrationPluginIds = $data_migration_plugin_ids;
     $this->completed = $completed;
     $this->skipped = $skipped;
+    $this->lastImportFingerprint = $last_import_fingerprint;
+    $this->lastComputedFingerprint = $last_computed_fingerprint;
     $this->lastImportTimestamp = $last_import_timestamp;
     $this->lastImportDuration = $last_import_duration;
   }
@@ -210,6 +230,8 @@ final class Migration {
     $flags = $all_flags[$this->id];
     $this->completed = $flags->completed;
     $this->skipped = $flags->skipped;
+    $this->lastImportFingerprint = $flags->last_import_fingerprint;
+    $this->lastComputedFingerprint = $flags->last_computed_fingerprint;
     $this->lastImportTimestamp = $flags->last_import_timestamp;
     $this->lastImportDuration = $flags->last_import_duration;
   }
@@ -283,7 +305,7 @@ final class Migration {
   /**
    * Gets the the migration plugins that this migration consists of.
    *
-   * @return string[]
+   * @return \Drupal\migrate\Plugin\Migration[]
    *   A list of migration plugin instances.
    */
   public function getMigrationPluginInstances() : array {
@@ -437,6 +459,16 @@ final class Migration {
   }
 
   /**
+   * Whether this migration's imported data is stale.
+   *
+   * @return bool
+   *   Whether this migration is stale.
+   */
+  public function isStale() : bool {
+    return MigrationFingerprinter::detectChange($this->lastImportFingerprint, $this->lastComputedFingerprint);
+  }
+
+  /**
    * The UNIX timestamp when the last import started, if any.
    *
    * @return int|null
@@ -504,6 +536,11 @@ final class Migration {
         $urls['rollback-and-import'] = Url::fromRoute('acquia_migrate.api.migration.rollback_import')->setOption('query', [
           'migrationId' => $this->id(),
         ]);
+        if ($this->isStale()) {
+          $urls['refresh'] = Url::fromRoute('acquia_migrate.api.migration.rollback_import')->setOption('query', [
+            'migrationId' => $this->id(),
+          ]);
+        }
       }
     }
 
@@ -801,6 +838,11 @@ final class Migration {
         case 'rollback-and-import':
           $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
           $link_title = t('Rollback and import');
+          break;
+
+        case 'refresh':
+          $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
+          $link_title = t('Refresh');
           break;
 
         case 'complete':

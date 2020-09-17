@@ -77,6 +77,17 @@ final class UriDefinitions {
   const LINK_REL_START_BATCH_PROCESS = 'https://github.com/acquia/acquia_migrate#link-rel-start-batch-process';
 
   /**
+   * The link target contains up-to-date information about stale migrations.
+   *
+   * Clients SHOULD request this resource whenever it appears.
+   *
+   * @const string
+   *
+   * @see https://github.com/acquia/acquia_migrate/wiki/Internal-Documentation#stale-data
+   */
+  const LINK_REL_STALE_DATA = 'https://github.com/acquia/acquia_migrate#link-rel-stale-data';
+
+  /**
    * The link relation URI for the syslog severity as defined in RFC5424.
    *
    * @const string

@@ -13,6 +13,7 @@ use Drupal\acquia_migrate\Exception\MultipleClientErrorsException;
 use Drupal\acquia_migrate\Exception\QueryParameterNotAllowedException;
 use Drupal\acquia_migrate\MessageAnalyzer;
 use Drupal\acquia_migrate\Migration;
+use Drupal\acquia_migrate\MigrationFingerprinter;
 use Drupal\acquia_migrate\MigrationMappingManipulator;
 use Drupal\acquia_migrate\MigrationMappingViewer;
 use Drupal\acquia_migrate\MigrationPreviewer;
@@ -199,6 +200,13 @@ final class HttpApi {
   protected $moduleAuditor;
 
   /**
+   * The migration fingerprinter.
+   *
+   * @var \Drupal\acquia_migrate\MigrationFingerprinter
+   */
+  protected $migrationFingerprinter;
+
+  /**
    * HttpApi constructor.
    *
    * @param \Drupal\acquia_migrate\MigrationRepository $repository
@@ -217,10 +225,12 @@ final class HttpApi {
    *   The migration message analyzer.
    * @param \Drupal\acquia_migrate\ModuleAuditor $module_auditor
    *   The module auditor.
+   * @param \Drupal\acquia_migrate\MigrationFingerprinter $migration_fingerprinter
+   *   The migration fingerprinter.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, ConfigFactoryInterface $config_factory) {
+  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, ConfigFactoryInterface $config_factory) {
     $this->repository = $repository;
     $this->migrationBatchManager = $batch_manager;
     $this->connection = $connection;
@@ -229,7 +239,39 @@ final class HttpApi {
     $this->migrationMappingManipulator = $migration_mapping_manipulator;
     $this->messageAnalyzer = $message_analyzer;
     $this->moduleAuditor = $module_auditor;
+    $this->migrationFingerprinter = $migration_fingerprinter;
     $this->configFactory = $config_factory;
+  }
+
+  /**
+   * Returns a collection of migrations with stale imported data.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
+   */
+  public function staleData(Request $request): JsonResponse {
+    $this->validateRequest($request);
+    $this->migrationFingerprinter->compute();
+    $data = [];
+    foreach ($this->loadMigrations() as $migration) {
+      if ($migration->isStale()) {
+        $data[] = [
+          'type' => 'migration',
+          'id' => $migration->id(),
+          'attributes' => [
+            'label' => $migration->label(),
+          ],
+        ];
+      }
+    }
+    return JsonResponse::create([
+      'data' => $data,
+      'links' => [
+        'self' => [
+          'href' => $request->getUri(),
+        ],
+      ],
+    ], 200, static::$defaultResponseHeaders);
   }
 
   /**
@@ -241,7 +283,7 @@ final class HttpApi {
   public function moduleInformation(Request $request): JsonResponse {
     $this->validateRequest($request);
 
-    // This concatentates all resource objects, source modules and
+    // This concatenates all resource objects, source modules and
     // recommendations into a single array and remove all the array keys so that
     // they will be serialized as a JSON array instead of an object.
     return JsonResponse::create([
@@ -317,7 +359,17 @@ final class HttpApi {
       $total_import_count = array_reduce($resource_objects, function (int $sum, array $resource_object) : int {
         return $sum + $resource_object['attributes']['importedCount'];
       }, 0);
-
+      if ($this->migrationFingerprinter->recomputeRecommended()) {
+        $stale_data_url = Url::fromRoute('acquia_migrate.api.stale_data')
+          ->setAbsolute()
+          ->toString(TRUE);
+        $cacheability->addCacheableDependency($stale_data_url);
+        $document['links']['stale-data'] = [
+          "href" => $stale_data_url->getGeneratedUrl(),
+          "title" => $this->t('Check for updates'),
+          "rel" => UriDefinitions::LINK_REL_STALE_DATA,
+        ];
+      }
       if ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess()) {
         $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
           ->setAbsolute()
@@ -334,20 +386,6 @@ final class HttpApi {
       }
     }
     $total_message_count = $this->getTotalMigrationMessageCount();
-    if ($total_message_count > 0) {
-      $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
-        ->setAbsolute()
-        ->toString(TRUE);
-      $cacheability->addCacheableDependency($messages_route_url);
-      $document['links']['migration-messages'] = [
-        'href' => $messages_route_url->getGeneratedUrl(),
-        'rel' => UriDefinitions::LINK_REL_MIGRATION_MESSAGES,
-        'type' => 'text/html',
-        'title' => $this->t("Total errors: @messageCount", [
-          '@messageCount' => $total_message_count,
-        ]),
-      ];
-    }
     $total_entity_validation_message_count = $this->getTotalEntityValidationMigrationMessageCount();
     if ($total_entity_validation_message_count > 0) {
       $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
@@ -365,8 +403,41 @@ final class HttpApi {
         'href' => $messages_route_url->getGeneratedUrl(),
         'rel' => UriDefinitions::LINK_REL_MIGRATION_MESSAGES,
         'type' => 'text/html',
-        'title' => $this->t("Total validation errors: @messageCount", [
+        'title' => $this->t("Validation errors: @messageCount", [
           '@messageCount' => $total_entity_validation_message_count,
+        ]),
+      ];
+      $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
+        ->setOption('query', [
+          'filter' => implode(',', [
+            ':eq',
+            SqlWithCentralizedMessageStorage::COLUMN_CATEGORY,
+            HttpApi::MESSAGE_CATEGORY_OTHER,
+          ]),
+        ])
+        ->setAbsolute()
+        ->toString(TRUE);
+      $cacheability->addCacheableDependency($messages_route_url);
+      $document['links']['migration-entity-other-messages'] = [
+        'href' => $messages_route_url->getGeneratedUrl(),
+        'rel' => UriDefinitions::LINK_REL_MIGRATION_MESSAGES,
+        'type' => 'text/html',
+        'title' => $this->t("Other errors: @messageCount", [
+          '@messageCount' => $total_message_count - $total_entity_validation_message_count,
+        ]),
+      ];
+    }
+    if ($total_message_count > 0) {
+      $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
+        ->setAbsolute()
+        ->toString(TRUE);
+      $cacheability->addCacheableDependency($messages_route_url);
+      $document['links']['migration-messages'] = [
+        'href' => $messages_route_url->getGeneratedUrl(),
+        'rel' => UriDefinitions::LINK_REL_MIGRATION_MESSAGES,
+        'type' => 'text/html',
+        'title' => $this->t("Total errors: @messageCount", [
+          '@messageCount' => $total_message_count,
         ]),
       ];
     }

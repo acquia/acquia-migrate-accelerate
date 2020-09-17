@@ -1,4 +1,13 @@
 # API routes.
+acquia_migrate.api.stale_data:
+  path: /upgrade/api/stale-data
+  methods: ['GET']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:staleData
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
 acquia_migrate.api.module.info:
   path: &module_info_api_source /upgrade/api/module-info
   methods: ['GET']
@@ -132,12 +141,12 @@ acquia_migrate.api.migration.mapping.drop_source_field:
     _controller: controller.acquia_migrate.http_api:migrationMappingDropSourceField
   requirements:
     _permission: 'administer migrations'
+    destination_field_name: '(\{destinationFieldName\}|[\w_]+)'
   options:
     no_cache: 'TRUE'
     parameters:
       migration:
         type: 'migration'
-      destination_field_name: '[\w_]+'
 acquia_migrate.api.migration.mapping.revert_field_overrides:
   path: /upgrade/api/migrations/{migration}/mapping/revert/{destination_field_name}
   methods: ['POST']
@@ -145,12 +154,12 @@ acquia_migrate.api.migration.mapping.revert_field_overrides:
     _controller: controller.acquia_migrate.http_api:migrationMappingRevertOverrides
   requirements:
     _permission: 'administer migrations'
+    destination_field_name: '(\{destinationFieldName\}|[\w_]+)'
   options:
     no_cache: 'TRUE'
     parameters:
       migration:
         type: 'migration'
-      destination_field_name: '[\w_]+'
 acquia_migrate.api.migration.process:
   path: /upgrade/api/migration/process/{process_id}
   methods: ['GET']
@@ -191,6 +200,7 @@ acquia_migrate.migrations.dashboard:
       source: *migrations_api_source
       basepath: *migrations_ui_basepath
       basepath-preselect: &migrations_ui_preselect_basepath /upgrade/preselect
+      basepath-module: &migrations_ui_module_info_basepath /upgrade/modules
     _title: 'Migrations Dashboard'
   requirements:
     _permission: 'administer migrations'
@@ -228,7 +238,7 @@ acquia_migrate.migrations.preselect:
   options:
     _admin_route: TRUE
 acquia_migrate.migrations.module.info:
-  path: &migrations_ui_module_info_basepath /upgrade/modules
+  path: *migrations_ui_module_info_basepath
   defaults:
     _decoupled_page_main: acquia_migrate/modules
     _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider

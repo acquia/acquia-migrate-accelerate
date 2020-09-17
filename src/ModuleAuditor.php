@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\acquia_migrate;
 
+use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\State\StateInterface;
@@ -40,6 +41,13 @@ final class ModuleAuditor {
   protected $moduleHandler;
 
   /**
+   * The info parser.
+   *
+   * @var \Drupal\Core\Extension\InfoParserInterface
+   */
+  protected $infoParser;
+
+  /**
    * Initial module information.
    *
    * @var array
@@ -53,14 +61,17 @@ final class ModuleAuditor {
    *   The module extension list.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
+   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
+   *   The info parser.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(ModuleExtensionList $module_extension_list, ModuleHandlerInterface $module_handler, StateInterface $state, TranslationInterface $string_translation) {
+  public function __construct(ModuleExtensionList $module_extension_list, ModuleHandlerInterface $module_handler, InfoParserInterface $info_parser, StateInterface $state, TranslationInterface $string_translation) {
     $this->moduleExtensionList = $module_extension_list;
     $this->moduleHandler = $module_handler;
+    $this->infoParser = $info_parser;
     $this->stringTranslation = $string_translation;
     // This key should be set during the initial installation of the site using
     // this module. The value should be the output of the ah-migrate-info
@@ -199,14 +210,20 @@ final class ModuleAuditor {
    */
   protected function getModuleInformation(string $module_machine_name) : array {
     $module_in_codebase = $this->moduleExtensionList->exists($module_machine_name);
+    $info = $module_in_codebase
+      ? $this->infoParser->parse($this->moduleExtensionList->get($module_machine_name)->getPathname())
+      : [];
+    $version = $info['version'] ?? NULL;
+
     // Using the machine name and a human name, create a "display" name to be
     // used by the client UI.
     $display_name = $module_in_codebase
-      ? sprintf('%s (%s)', $this->moduleExtensionList->getName($module_machine_name), $module_machine_name)
+      ? trim($this->moduleExtensionList->getName($module_machine_name))
       : $module_machine_name;
     return [
       'displayName' => $display_name,
       'machineName' => $module_machine_name,
+      'version' => $version,
       'availableToInstall' => $module_in_codebase,
       'installed' => $module_in_codebase && $this->moduleHandler->moduleExists($module_machine_name),
     ];

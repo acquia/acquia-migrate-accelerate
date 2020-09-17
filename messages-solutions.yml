@@ -255,6 +255,12 @@ d7_menu_links:
         The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
     generic_solution: This menu link points to a path that no longer exists or possibly never existed. Perhaps it
       points to a View that hasn't been manually recreated?
+  - message:
+      regexp: >-
+        No parent link found for plid '\d+' in menu
+        The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
+    generic_solution: This menu link does not have a parent link. This is wrong in the Drupal 7 source database too,
+      please fix it there, refresh the source database and rollback & import this migration.
 
 d7_path_redirect:
   - message:
@@ -298,7 +304,7 @@ d7_url_alias:
   -
     message:
       regexp: >-
-        \[path_alias: (?<src_path_alias_id>\d+), revision: (?<src_path_alias_revision_id>\d+)\]: path.0.value=Either the
+        \[path_alias: (?<src_path_alias_id>\d+), revision: (?<src_path_alias_revision_id>\d+)\]: .*path.0.value=Either the
         path '(?<src_invalid_path_source>.+)' is invalid or you do not have access to it.
     generic_solution: This path alias points to a path that no longer exists or possibly never existed. Perhaps it
       points to a View that hasn't been manually recreated?
