@@ -396,14 +396,7 @@ class MigrationClusterer {
 
     // Compute cluster 3: one cluster per entity type + bundle.
     $entity_migrations = array_filter($migrations, [get_class($this), 'isContentEntityDestination']);
-    // Sort entity migrations by inspecting dependencies. Do this on a clone of
-    // each Migration object, to avoid overwriting the complete dependency
-    // metadata.
-    $entity_migrations = array_map(function ($object) {
-      return clone $object;
-    }, $entity_migrations);
-    $all_entity_migrations_sorted = array_keys($this->migrationManager->buildDependencyMigration($entity_migrations, []));
-    reset($all_entity_migrations_sorted);
+    $all_entity_migrations_sorted = $this->getSortedSubset(array_keys($entity_migrations), $migrations);
     // $entity_migrations contains only content entity migrations, not their
     // dependencies. Without their dependencies, they will fail. Use the
     // dependency metadata on the entity migrations to determine which other
@@ -415,7 +408,7 @@ class MigrationClusterer {
       $migration = $migrations[$migration_id];
       $entity_cluster = (string) $migration->label();
       if (!empty($migration->getMetadata('after'))) {
-        $to_be_lifted_migration_ids = array_diff_key(static::getRecursivelyRequiredMigrationDependencies($migration_id, $migrations), $entity_migrations_plus_dependencies, $clustered_migrations);
+        $to_be_lifted_migration_ids = static::getRecursivelyRequiredMigrationDependenciesExcept($migration_id, $migrations, $entity_migrations_plus_dependencies, $clustered_migrations);
         // "d7_menu_link:<entity_type_id>" migrations should be lifted into the
         // corresponding entity cluster, and not into "d7_shortcut".
         if ($migration_id === 'd7_shortcut') {
@@ -605,7 +598,7 @@ class MigrationClusterer {
    * @return array
    *   An array of migration plugin IDs.
    */
-  protected static function getRecursivelyRequiredMigrationDependencies($migration_plugin_id, array $all_migration_plugins) : array {
+  protected static function getRecursivelyRequiredMigrationDependencies(string $migration_plugin_id, array $all_migration_plugins) : array {
     static $recursive_calls;
     if (!isset($recursive_calls)) {
       $recursive_calls = [];
@@ -635,6 +628,76 @@ class MigrationClusterer {
     }
     unset($recursive_calls[$migration_plugin_id]);
     return array_unique($deps);
+  }
+
+  /**
+   * Gets the recursive required dependencies for a migration plugin.
+   *
+   * @param string $migration_plugin_id
+   *   The ID of the migration plugin for which to get the recursive required
+   *   dependencies.
+   * @param \Drupal\migrate\Plugin\MigrationInterface[] $all_migration_plugins
+   *   An array of all available migration plugin instances, keyed by migration
+   *   ID.
+   * @param array $except
+   *   Arrays of migration plugin IDs to exclude.
+   *
+   * @return array
+   *   An array of migration plugin IDs.
+   */
+  protected static function getRecursivelyRequiredMigrationDependenciesExcept(string $migration_plugin_id, array $all_migration_plugins, array ...$except) : array {
+    return array_diff_key(static::getRecursivelyRequiredMigrationDependencies($migration_plugin_id, $all_migration_plugins), ...$except);
+  }
+
+  /**
+   * Gets a sorted subset of migration plugin IDs.
+   *
+   * @param string[] $subset
+   *   The subset of migration plugin IDs for which to get the required
+   *   dependency-respecting sorting order.
+   * @param \Drupal\migrate\Plugin\MigrationInterface[] $all_migration_plugins
+   *   An array of all available migration plugin instances, keyed by migration
+   *   ID.
+   *
+   * @return string[]
+   *   The sorted subset of migration plugin IDs.
+   */
+  protected function getSortedSubset(array $subset, array $all_migration_plugins) : array {
+    // @codingStandardsIgnoreStart
+    // Assert shape of input data:
+    // - they must be Migration plugin instances
+    assert(Inspector::assertAllObjects($all_migration_plugins, Migration::class));
+    // - the subset must be valid
+    assert(count($subset) === count(array_intersect(array_keys($all_migration_plugins), $subset)));
+    // @codingStandardsIgnoreEnd
+
+    // Sort migrations by inspecting dependencies. Do this on a clone of each
+    // Migration plugin instance, to avoid overwriting the complete dependency
+    // metadata. To ensure a correct ordering, we must include all required
+    // dependencies in this subset too: we must operate on the subgraph.
+    $subgraph = [];
+    foreach ($subset as $migration_plugin_id) {
+      $subgraph[$migration_plugin_id] = clone $all_migration_plugins[$migration_plugin_id];
+      // Add missing required dependencies to the subgraph.
+      $missing_dependencies = static::getRecursivelyRequiredMigrationDependenciesExcept($migration_plugin_id, $all_migration_plugins, $subgraph);
+      foreach ($missing_dependencies as $dependency_plugin_id) {
+        // Some required migration dependencies may not exist because they were
+        // explicitly omitted by the migration plugin manager due to their
+        // requirements not having been met.
+        // For example, d7_user depends on user_profile_field_instance, but not
+        // every D7 site has user profile fields enabled.
+        if (isset($all_migration_plugins[$dependency_plugin_id])) {
+          $subgraph[$dependency_plugin_id] = clone $all_migration_plugins[$dependency_plugin_id];
+        }
+      }
+    }
+    $sorted_subgraph = $this->migrationManager->buildDependencyMigration($subgraph, []);
+    $sorted_subset = array_intersect(array_keys($sorted_subgraph), $subset);
+    reset($sorted_subset);
+
+    assert(count($subset) === count(array_intersect($subset, $sorted_subset)));
+
+    return $sorted_subset;
   }
 
   /**

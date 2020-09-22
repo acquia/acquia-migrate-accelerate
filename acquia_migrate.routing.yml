@@ -253,3 +253,14 @@ acquia_migrate.migrations.module.info:
     _decoupled_page_paths:
       page: /upgrade/modules/{page}
     _admin_route: TRUE
+acquia_migrate.acquia_site_studio:
+  path: /upgrade/acquia-site-studio
+  defaults:
+    _title: 'Appearance'
+    _controller: Drupal\acquia_migrate\Controller\GetStarted:acquiaSiteStudio
+  requirements:
+    # Any user should be able to see the getting started page.
+    _access: 'TRUE'
+  options:
+    no_cache: 'TRUE'
+    _admin_route: 'TRUE'

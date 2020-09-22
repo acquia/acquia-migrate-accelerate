@@ -167,16 +167,34 @@ final class MigrationAlterer {
    *   enriched with some meta information added during discovery phase.
    */
   public function refineMigrationLabel(array &$migration) {
-    if (!isset($migration['deriver']) || !isset($migration['destination']['plugin'])  || strpos($migration['destination']['plugin'], ':') === FALSE) {
-      // Not a derived migration; invalid migration without a source plugin, or
+    if (!isset($migration['destination']['plugin'])  || strpos($migration['destination']['plugin'], ':') === FALSE) {
+      // Invalid migration without a destination plugin, or
       // no ':' delimiter in the destination plugin – nothing to do.
       return;
     }
 
-    $entity_destination_base_plugin_ids = ['entity_complete', 'entity'];
+    $entity_destination_base_plugin_ids = [
+      'entity',
+      'entity_complete',
+    ];
 
-    list($base_plugin_id, $target_entity_type_id) = explode(':', $migration['destination']['plugin']);
+    [
+      $base_plugin_id,
+      $target_entity_type_id,
+    ] = explode(':', $migration['destination']['plugin']);
     if (empty($target_entity_type_id) || !in_array($base_plugin_id, $entity_destination_base_plugin_ids, TRUE)) {
+      return;
+    }
+
+    // Construct a custom label for webform and webform submission migrations.
+    // @todo Consider creating derivatives of this migration based on data in https://backlog.acquia.com/browse/OCTO-3676
+    if ($target_entity_type_id === 'webform_submission') {
+      $migration['label'] = $this->t('Webform submissions (including webforms)');
+      return;
+    }
+
+    if (!isset($migration['deriver'])) {
+      // Not a derived migration.
       return;
     }
 
@@ -346,7 +364,8 @@ final class MigrationAlterer {
 
       $destination = isset($migration_data['destination']['plugin']) ? $migration_data['destination']['plugin'] : NULL;
       $source_type = $migration_data['source']['type'] ?? $migration_data['source']['source_field_type'] ?? NULL;
-      $source_plugin_is_media_source = in_array($migration_data['source']['plugin'], ['d7_file_entity_item', 'd7_file_plain'], TRUE);
+      $media_source_plugin_ids = ['d7_file_entity_item', 'd7_file_plain'];
+      $source_plugin_is_media_source = in_array($migration_data['source']['plugin'], $media_source_plugin_ids, TRUE);
 
       if (!$source_plugin_is_media_source || $destination !== 'entity:media' || !$source_type) {
         continue;

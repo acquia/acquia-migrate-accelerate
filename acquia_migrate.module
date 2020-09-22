@@ -54,6 +54,14 @@ function acquia_migrate_toolbar() {
               'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-modules'],
             ],
           ],
+          'acquia-site-studio' => [
+            'type' => 'link',
+            'title' => t('Appearance'),
+            'url' => Url::fromRoute('acquia_migrate.acquia_site_studio'),
+            'attributes' => [
+              'class' => ['toolbar-icon', 'toolbar-icon-system-themes-page'],
+            ],
+          ],
         ],
         '#attributes' => [
           'class' => ['toolbar-menu'],

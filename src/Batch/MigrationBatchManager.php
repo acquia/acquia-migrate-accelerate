@@ -387,17 +387,25 @@ final class MigrationBatchManager {
         'op' => 'do',
         '_format' => 'json',
       ])->toString()), HttpKernelInterface::SUB_REQUEST);
+      if ($response->isServerError()) {
+        // @todo create BatchError class?
+        return new BatchUnknown();
+      }
       $status = Json::decode($response->getContent());
       $progress = floatval($status['percentage']) / 100;
       $progress = min($progress, 0.99);
       return new BatchStatus($batch_id, $progress);
     }
     else {
-      $this->httpKernel->handle(Request::create($batch_url->setOption('query', [
+      $response = $this->httpKernel->handle(Request::create($batch_url->setOption('query', [
         'id' => $batch_id,
         'op' => 'finished',
         '_format' => 'json',
       ])->toString()), HttpKernelInterface::SUB_REQUEST);
+      if ($response->isServerError()) {
+        // @todo create BatchError class?
+        return new BatchUnknown();
+      }
       return new BatchStatus($batch_id, 1);
     }
   }
