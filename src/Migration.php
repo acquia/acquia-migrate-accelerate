@@ -42,6 +42,13 @@ final class Migration {
   const ACTIVITY_ROLLING_BACK = 'rollingBack';
 
   /**
+   * This migration is being refreshed.
+   *
+   * @var string
+   */
+  const ACTIVITY_REFRESHING = 'refreshing';
+
+  /**
    * The migration ID: an opaque identifier, without meaning.
    *
    * @var string
@@ -465,7 +472,7 @@ final class Migration {
    *   Whether this migration is stale.
    */
   public function isStale() : bool {
-    return MigrationFingerprinter::detectChange($this->lastImportFingerprint, $this->lastComputedFingerprint);
+    return MigrationFingerprinter::detectChange($this->lastImportFingerprint, $this->lastComputedFingerprint) && $this->canBeRolledBack();
   }
 
   /**
@@ -522,26 +529,20 @@ final class Migration {
         'migrationId' => $this->id(),
       ]);
     }
-    if ($this->getProcessedCount() > 0) {
-      $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
-        return $migration_plugin->getDestinationPlugin()->supportsRollback()
-          ? array_merge($rollback_capable_plugins, [$migration_plugin])
-          : $rollback_capable_plugins;
-      }, []);
-      // @todo: should there be a special case here when *some*, but not *all*, plugins support rollback?
-      if (count($rollback_capable_plugins) > 0 && count($rollback_capable_plugins) === count($this->migrationPlugins)) {
-        $urls['rollback'] = Url::fromRoute('acquia_migrate.api.migration.rollback')->setOption('query', [
-          'migrationId' => $this->id(),
-        ]);
-        $urls['rollback-and-import'] = Url::fromRoute('acquia_migrate.api.migration.rollback_import')->setOption('query', [
-          'migrationId' => $this->id(),
-        ]);
-        if ($this->isStale()) {
-          $urls['refresh'] = Url::fromRoute('acquia_migrate.api.migration.rollback_import')->setOption('query', [
-            'migrationId' => $this->id(),
-          ]);
-        }
-      }
+
+    if ($this->canBeRolledBack()) {
+      $urls['rollback'] = Url::fromRoute('acquia_migrate.api.migration.rollback')->setOption('query', [
+        'migrationId' => $this->id(),
+      ]);
+      $urls['rollback-and-import'] = Url::fromRoute('acquia_migrate.api.migration.rollback_import')->setOption('query', [
+        'migrationId' => $this->id(),
+      ]);
+    }
+
+    if ($this->isStale() && $this->isImportable()) {
+      $urls['refresh'] = Url::fromRoute('acquia_migrate.api.migration.refresh')->setOption('query', [
+        'migrationId' => $this->id(),
+      ]);
     }
 
     if (!$this->isCompleted()) {
@@ -585,6 +586,26 @@ final class Migration {
     }
 
     return $urls;
+  }
+
+  /**
+   * Whether this migration is capable of being rolled back.
+   *
+   * @return bool
+   *   TRUE if a migration has processed at least 1 row and all of its migration
+   *   plugins can be rolled back, FALSE otherwise.
+   */
+  protected function canBeRolledBack() : bool {
+    if ($this->getProcessedCount() === 0) {
+      return FALSE;
+    }
+    // @todo: should there be a special case here when *some*, but not *all*, plugins support rollback?
+    $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
+      return $migration_plugin->getDestinationPlugin()->supportsRollback()
+        ? array_merge($rollback_capable_plugins, [$migration_plugin])
+        : $rollback_capable_plugins;
+    }, []);
+    return count($rollback_capable_plugins) > 0 && count($rollback_capable_plugins) === count($this->migrationPlugins);
   }
 
   /**
@@ -674,6 +695,14 @@ final class Migration {
 
     switch ($max_migration_plugin_status) {
       case MigrationInterface::STATUS_IMPORTING:
+        // Refreshing is a special case of importing as far as the migration
+        // system is concerned. Therefore we need to carefully detect this. Note
+        // this is specifically not using ::getUiProcecessedCount()!
+        // @see ::getProcessedCount()
+        // @see ::getUiProcessedCount()
+        if ($this->getProcessedCount() == $this->getTotalCount()) {
+          return self::ACTIVITY_REFRESHING;
+        }
         return self::ACTIVITY_IMPORTING;
 
       case MigrationInterface::STATUS_ROLLING_BACK:
@@ -744,6 +773,7 @@ final class Migration {
         'processedCount' => $migration->getUiProcessedCount(),
         'totalCount' => $migration->getTotalCount(),
         'completed' => $migration->isCompleted(),
+        'stale' => $migration->isStale(),
         'skipped' => $migration->isSkipped(),
         'lastImported' => NULL,
         'activity' => $migration->getActivity(),

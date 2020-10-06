@@ -105,6 +105,10 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   // @see \Drupal\acquia_migrate\Plugin\migrate\source\UserWithoutOne
   assert($migrations['d7_user']['source']['plugin'] === 'd7_user');
   $migrations['d7_user']['source']['plugin'] = 'd7_user_without_one';
+
+  // Enable change tracking on migration plugins so that they can be re-imported
+  // without rolling them back (a.k.a. "refreshed").
+  $migration_alterer->addChangeTracking($migrations);
 }
 
 /**

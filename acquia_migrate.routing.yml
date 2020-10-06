@@ -78,6 +78,16 @@ acquia_migrate.api.migration.import:
     _permission: 'administer migrations'
   options:
     no_cache: 'TRUE'
+acquia_migrate.api.migration.refresh:
+  path: /upgrade/api/migration/refresh
+  methods: ['POST']
+  defaults:
+    _controller: controller.acquia_migrate.http_api:migrationStart
+    migration_action: 'refresh'
+  requirements:
+    _permission: 'administer migrations'
+  options:
+    no_cache: 'TRUE'
 acquia_migrate.api.migration.rollback:
   path: /upgrade/api/migration/rollback
   methods: ['POST']

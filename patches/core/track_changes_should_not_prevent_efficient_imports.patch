@@ -1,0 +1,20 @@
+diff --git a/core/modules/migrate/src/Plugin/migrate/source/SqlBase.php b/core/modules/migrate/src/Plugin/migrate/source/SqlBase.php
+index ec22c3f65e..4b1e06db80 100644
+--- a/core/modules/migrate/src/Plugin/migrate/source/SqlBase.php
++++ b/core/modules/migrate/src/Plugin/migrate/source/SqlBase.php
+@@ -412,8 +412,13 @@ protected function mapJoinable() {
+     }
+
+     // If we are tracking changes, we also need to retrieve all rows to compare
+-    // hashes
+-    if ($this->trackChanges) {
++    // hashes. However, only do this when we now we want to refresh already
++    // imported rows, otherwise we slow down initial imports too.
++    // (When migrating using the UI, the batch system is used. This means a
++    // migration runs across many requests, and not joining against the map
++    // table implies every batch request must iterate over every source row,
++    // causing a performance regression.
++    if (\Drupal\acquia_migrate\Batch\MigrationBatchManager::$isRefreshing && $this->trackChanges) {
+       return FALSE;
+     }
+

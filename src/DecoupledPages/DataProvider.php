@@ -63,15 +63,18 @@ class DataProvider implements DataProviderInterface {
    */
   public function getData(Route $route, Request $request): Dataset {
     $cacheability = new CacheableMetadata();
+    $uuid = AcquiaDrupalEnvironmentDetector::getAhApplicationUuid();
+    $cloud_url = $uuid ? 'https://cloud.acquia.com/a/develop/applications/' . $uuid : NULL;
     return Dataset::cacheVariable($cacheability->setCacheMaxAge(86400), [
       'tracking-api-key' => $this->key,
       'module-path' => $this->modulePath,
       'drupal-app-id' => Crypt::hashBase64($this->configFactory->get('system.site')->get('uuid')),
-      'ah-app-uuid' => AcquiaDrupalEnvironmentDetector::getAhApplicationUuid(),
+      'ah-app-uuid' => $uuid,
       'ah-realm' => AcquiaDrupalEnvironmentDetector::getAhRealm(),
       'ah-non-production' => AcquiaDrupalEnvironmentDetector::getAhNonProduction(),
       'ah-env' => AcquiaDrupalEnvironmentDetector::getAhEnv(),
       'ah-group' => AcquiaDrupalEnvironmentDetector::getAhGroup(),
+      'ah-cloud-url' => $cloud_url,
     ]);
   }
 

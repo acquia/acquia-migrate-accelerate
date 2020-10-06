@@ -27,6 +27,7 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -56,6 +57,11 @@ final class HttpApi {
    * The "other" category of migration messages. This is the default.
    */
   const MESSAGE_CATEGORY_OTHER = 'other';
+
+  /**
+   * The name used to identify the lock that ensures only a single active batch.
+   */
+  const ACTIVE_BATCH = 'acquia_migrate__active_batch';
 
   /**
    * Cache contexts to be added to all cacheable responses.
@@ -207,6 +213,13 @@ final class HttpApi {
   protected $migrationFingerprinter;
 
   /**
+   * The persistent lock which is used to lock across requests.
+   *
+   * @var \Drupal\Core\Lock\LockBackendInterface
+   */
+  protected $persistentLock;
+
+  /**
    * HttpApi constructor.
    *
    * @param \Drupal\acquia_migrate\MigrationRepository $repository
@@ -229,8 +242,10 @@ final class HttpApi {
    *   The migration fingerprinter.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
+   * @param \Drupal\Core\Lock\LockBackendInterface $persistent_lock
+   *   A persistent lock backend instance.
    */
-  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, ConfigFactoryInterface $config_factory) {
+  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, ConfigFactoryInterface $config_factory, LockBackendInterface $persistent_lock) {
     $this->repository = $repository;
     $this->migrationBatchManager = $batch_manager;
     $this->connection = $connection;
@@ -241,6 +256,7 @@ final class HttpApi {
     $this->moduleAuditor = $module_auditor;
     $this->migrationFingerprinter = $migration_fingerprinter;
     $this->configFactory = $config_factory;
+    $this->persistentLock = $persistent_lock;
   }
 
   /**
@@ -316,6 +332,11 @@ final class HttpApi {
    * @see \Drupal\node\Plugin\migrate\D7NodeTranslation::generateFollowUpMigrations
    */
   public function migrationsCollection(Request $request): JsonResponse {
+    // @see system_cron() — we want this to run more frequently and more
+    // reliably than cron so that expired locks are quickly cleaned up.
+    // @codingStandardsIgnoreLine
+    \Drupal::service('keyvalue.expirable.database')->garbageCollection();
+
     $this->validateRequest($request);
     $cacheability = new CacheableMetadata();
     $cacheability->addCacheContexts(static::$defaultCacheContexts);
@@ -370,7 +391,7 @@ final class HttpApi {
           "rel" => UriDefinitions::LINK_REL_STALE_DATA,
         ];
       }
-      if ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess()) {
+      if ($this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH) && ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess())) {
         $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
           ->setAbsolute()
           ->toString(TRUE);
@@ -1213,8 +1234,8 @@ final class HttpApi {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request to serve.
    * @param string $migration_action
-   *   The migration action to start processing. Either 'import', 'rollback', or
-   *   'rollback-and-import'.
+   *   The migration action to start processing. Either 'import', 'rollback',
+   *   'rollback-and-import', or 'refresh'.
    *   This argument is defined as a route default.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -1224,6 +1245,19 @@ final class HttpApi {
     $this->validateRequest($request, [
       'required' => ['migrationId'],
     ]);
+
+    if (!$this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH)) {
+      return JsonResponse::create([
+        'errors' => [
+          [
+            'code' => (string) 400,
+            'status' => Response::$statusTexts[400],
+            'detail' => 'Another Acquia Migrate: Accelerate operation is already running. Please coordinate with your colleagues because to guarantee data consistency concurrent migration operations are not supported.',
+          ],
+        ],
+      ], 400, static::$defaultResponseHeaders);
+    }
+
     $migration_id = $request->get('migrationId');
     // @todo: validate that the requested migration ID exists.
     $batch_url = $this->getMigrationProcessUrl($migration_id, $migration_action)->setAbsolute();
@@ -1289,6 +1323,7 @@ final class HttpApi {
       // @todo: should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.
       return JsonResponse::create(NULL, 404, static::$defaultResponseHeaders);
     }
+    $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
     $data = [
       'type' => 'migrationProcess',
       'id' => (string) $process_id,
@@ -1300,6 +1335,9 @@ final class HttpApi {
     $links = ['self' => ['href' => $self_url->toString()]];
     if ($batch_status->getProgress() < 1) {
       $links['next'] = ['href' => $self_url->toString()];
+    }
+    else {
+      $this->persistentLock->release(static::ACTIVE_BATCH);
     }
     return JsonResponse::create([
       'data' => $data,
@@ -1315,8 +1353,9 @@ final class HttpApi {
    *   provided.
    * @param string $action
    *   An action type. Either MigrationBatchManager::ACTION_IMPORT,
-   *   MigrationBatchManager::ACTION_ROLLBACK, or
-   *   MigrationBatchManager::ACTION_ROLLBACK_AND_IMPORT.
+   *   MigrationBatchManager::ACTION_ROLLBACK,
+   *   MigrationBatchManager::ACTION_ROLLBACK_AND_IMPORT, or
+   *   MigrationBatchManager::ACTION_REFRESH.
    *
    * @return \Drupal\Core\Url
    *   The first batch URL, following this URL should allow Drupal to start
@@ -1325,6 +1364,7 @@ final class HttpApi {
    * @see \Drupal\acquia_migrate\Batch\MigrationBatchManager::ACTION_IMPORT
    * @see \Drupal\acquia_migrate\Batch\MigrationBatchManager::ACTION_ROLLBACK
    * @see \Drupal\acquia_migrate\Batch\MigrationBatchManager::ACTION_ROLLBACK_AND_IMPORT
+   * @see \Drupal\acquia_migrate\Batch\MigrationBatchManager::ACTION_REFRESH
    */
   protected function getMigrationProcessUrl(string $migration, string $action): Url {
     $batch_status = $this->migrationBatchManager->createMigrationBatch($migration, $action);

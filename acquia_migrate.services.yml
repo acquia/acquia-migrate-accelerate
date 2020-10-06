@@ -16,6 +16,7 @@ services:
       - '@acquia_migrate.module_auditor'
       - '@acquia_migrate.migration_fingerprinter'
       - '@config.factory'
+      - '@lock.persistent'
 
   # Migration action supporting services: preview, mapping viewer, mapping manipulator.
   acquia_migrate.previewer:
@@ -151,6 +152,9 @@ services:
     class: Drupal\acquia_migrate\MigrationAlterer
     arguments:
       - '@entity_type.manager'
+      - '@entity_field.manager'
+      - '@plugin.manager.migrate.source'
+      - '@plugin.manager.migrate.destination'
 
   # Service decorator
   acquia_migrate.cache_tags.invalidator:

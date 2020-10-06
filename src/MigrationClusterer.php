@@ -409,14 +409,6 @@ class MigrationClusterer {
       $entity_cluster = (string) $migration->label();
       if (!empty($migration->getMetadata('after'))) {
         $to_be_lifted_migration_ids = static::getRecursivelyRequiredMigrationDependenciesExcept($migration_id, $migrations, $entity_migrations_plus_dependencies, $clustered_migrations);
-        // "d7_menu_link:<entity_type_id>" migrations should be lifted into the
-        // corresponding entity cluster, and not into "d7_shortcut".
-        if ($migration_id === 'd7_shortcut') {
-          $to_be_lifted_migration_ids = array_filter($to_be_lifted_migration_ids, function (string $id) {
-            $base_plugin_id = explode(':', $id)[0];
-            return $base_plugin_id !== 'd7_menu_links';
-          });
-        }
         $lifted_migrations = array_map(
           call_user_func_array([get_class($this), 'setClusterCallback'], ["LIFTED-$entity_cluster"]),
           array_intersect_key($migrations, $to_be_lifted_migration_ids)
