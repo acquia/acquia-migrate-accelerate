@@ -861,6 +861,14 @@ iframe {
   margin: -2rem 0 0 0;
 }
 
+.module-recommendations__recommendation > .datagrid__item {
+  margin-top: 2rem;
+}
+
+.module-recommendations__recommendation > .module-recommendations__recommendation-header + .datagrid__item {
+  margin-top: inherit;
+}
+
 .module-recommendations__module-list {
   margin: 0;
   padding: 0;

@@ -155,6 +155,7 @@ services:
       - '@entity_field.manager'
       - '@plugin.manager.migrate.source'
       - '@plugin.manager.migrate.destination'
+      - '@logger.channel.acquia_migrate'
 
   # Service decorator
   acquia_migrate.cache_tags.invalidator:

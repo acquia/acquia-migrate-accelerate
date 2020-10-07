@@ -9,6 +9,8 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\migrate\Exception\RequirementsException;
@@ -120,6 +122,22 @@ final class MigrationAlterer {
     ],
   ];
 
+  const FIELD_MIGRATION_PLUGIN_IDS = [
+    'd7_view_modes',
+    'd7_field',
+    'd7_field_instance',
+    'd7_field_instance_widget_settings',
+    'd7_field_formatter_settings',
+    'd7_field_instance_per_form_display',
+    'd7_field_instance_per_view_mode',
+  ];
+
+  const ENTITY_TYPE_KNOWN_REMAP = [
+    // @see \Drupal\paragraphs\MigrationPluginsAlterer::PARAGRAPHS_ENTITY_TYPE_ID_MAPs
+    'field_collection_item' => 'paragraph',
+    'paragraphs_item' => 'paragraph',
+  ];
+
   /**
    * Migration tag.
    *
@@ -159,6 +177,13 @@ final class MigrationAlterer {
   protected $destinationPluginManager;
 
   /**
+   * The logger to use.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a MigrationAlterer.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -169,12 +194,15 @@ final class MigrationAlterer {
    *   The migrate source plugin manager.
    * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $destination_plugin_manager
    *   The migrate destination plugin manager.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger to use.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager, LoggerChannelInterface $logger) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->sourcePluginManager = $source_plugin_manager;
     $this->destinationPluginManager = $destination_plugin_manager;
+    $this->logger = $logger;
   }
 
   /**
@@ -696,6 +724,42 @@ final class MigrationAlterer {
   }
 
   /**
+   * Omits field-related migrations for missing entity types.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   */
+  public function omitFieldMigrationsForMissingEntityTypes(array &$migrations) {
+    $omitted_migration_plugin_ids = [];
+
+    foreach ($migrations as $migration_id => $migration_data) {
+      $base_plugin_id = $migration_data['id'];
+      if (!in_array($base_plugin_id, self::FIELD_MIGRATION_PLUGIN_IDS, TRUE)) {
+        continue;
+      }
+
+      $source_entity_type_id = $migration_data['source']['entity_type'];
+      $destination_entity_type_id = isset(self::ENTITY_TYPE_KNOWN_REMAP[$source_entity_type_id])
+        ? self::ENTITY_TYPE_KNOWN_REMAP[$source_entity_type_id]
+        : $source_entity_type_id;
+
+      if (!$this->entityTypeManager->hasDefinition($destination_entity_type_id)) {
+        unset($migrations[$migration_id]);
+        $omitted_migration_plugin_ids[$destination_entity_type_id][] = $migration_id;
+      }
+    }
+
+    foreach ($omitted_migration_plugin_ids as $entity_type_id => $ids) {
+      $this->logger->debug('Omitted @count field-related migration plugin (@migration-plugin-ids) because the entity type "@entity-type-id" does not exist on the destination site.', [
+        '@count' => count($ids),
+        '@migration-plugin-ids' => implode(', ', $ids),
+        '@entity-type-id' => $entity_type_id,
+      ]);
+    }
+  }
+
+  /**
    * Sets the high_water_property or track_changes on all migrations.
    *
    * This will set the `track_changes` migration source property to TRUE, unless
@@ -733,6 +797,11 @@ final class MigrationAlterer {
    */
   public function addChangeTracking(array &$migrations) {
     foreach ($migrations as $migration_id => $definition) {
+      // Only add change tracking to Drupal 7 migrations.
+      $is_drupal_7_migration = !empty($definition['migration_tags']) && is_array($definition['migration_tags']) && in_array('Drupal 7', $definition['migration_tags'], TRUE);
+      if (!$is_drupal_7_migration) {
+        continue;
+      }
       // Only continue if the migration plugin already has a change tracking
       // option set up.
       if (isset($migrations[$migration_id]['source']['high_water_property']) || isset($migrations[$migration_id]['source']['track_changes'])) {
@@ -794,7 +863,7 @@ final class MigrationAlterer {
       // guaranteed by the core migrate system.
       try {
         $stub_migration_plugin = new StubMigrationPlugin();
-        $source_plugin = $this->sourcePluginManager->createInstance($source_plugin_id, [], $stub_migration_plugin);
+        $source_plugin = $this->sourcePluginManager->createInstance($source_plugin_id, $definition['source'], $stub_migration_plugin);
       }
       catch (PluginException $e) {
         $migrations[$migration_id]['source']['track_changes'] = TRUE;
@@ -812,6 +881,56 @@ final class MigrationAlterer {
       $migrations[$migration_id]['source']['high_water_property'] = [
         'name' => $source_field,
       ];
+
+      // When the source plugin queries multiple tables and multiple tables have
+      // the source plugin's high_water_property source field name as one of
+      // their columns, then set the optional `alias` to ensure the correct
+      // table alias is specified. Otherwise the SQL query will fail due to an
+      // ambiguous query.
+      if (count($source_plugin->query()->getTables()) > 1) {
+        $selected_table_alias = NULL;
+        $tables = $source_plugin->query()->getTables();
+        $schema = $source_plugin->getDatabase()->schema();
+        // Determine in which tables in the query the high_water_property column
+        // exists.
+        $candidate_table_aliases = [];
+        foreach ($tables as $alias => $table_info) {
+          if ($schema->fieldExists($table_info['table'], $source_field)) {
+            $candidate_table_aliases[$table_info['table']] = $alias;
+          }
+        }
+        // Only add an alias if the high_water_property column truly exists in
+        // multiple tables.
+        if (count($candidate_table_aliases) > 1) {
+          $base_migration_plugin_id = $definition['id'];
+          $selected_table_alias = NULL;
+          $is_heuristic = FALSE;
+          switch ($base_migration_plugin_id) {
+            case 'd7_comment':
+              // @see \Drupal\comment\Plugin\migrate\source\d7\Comment::query()
+              $selected_table_alias = 'c';
+              break;
+
+            default:
+              $selected_table_alias = reset(array_keys($candidate_table_aliases));
+              $is_heuristic = TRUE;
+              break;
+          }
+          $level = $is_heuristic
+            ? RfcLogLevel::WARNING
+            : RfcLogLevel::DEBUG;
+          $this->logger->log($level, 'The high_water_property "@column-name" for the base migration plugin "@migration-plugin-id" occurred in @count tables in the query, of which @count-column contain this column. The alias "@alias" for the table "@table" was selected. (@known-or-heuristic)', [
+            '@column-name' => $source_field,
+            '@migration-plugin-id' => $migration_id,
+            '@count' => count($tables),
+            '@count-column' => count($candidate_table_aliases),
+            '@alias' => $selected_table_alias,
+            '@table' => $tables[$selected_table_alias]['table'],
+            '@known-or-heuristic' => $is_heuristic ? 'Heuristic, should be investigated and hardcode a known disambiguation.' : 'Known ambiguity.',
+          ]);
+          $migrations[$migration_id]['source']['high_water_property']['alias'] = $selected_table_alias;
+        }
+      }
     }
   }
 

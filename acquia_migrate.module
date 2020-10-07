@@ -100,6 +100,7 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   $migration_alterer->refineMediaEntityMigrations($migrations);
   $migration_alterer->addDiscoveredTaxonomyDependencies($migrations);
   $migration_alterer->addFieldTypePluginChecker($migrations);
+  $migration_alterer->omitFieldMigrationsForMissingEntityTypes($migrations);
 
   // Use custom source plugin for migrating users to prevent migrating user 1.
   // @see \Drupal\acquia_migrate\Plugin\migrate\source\UserWithoutOne
