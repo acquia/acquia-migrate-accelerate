@@ -25,6 +25,13 @@ final class ModuleAuditor {
   use StringTranslationTrait;
 
   /**
+   * State key for storing the last fingerprint canary time.
+   *
+   * @const string
+   */
+  const KEY_INITIAL_INFO = 'acquia_migrate.initial_info';
+
+  /**
    * The module extension list.
    *
    * @var \Drupal\Core\Extension\ModuleExtensionList
@@ -75,9 +82,8 @@ final class ModuleAuditor {
     $this->stringTranslation = $string_translation;
     // This key should be set during the initial installation of the site using
     // this module. The value should be the output of the ah-migrate-info
-    // command. The migrate-quickstart command does this automatically.
-    // @see https://github.com/acquia/ah-migrate-utils
-    $this->initialInfo = $state->get('acquia_migrate.initial_info', []);
+    // command.
+    $this->initialInfo = $state->get(static::KEY_INITIAL_INFO, []);
   }
 
   /**

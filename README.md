@@ -42,7 +42,7 @@ Open your Drupal 9 site's `sites/default/settings.php`, create a new `$databases
 
 ## Troubleshooting
 
-### I go to `/upgrade/migrations` I get "An unrecognized error occurred." What gives?!
+### I go to `/acquia-migrate-accelerate/migrations` I get "An unrecognized error occurred." What gives?!
 
 This is normally caused by Drupal issuing a 500 error. Go to `/admin/reports/dblog` and see if that holds any clues. Another common troubleshooting step is to clear the cache. (Navigate to `/admin/config/development/performance` or run `drush cr`)
 

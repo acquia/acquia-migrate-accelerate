@@ -5,6 +5,7 @@ namespace Drupal\acquia_migrate;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 
 /**
  * Utilities for working with the migrate source database.
@@ -33,9 +34,18 @@ final class SourceDatabase {
    */
   public static function isConnected(): bool {
     try {
-      static::getConnection();
+      static::getConnection()->select(MigrationFingerprinter::CANARY_TABLE)
+        ->countQuery()
+        ->execute()
+        ->fetchField();
     }
     catch (ConnectionNotDefinedException $e) {
+      return FALSE;
+    }
+    catch (DatabaseExceptionWrapper $e) {
+      // If even the migration fingerprinter's canary table is not present, then
+      // the database cannot contain Drupal 7 data. Merely a valid database
+      // connection is insufficient for Acquia Migrate: Accelerate to function.
       return FALSE;
     }
     catch (\Exception $e) {

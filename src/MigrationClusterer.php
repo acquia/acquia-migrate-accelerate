@@ -3,9 +3,9 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\MigrateBuildDependencyInterface;
@@ -479,6 +479,46 @@ class MigrationClusterer {
         $migration_to_push_towards = reset($clustered_dependees);
         $cluster_to_push_towards = $migrations[$migration_to_push_towards]->getMetadata('cluster');
         $migration->setMetadata('cluster', $cluster_to_push_towards);
+      }
+      // We will try to find a matching cluster for every not-yet-clustered
+      // migration which
+      // 1. has no migrations that depend on it, and
+      // 2. has "entity_type" and "bundle" source properties.
+      // At this point, at least for now, this statement will find
+      // "d7_field_group" migrations.
+      elseif (!$is_cluster_depender && $is_non_dependee) {
+        $source_config = $migration->getSourceConfiguration();
+        $entity_type_param = $source_config['entity_type'] ?? NULL;
+        $bundle_param = $source_config['bundle'] ?? NULL;
+
+        if ($entity_type_param && $bundle_param) {
+          $parent_cluster_main_migration_id_candidates = [
+            // Per-bundle derived "regular" and "complete" migrations.
+            // Example: "d7_node_complete:article".
+            implode(PluginBase::DERIVATIVE_SEPARATOR, [
+              "d7_{$entity_type_param}_complete",
+              $bundle_param,
+            ]),
+            // Example: "d7_taxonomy_term:tags".
+            implode(PluginBase::DERIVATIVE_SEPARATOR, [
+              "d7_$entity_type_param",
+              $bundle_param,
+            ]),
+            // "All bundle" regular and complete migrations.
+            "d7_{$entity_type_param}_complete",
+            // Example: "d7_user".
+            "d7_$entity_type_param",
+          ];
+
+          // Let's try to find the cluster to which the current migration
+          // belongs.
+          foreach ($parent_cluster_main_migration_id_candidates as $parent_cluster_main_migration_id_candidate) {
+            if ($parent_cluster_main_migration = $migrations[$parent_cluster_main_migration_id_candidate] ?? NULL) {
+              $migration->setMetadata('cluster', $parent_cluster_main_migration->getMetadata('cluster'));
+              break 1;
+            }
+          }
+        }
       }
     }
 

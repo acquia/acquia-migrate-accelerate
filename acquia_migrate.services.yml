@@ -72,6 +72,7 @@ services:
       - '@database'
       - '@state'
       - '@file_system'
+      - '@logger.channel.acquia_migrate'
 
   # We decorate the plugin.manager.migration service because it's impossible to decorate through a ServiceProvider.
   # (ServiceProviders are invoked in alphabetical order by ModifyServiceDefinitionsPass, not by priority. Which means
@@ -119,6 +120,12 @@ services:
   logger.channel.acquia_migrate_statistics:
     parent: logger.channel_base
     arguments: ['acquia_migrate_statistics']
+  logger.channel.acquia_migrate_profiling_statistics:
+    parent: logger.channel_base
+    arguments: ['acquia_migrate_profiling_statistics']
+  logger.channel.acquia_migrate_silenced_broken_code:
+    parent: logger.channel_base
+    arguments: ['acquia_migrate_silenced_broken_code']
 
   # Event subscribers.
   controller.acquia_migrate.http_api.response_validator:
@@ -156,6 +163,7 @@ services:
       - '@plugin.manager.migrate.source'
       - '@plugin.manager.migrate.destination'
       - '@logger.channel.acquia_migrate'
+      - '@service_container'
 
   # Service decorator
   acquia_migrate.cache_tags.invalidator:
@@ -184,3 +192,11 @@ services:
     class: Drupal\acquia_migrate\Theme\ThemeNegotiator
     tags:
       - { name: theme_negotiator, priority: 1000 }
+
+  acquia_migrate.uninstall_validator:
+    class: Drupal\acquia_migrate\UninstallValidator
+    tags:
+      - { name: module_install.uninstall_validator }
+    arguments:
+      - '@string_translation'
+    lazy: true

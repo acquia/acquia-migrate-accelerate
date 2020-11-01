@@ -1,6 +1,6 @@
 # API routes.
 acquia_migrate.api.stale_data:
-  path: /upgrade/api/stale-data
+  path: /acquia-migrate-accelerate/api/stale-data
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:staleData
@@ -9,7 +9,7 @@ acquia_migrate.api.stale_data:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.module.info:
-  path: &module_info_api_source /upgrade/api/module-info
+  path: &module_info_api_source /acquia-migrate-accelerate/api/module-info
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:moduleInformation
@@ -18,7 +18,7 @@ acquia_migrate.api.module.info:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migrations.get:
-  path: &migrations_api_source /upgrade/api/migrations
+  path: &migrations_api_source /acquia-migrate-accelerate/api/migrations
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationsCollection
@@ -36,7 +36,7 @@ acquia_migrate.api.migrations.bulk_update:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.get:
-  path: &migrations_api_individual /upgrade/api/migrations/{migration}
+  path: &migrations_api_individual /acquia-migrate-accelerate/api/migrations/{migration}
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationGet
@@ -60,7 +60,7 @@ acquia_migrate.api.migration.patch:
       migration:
         type: 'migration'
 acquia_migrate.api.migration.import.initial:
-  path: /upgrade/api/migration/import/initial
+  path: /acquia-migrate-accelerate/api/migration/import/initial
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationImportInitial
@@ -69,7 +69,7 @@ acquia_migrate.api.migration.import.initial:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.import:
-  path: /upgrade/api/migration/import
+  path: /acquia-migrate-accelerate/api/migration/import
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationStart
@@ -79,7 +79,7 @@ acquia_migrate.api.migration.import:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.refresh:
-  path: /upgrade/api/migration/refresh
+  path: /acquia-migrate-accelerate/api/migration/refresh
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationStart
@@ -89,7 +89,7 @@ acquia_migrate.api.migration.refresh:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.rollback:
-  path: /upgrade/api/migration/rollback
+  path: /acquia-migrate-accelerate/api/migration/rollback
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationStart
@@ -99,7 +99,7 @@ acquia_migrate.api.migration.rollback:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.rollback_import:
-  path: /upgrade/api/migration/rollback-and-import
+  path: /acquia-migrate-accelerate/api/migration/rollback-and-import
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationStart
@@ -109,7 +109,7 @@ acquia_migrate.api.migration.rollback_import:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.migration.preview:
-  path: /upgrade/api/migrations/{migration}/preview
+  path: /acquia-migrate-accelerate/api/migrations/{migration}/preview
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationRowPreview
@@ -121,7 +121,7 @@ acquia_migrate.api.migration.preview:
       migration:
         type: 'migration'
 acquia_migrate.api.migration.mapping:
-  path: &mapping_api /upgrade/api/migrations/{migration}/mapping
+  path: &mapping_api /acquia-migrate-accelerate/api/migrations/{migration}/mapping
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationMappingGet
@@ -145,7 +145,7 @@ acquia_migrate.api.migration.mapping.patch:
       migration:
         type: 'migration'
 acquia_migrate.api.migration.mapping.drop_source_field:
-  path: /upgrade/api/migrations/{migration}/mapping/override/drop_source_field/{destination_field_name}
+  path: /acquia-migrate-accelerate/api/migrations/{migration}/mapping/override/drop_source_field/{destination_field_name}
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationMappingDropSourceField
@@ -158,7 +158,7 @@ acquia_migrate.api.migration.mapping.drop_source_field:
       migration:
         type: 'migration'
 acquia_migrate.api.migration.mapping.revert_field_overrides:
-  path: /upgrade/api/migrations/{migration}/mapping/revert/{destination_field_name}
+  path: /acquia-migrate-accelerate/api/migrations/{migration}/mapping/revert/{destination_field_name}
   methods: ['POST']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationMappingRevertOverrides
@@ -171,7 +171,7 @@ acquia_migrate.api.migration.mapping.revert_field_overrides:
       migration:
         type: 'migration'
 acquia_migrate.api.migration.process:
-  path: /upgrade/api/migration/process/{process_id}
+  path: /acquia-migrate-accelerate/api/migration/process/{process_id}
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:migrationProcess
@@ -181,7 +181,7 @@ acquia_migrate.api.migration.process:
   options:
     no_cache: 'TRUE'
 acquia_migrate.api.messages.get:
-  path: &messages_api_source /upgrade/api/messages
+  path: &messages_api_source /acquia-migrate-accelerate/api/messages
   methods: ['GET']
   defaults:
     _controller: controller.acquia_migrate.http_api:messagesCollection
@@ -191,8 +191,40 @@ acquia_migrate.api.messages.get:
     no_cache: 'TRUE'
 
 # UI routes.
+acquia_migrate.get_started.configure_user_one:
+  path: '/acquia-migrate-accelerate/get_started/user_one'
+  defaults:
+    _entity_form: 'user.acquia_migrate_configure_user_one'
+    _title: 'Configure user 1'
+  options:
+    no_cache: 'TRUE'
+    _admin_route: 'TRUE'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+    _custom_access: '\Drupal\acquia_migrate\Form\UserOneConfigurationForm::isAvailable'
+acquia_migrate.get_started.public_acknowledge:
+  path: '/acquia-migrate-accelerate/get_started/acknowledge'
+  defaults:
+    _form: '\Drupal\acquia_migrate\Form\PublicAcknowledgementForm'
+    _title: 'Security notice'
+  options:
+    no_cache: 'TRUE'
+    _admin_route: 'TRUE'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _custom_access: '\Drupal\acquia_migrate\Form\PublicAcknowledgementForm::isAvailable'
+acquia_migrate.start-page:
+  path: /acquia-migrate-accelerate/start-page
+  defaults:
+    _controller: Drupal\acquia_migrate\Controller\GetStarted:startPage
+  requirements:
+    # Any user should be able to see the getting started page, so any user should be able to benefit from the redirect.
+    _access: 'TRUE'
+  options:
+    no_cache: 'TRUE'
+    _admin_route: 'TRUE'
 acquia_migrate.get_started:
-  path: /upgrade/get-started
+  path: /acquia-migrate-accelerate/get-started
   defaults:
     _controller: Drupal\acquia_migrate\Controller\GetStarted:build
   requirements:
@@ -202,26 +234,26 @@ acquia_migrate.get_started:
     no_cache: 'TRUE'
     _admin_route: 'TRUE'
 acquia_migrate.migrations.dashboard:
-  path: &migrations_ui_basepath /upgrade/migrations
+  path: &migrations_ui_basepath /acquia-migrate-accelerate/migrations
   defaults:
     _decoupled_page_main: acquia_migrate/dashboard
     _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
     _decoupled_page_data:
       source: *migrations_api_source
       basepath: *migrations_ui_basepath
-      basepath-preselect: &migrations_ui_preselect_basepath /upgrade/preselect
-      basepath-module: &migrations_ui_module_info_basepath /upgrade/modules
+      basepath-module: &migrations_ui_module_info_basepath /acquia-migrate-accelerate/modules
+      basepath-preselect: &migrations_ui_preselect_basepath /acquia-migrate-accelerate/preselect
     _title: 'Migrations Dashboard'
   requirements:
     _permission: 'administer migrations'
   options:
     _decoupled_page_paths:
-      page: /upgrade/migrations/{page}
-      migration_detail: /upgrade/migrations/migration/{migration}
-      migration_detail_tab: /upgrade/migrations/migration/{migration}/{tab}
+      page: /acquia-migrate-accelerate/migrations/{page}
+      migration_detail: /acquia-migrate-accelerate/migrations/migration/{migration}
+      migration_detail_tab: /acquia-migrate-accelerate/migrations/migration/{migration}/{tab}
     _admin_route: TRUE
 acquia_migrate.migrations.messages:
-  path: &migrations_ui_messages_basepath /upgrade/messages
+  path: &migrations_ui_messages_basepath /acquia-migrate-accelerate/messages
   defaults:
     _decoupled_page_main: acquia_migrate/messages
     _decoupled_page_data_provider: acquia_migrate.decoupled_pages_data_provider
@@ -261,10 +293,10 @@ acquia_migrate.migrations.module.info:
     _permission: 'administer migrations'
   options:
     _decoupled_page_paths:
-      page: /upgrade/modules/{page}
+      page: /acquia-migrate-accelerate/modules/{page}
     _admin_route: TRUE
 acquia_migrate.acquia_site_studio:
-  path: /upgrade/acquia-site-studio
+  path: /acquia-migrate-accelerate/acquia-site-studio
   defaults:
     _title: 'Appearance'
     _controller: Drupal\acquia_migrate\Controller\GetStarted:acquiaSiteStudio

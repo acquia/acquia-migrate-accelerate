@@ -6,9 +6,15 @@
  */
 
 use Drupal\acquia_migrate\MigrationAlterer;
+use Drupal\acquia_migrate\Plugin\migrate\destination\AcquiaMigrateUser;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
+use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Implements hook_toolbar().
@@ -94,6 +100,7 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   // https://github.com/acquia/coding-standards-php/pull/8 is merged.
   assert($migration_alterer instanceof MigrationAlterer);
   // @codingStandardsIgnoreEnd
+  $migration_alterer->addDependenciesFromFieldPlugins($migrations);
   $migration_alterer->refineMigrationsLabels($migrations);
   $migration_alterer->convertToRollbackableConfig($migrations);
   $migration_alterer->convertToRollbackableEntityDisplay($migrations);
@@ -101,15 +108,13 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   $migration_alterer->addDiscoveredTaxonomyDependencies($migrations);
   $migration_alterer->addFieldTypePluginChecker($migrations);
   $migration_alterer->omitFieldMigrationsForMissingEntityTypes($migrations);
-
-  // Use custom source plugin for migrating users to prevent migrating user 1.
-  // @see \Drupal\acquia_migrate\Plugin\migrate\source\UserWithoutOne
-  assert($migrations['d7_user']['source']['plugin'] === 'd7_user');
-  $migrations['d7_user']['source']['plugin'] = 'd7_user_without_one';
+  $migration_alterer->refineViewModeDependencies($migrations);
 
   // Enable change tracking on migration plugins so that they can be re-imported
   // without rolling them back (a.k.a. "refreshed").
   $migration_alterer->addChangeTracking($migrations);
+  // Enable caching on migration plugins to improve performance.
+  $migration_alterer->addCachingToSqlBasedMigrationPlugins($migrations);
 }
 
 /**
@@ -117,7 +122,45 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
  */
 function acquia_migrate_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
   if ($entity_type->id() === 'user') {
+    // @see \Drupal\acquia_migrate\Plugin\migrate\destination\AcquiaMigrateUser::import()
     $fields['name']->addConstraint('UserOnePetrified');
+    $fields['mail']->addConstraint('UserOnePetrified');
+    $fields['init']->addConstraint('UserOnePetrified');
+    $fields['pass']->addConstraint('UserOnePetrified');
   }
   return $fields;
+}
+
+/**
+ * Implements hook_migrate_destination_info_alter().
+ */
+function acquia_migrate_migrate_destination_info_alter(&$definitions) {
+  if (!empty($definitions['entity:user'])) {
+    $definitions['entity:user']['class'] = AcquiaMigrateUser::class;
+  }
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ *
+ * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::OPERATION
+ */
+function acquia_migrate_entity_type_alter(array &$entity_types) {
+  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  $entity_types['user']->setFormClass(UserOneConfigurationForm::OPERATION, UserOneConfigurationForm::class);
+}
+
+/**
+ * Implements hook_entity_field_access()
+ *
+ * @see acquia_migrate_install()
+ * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::reset()
+ * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::submitForm()
+ */
+function acquia_migrate_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($items && $operation == 'edit' && $account->isAnonymous() && $items->getEntity()->getEntityTypeId() === 'user' && (int) $items->getEntity()->id() === 1) {
+    return AccessResult::allowedIf(!UserOneConfigurationForm::hasBeenConfigured() && in_array($field_definition->getName(), UserOneConfigurationForm::ALLOWED_FIELDS))
+      ->setCacheMaxAge(0);
+  }
+  return AccessResult::neutral();
 }

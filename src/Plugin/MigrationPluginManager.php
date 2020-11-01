@@ -2,15 +2,19 @@
 
 namespace Drupal\acquia_migrate\Plugin;
 
+use Drupal\acquia_migrate\Plugin\Discovery\ProfiledContainerDerivativeDiscoveryDecorator;
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery;
+use Drupal\migrate\Plugin\Discovery\ProviderFilterDecorator;
 use Drupal\migrate\Plugin\migrate\destination\Entity;
 use Drupal\migrate\Plugin\MigrateSourcePluginManager;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
+use Drupal\migrate\Plugin\NoSourcePluginDecorator;
 use Drupal\migrate_drupal\MigrationPluginManager as BaseMigrationPluginManager;
 
 /**
@@ -54,6 +58,33 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     // "complete" successors.
     $definitions = $this->filterNonCompleteWhenCompleteExistsDefinitions($definitions);
     return $definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * This is 99% a copy/paste from the parent implementation. The only change is
+   * that we use ProfiledContainerDerivativeDiscoveryDecorator instead of
+   * ContainerDerivativeDiscoveryDecorator.
+   */
+  protected function getDiscovery() {
+    if (!isset($this->discovery)) {
+      $directories = array_map(function ($directory) {
+        return [$directory . '/migrations'];
+      }, $this->moduleHandler->getModuleDirectories());
+
+      $yaml_discovery = new YamlDirectoryDiscovery($directories, 'migrate');
+      // This gets rid of migrations which try to use a non-existent source
+      // plugin. The common case for this is if the source plugin has, or
+      // specifies, a non-existent provider.
+      $only_with_source_discovery = new NoSourcePluginDecorator($yaml_discovery);
+      // This gets rid of migrations with explicit providers set if one of the
+      // providers do not exist before we try to use a potentially non-existing
+      // deriver. This is a rare case.
+      $filtered_discovery = new ProviderFilterDecorator($only_with_source_discovery, [$this->moduleHandler, 'moduleExists']);
+      $this->discovery = new ProfiledContainerDerivativeDiscoveryDecorator($filtered_discovery);
+    }
+    return $this->discovery;
   }
 
   /**

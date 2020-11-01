@@ -5,10 +5,13 @@ namespace Drupal\acquia_migrate\Batch;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\Plugin\MigrationPluginManager;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\Error;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate_drupal_ui\Batch\MigrateUpgradeImportBatch;
 use Symfony\Component\HttpFoundation\Request;
@@ -167,6 +170,7 @@ final class MigrationBatchManager {
     foreach ($completely_imported as $migration_id) {
       $operations[] = [[__CLASS__, 'recordImportStart'], [$migration_id]];
     }
+    $operations[] = [[__CLASS__, 'overrideErrorHandler'], []];
     $operations[] = [
       static::$actionCallable[static::ACTION_IMPORT],
       [
@@ -174,6 +178,7 @@ final class MigrationBatchManager {
         $config,
       ],
     ];
+    $operations[] = [[__CLASS__, 'restoreErrorHandler'], []];
     foreach ($completely_imported as $migration_id) {
       $operations[] = [[__CLASS__, 'recordImportDuration'], [$migration_id]];
       $operations[] = [[__CLASS__, 'calculateCompleteness'], [$migration_id]];
@@ -244,6 +249,11 @@ final class MigrationBatchManager {
       ];
     }
     $operations[] = [[__CLASS__, 'calculateCompleteness'], [$migration_id]];
+
+    // Silence non-halting errors during migrations.
+    array_unshift($operations, [[__CLASS__, 'overrideErrorHandler'], []]);
+    array_push($operations, [[__CLASS__, 'restoreErrorHandler'], []]);
+
     $new_batch = [
       'operations' => $operations,
     ];
@@ -290,6 +300,83 @@ final class MigrationBatchManager {
     $callable = [MigrateUpgradeImportBatch::class, 'run'];
     $arguments = [$initial_ids, $config, &$context];
     call_user_func_array($callable, $arguments);
+  }
+
+  /**
+   * Overrides Drupal's error handler to log non-halting PHP errors.
+   *
+   * Typically this means PHP notices and warnings are logged in poorly
+   * code.
+   *
+   * Avoids noisy Drupal messages after running a migration with buggy code.
+   *
+   * @see \Drupal\acquia_migrate\Batch\MigrationBatchManager::logNonHaltingErrorsOrPassthrough()
+   */
+  public static function overrideErrorHandler() : void {
+    set_error_handler(static::class . '::logNonHaltingErrorsOrPassthrough');
+  }
+
+  /**
+   * Restores Drupal's error handler to log non-halting PHP errors.
+   */
+  public static function restoreErrorHandler() : void {
+    // Restore Drupal's error handler.
+    restore_error_handler();
+  }
+
+  /**
+   * Logs non-halting PHP errors, passes through the rest to Drupal's default.
+   *
+   * @param int $error_level
+   *   The level of the error raised.
+   * @param string $message
+   *   The error message.
+   * @param string $filename
+   *   The filename that the error was raised in.
+   * @param int $line
+   *   The line number the error was raised at.
+   * @param array $context
+   *   An array that points to the active symbol table at the point the error
+   *   occurred.
+   */
+  public static function logNonHaltingErrorsOrPassthrough($error_level, $message, $filename, $line, array $context) : void {
+    $backtrace = debug_backtrace();
+
+    $non_halting_error_levels = [
+      E_DEPRECATED,
+      E_USER_DEPRECATED,
+      E_NOTICE,
+      E_USER_NOTICE,
+      E_STRICT,
+      E_WARNING,
+      E_USER_WARNING,
+      E_CORE_WARNING,
+    ];
+    if (!in_array($error_level, $non_halting_error_levels, TRUE)) {
+      // Pass through to the Drupal error handler.
+      _drupal_error_handler($error_level, $message, $filename, $line, $context);
+      return;
+    }
+
+    static $logger;
+    if (!isset($logger)) {
+      $logger = \Drupal::logger('acquia_migrate_silenced_broken_code');
+    }
+    // Most of the code below is copied from _drupal_error_handler_real().
+    // @see _drupal_error_handler_real()
+    $types = drupal_error_levels();
+    [$severity_msg, $severity_level] = $types[$error_level];
+    $caller = Error::getLastCaller($backtrace);
+    $logger->log($severity_level, 'Silenced %type: @message in %function (line %line of %file) @backtrace_string.', [
+      '%type' => $severity_msg,
+      // The standard PHP error handler considers that the error messages
+      // are HTML. We mimic this behavior here.
+      '@message' => Markup::create(Xss::filterAdmin($message)),
+      '%function' => $caller['function'],
+      '%file' => $caller['file'],
+      '%line' => $caller['line'],
+      '@backtrace_string' => (new \Exception())->getTraceAsString(),
+    ]);
   }
 
   /**

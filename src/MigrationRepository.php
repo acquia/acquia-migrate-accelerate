@@ -316,7 +316,7 @@ class MigrationRepository {
         // cluster label.
         // @see acquia_migrate_schema()
         // @see \Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface::ROLLBACK_DATA_TABLE
-        $migration_id = md5($cluster) . '-' . substr($cluster, 0, 192);
+        $migration_id = md5($cluster) . '-' . substr(str_replace('/', '-', $cluster), 0, 192);
         if (!isset($flags[$migration_id])) {
           // Insert default flags.
           $this->connection->insert('acquia_migrate_migration_flags')

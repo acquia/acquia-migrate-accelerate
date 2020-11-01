@@ -574,7 +574,7 @@ final class MigrationPreviewer {
       if (isset($carry)) {
         return $carry;
       }
-      if ($process_configuration['source']) {
+      if (array_key_exists('source', $process_configuration)) {
         $source = $process_configuration['source'];
         // @todo Change this from a heuristic (if an array, pick the last thing) to something that is actually guaranteed to work!
         $source = is_array($source) ? end($source) : $source;

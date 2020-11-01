@@ -2,10 +2,14 @@
 
 namespace Drupal\acquia_migrate\Controller;
 
+use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
+use Drupal\acquia_migrate\Form\PublicAcknowledgementForm;
+use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\SourceDatabase;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -42,19 +46,85 @@ final class GetStarted extends ControllerBase {
   }
 
   /**
+   * Acquia Migrate: Accelerate's dynamic start page: dynamically redirects.
+   *
+   * @return \Drupal\Core\Routing\LocalRedirectResponse
+   *   A redirect to the appropriate step, or to the list of steps if none could
+   *   be determined.
+   */
+  public function startPage() {
+    $build = $this->build();
+    $steps = $build['content']['#context']['checklist']['#context']['steps'];
+
+    // Redirect to the specific step if any.
+    foreach ($steps as $step_build) {
+      // Find the first non-completed step.
+      if ($step_build['completed']) {
+        continue;
+      }
+      // But if that step is not active, do not redirect to the first available
+      // step.
+      elseif (!$step_build['active']) {
+        break;
+      }
+
+      // Extract the URL for this step.
+      $url = $step_build['content']['label']['#url'];
+      assert($url instanceof Url);
+
+      // Redirect to this URL.
+      $generated_url = $url->toString(TRUE);
+      $generated_url->setCacheMaxAge(0);
+      try {
+        $redirect_response = new LocalRedirectResponse($generated_url->getGeneratedUrl());
+        $redirect_response->addCacheableDependency($generated_url);
+        return $redirect_response;
+      }
+      catch (\InvalidArgumentException $e) {
+        // The redirect was to an external URL. When a step points to an
+        // external URL, do not redirect, and instead let it fall back to the
+        // overview.
+        break;
+      }
+    }
+
+    // Otherwise redirect to the overview listing all steps.
+    return new LocalRedirectResponse(Url::fromRoute('acquia_migrate.get_started')->toString(TRUE)->getGeneratedUrl());
+  }
+
+  /**
    * Return a page render array.
    *
-   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
-   *   A render array or redirect.
+   * @return array
+   *   A render array.
    */
   public function build() {
-    $current_url = Url::fromRoute('<current>')->toString();
+    $current_url = Url::fromRoute('<current>')->toString(TRUE)->getGeneratedUrl();
     $preselect_url = Url::fromRoute('acquia_migrate.migrations.preselect');
     $dashboard_url = Url::fromRoute('acquia_migrate.migrations.dashboard');
     $steps = [];
+    $steps['user_one'] = [
+      'completed' => UserOneConfigurationForm::hasBeenConfigured(),
+      'active' => !UserOneConfigurationForm::hasBeenConfigured() && $this->currentUser()->isAnonymous(),
+      'content' => [
+        'label' => [
+          '#type' => 'link',
+          '#title' => $this->t('Configure user 1.'),
+          '#url' => Url::fromRoute('acquia_migrate.get_started.configure_user_one', [], [
+            'query' => ['destination' => $current_url],
+          ]),
+          '#attributes' => [
+            'class' => 'text-primary',
+          ],
+        ],
+        'description' => [
+          '#markup' => $this->t("You can choose the credentials for your site's admin account."),
+        ],
+      ],
+    ];
     $steps['authenticate'] = [
       'completed' => $this->currentUser()->isAuthenticated(),
-      'active' => !$this->currentUser()->isAuthenticated(),
+      'active' => UserOneConfigurationForm::hasBeenConfigured() && !$this->currentUser()->isAuthenticated(),
       'content' => [
         'label' => [
           '#type' => 'link',
@@ -67,10 +137,31 @@ final class GetStarted extends ControllerBase {
           ],
         ],
         'description' => [
-          '#markup' => $this->t('You can log in with the credentials generated for you when this site was installed for the first time.'),
+          '#markup' => $this->t('Log in with the credentials you chose in the first step.'),
         ],
       ],
     ];
+    if (AcquiaDrupalEnvironmentDetector::isAhEnv()) {
+      $steps['public_acknowledge'] = [
+        'completed' => PublicAcknowledgementForm::hasBeenAcknowledged(),
+        'active' => $this->currentUser->isAuthenticated() && !PublicAcknowledgementForm::hasBeenAcknowledged(),
+        'content' => [
+          'label' => [
+            '#type' => 'link',
+            '#title' => $this->t('Security notice.'),
+            '#url' => Url::fromRoute('acquia_migrate.get_started.public_acknowledge', [], [
+              'query' => ['destination' => $current_url],
+            ]),
+            '#attributes' => [
+              'class' => 'text-primary',
+            ],
+          ],
+          'description' => [
+            '#markup' => $this->t('This site is hosted on Acquia Cloud and is publicly accessible if the URL is known. You may want to change that.'),
+          ],
+        ],
+      ];
+    }
     $steps['configure'] = [
       'completed' => SourceDatabase::isConnected(),
       'active' => !SourceDatabase::isConnected(),
@@ -152,7 +243,7 @@ final class GetStarted extends ControllerBase {
     ];
     $steps['import_content'] = [
       'completed' => FALSE,
-      'active' => end($steps)['completed'],
+      'active' => $this->currentUser()->isAuthenticated() && end($steps)['completed'],
       'content' => [
         'label' => [
           '#type' => 'link',

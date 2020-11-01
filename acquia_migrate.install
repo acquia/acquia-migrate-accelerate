@@ -6,17 +6,30 @@
  */
 
 use Drupal\acquia_migrate\MigrationFingerprinter;
+use Drupal\acquia_migrate\ModuleAuditor;
 use Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface;
+use Drupal\acquia_migrate\Form\PublicAcknowledgementForm;
+use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
+use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\Core\Config\Config;
 
 /**
  * Implements hook_install().
  */
-function acquia_migrate_install() {
+function acquia_migrate_install($is_syncing) {
+  if ($is_syncing) {
+    return;
+  }
+
+  // Set AM:A's "Get started" page as the front page. Anonymous users will see
+  // this too.
   $config = \Drupal::service('config.factory')->getEditable('system.site');
   assert($config instanceof Config);
-  $config->set('page.front', '/upgrade/get-started');
+  $config->set('page.front', '/acquia-migrate-accelerate/get-started');
   $config->save();
+
+  // Grant anonymous users the permission to view the administration theme,
+  // since the "Get started" page will use that theme.
   $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
   $role->grantPermission('view the administration theme');
   $role->trustData()->save();
@@ -34,6 +47,63 @@ function acquia_migrate_install() {
   \Drupal::configFactory()->getEditable('system.logging')
     ->set('error_level', 'verbose')
     ->save();
+
+  // Avoid sending e-mails. Modules that add more mail interfaces should
+  // behave gracefully, like webform does.
+  // @see \Drupal\webform\WebformEmailProvider::check()
+  $mail_config = \Drupal::configFactory()->getEditable('system.mail');
+  $mail_plugins = $mail_config->get('interface');
+  foreach (array_keys($mail_plugins) as $interface_name) {
+    $mail_plugins[$interface_name] = 'terrible_mail_man';
+  }
+  $mail_config->set('interface', $mail_plugins)->save();
+
+  UserOneConfigurationForm::reset();
+  PublicAcknowledgementForm::reset();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function acquia_migrate_uninstall($is_syncing) {
+  // Drop all AM:A tables that are not defined in hook_schema() and hence not
+  // automatically created and dropped.
+  // @see acquia_migrate_schema()
+  \Drupal::database()->schema()->dropTable(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE);
+
+  // Delete all state.
+  \Drupal::state()->deleteMultiple([
+    ModuleAuditor::KEY_INITIAL_INFO,
+    MigrationFingerprinter::KEY_LAST_FINGERPRINT_CANARY_TIME,
+    MigrationFingerprinter::KEY_LAST_FINGERPRINT_COMPUTE_TIME,
+  ]);
+
+  if ($is_syncing) {
+    return;
+  }
+
+  // If the front page is still AM:A's "Get started" page, revert back to Drupal
+  // core's default.
+  $config = \Drupal::service('config.factory')->getEditable('system.site');
+  assert($config instanceof Config);
+  if ($config->get('page.front') === '/acquia-migrate-accelerate/get-started') {
+    $config->set('page.front', '/user/login');
+    $config->save();
+  }
+
+  // Also revoke the permission for anonymous users to view the administration
+  // theme.
+  $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
+  $role->revokePermission('view the administration theme');
+  $role->trustData()->save();
+
+  // Turn off verbose error logging.
+  \Drupal::configFactory()->getEditable('system.logging')
+    ->set('error_level', 'hide')
+    ->save();
+
+  // Warn the site owner to also uninstall other modules.
+  \Drupal::messenger()->addWarning(t('You probably also want to uninstall the <code>migrate</code>, <code>migrate_drupal</code>, <code>migrate_drupal_ui</code>, <code>migrate_plus</code>, <code>decoupled_pages</code>, <code>media_migration</code> and <code>webform_migrate</code> modules!'));
 }
 
 /**

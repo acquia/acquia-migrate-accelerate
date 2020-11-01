@@ -16,12 +16,14 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\migrate\destination\Entity;
 use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
+use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Plugin\MigratePluginManagerInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
-use Drupal\migrate\Plugin\MigrationDeriverTrait;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\FieldMigration;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Applies Acquia Migrate's migration changes.
@@ -34,7 +36,6 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 final class MigrationAlterer {
 
   use StringTranslationTrait;
-  use MigrationDeriverTrait;
 
   /**
    * Destination plugin map.
@@ -138,6 +139,15 @@ final class MigrationAlterer {
     'paragraphs_item' => 'paragraph',
   ];
 
+  const KNOWN_UNCACHED_MIGRATION_SOURCE_PLUGINS = [
+    // @see \Drupal\migrate\Plugin\migrate\source\EmbeddedDataSource
+    'embedded_data',
+    // @see \Drupal\migrate\Plugin\migrate\source\EmptySource
+    'empty',
+    // @see \Drupal\migrate_drupal\Plugin\migrate\source\EmptySource
+    'md_empty',
+  ];
+
   /**
    * Migration tag.
    *
@@ -165,14 +175,14 @@ final class MigrationAlterer {
   /**
    * The migration source plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var \Drupal\migrate\Plugin\MigratePluginManagerInterface
    */
   protected $sourcePluginManager;
 
   /**
    * The migration destination plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var \Drupal\migrate\Plugin\MigratePluginManagerInterface
    */
   protected $destinationPluginManager;
 
@@ -182,6 +192,13 @@ final class MigrationAlterer {
    * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
   protected $logger;
+
+  /**
+   * The service container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
 
   /**
    * Constructs a MigrationAlterer.
@@ -196,13 +213,16 @@ final class MigrationAlterer {
    *   The migrate destination plugin manager.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger to use.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager, LoggerChannelInterface $logger) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager, LoggerChannelInterface $logger, ContainerInterface $container) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->sourcePluginManager = $source_plugin_manager;
     $this->destinationPluginManager = $destination_plugin_manager;
     $this->logger = $logger;
+    $this->container = $container;
   }
 
   /**
@@ -509,7 +529,7 @@ final class MigrationAlterer {
     }
 
     foreach ($migrations as $migration_id => $migration_data) {
-      // Skip unsupported migrations based on migration tags. Now this means
+      // Skip unsupported migrations based on migration tags. For now this means
       // migrations that aren't tagged with "Drupal 7".
       $migration_tags = $migration_data['migration_tags'] ?? [];
       if (!in_array($this->migrationTag, $migration_tags, TRUE)) {
@@ -862,8 +882,7 @@ final class MigrationAlterer {
       // plugin actually provides this field. Unfortunately, this is not
       // guaranteed by the core migrate system.
       try {
-        $stub_migration_plugin = new StubMigrationPlugin();
-        $source_plugin = $this->sourcePluginManager->createInstance($source_plugin_id, $definition['source'], $stub_migration_plugin);
+        $source_plugin = static::getSourcePlugin($source_plugin_id, $definition['source']);
       }
       catch (PluginException $e) {
         $migrations[$migration_id]['source']['track_changes'] = TRUE;
@@ -896,7 +915,7 @@ final class MigrationAlterer {
         $candidate_table_aliases = [];
         foreach ($tables as $alias => $table_info) {
           if ($schema->fieldExists($table_info['table'], $source_field)) {
-            $candidate_table_aliases[$table_info['table']] = $alias;
+            $candidate_table_aliases[$alias] = $table_info['table'];
           }
         }
         // Only add an alias if the high_water_property column truly exists in
@@ -911,8 +930,16 @@ final class MigrationAlterer {
               $selected_table_alias = 'c';
               break;
 
+            case 'd7_menu_links':
+              // menu_links is joined against itself using two aliases in the
+              // d7_menu_links deriver.
+              // @see \Drupal\menu_link_content\Plugin\migrate\source\D7MenuLinkDeriverTrait::getBaseQuery()
+              $selected_table_alias = 'ml';
+              break;
+
             default:
-              $selected_table_alias = reset(array_keys($candidate_table_aliases));
+              $selected_table_aliases = array_keys($candidate_table_aliases);
+              $selected_table_alias = reset($selected_table_aliases);
               $is_heuristic = TRUE;
               break;
           }
@@ -930,6 +957,151 @@ final class MigrationAlterer {
           ]);
           $migrations[$migration_id]['source']['high_water_property']['alias'] = $selected_table_alias;
         }
+      }
+    }
+  }
+
+  /**
+   * Sets the cache_counts and cache_key properties on certain migrations.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2684567
+   * @see https://www.drupal.org/node/2801549
+   * @see https://www.drupal.org/project/drupal/issues/2723115
+   * @see https://www.drupal.org/project/drupal/issues/3092227
+   * @see https://www.drupal.org/project/drupal/issues/2598670
+   * @todo https://backlog.acquia.com/browse/OCTO-3742
+   */
+  public function addCachingToSqlBasedMigrationPlugins(array &$migrations) {
+    foreach ($migrations as $migration_id => $definition) {
+      // Only add change tracking to Drupal 7 migrations.
+      $is_drupal_7_migration = !empty($definition['migration_tags']) && is_array($definition['migration_tags']) && in_array('Drupal 7', $definition['migration_tags'], TRUE);
+      if (!$is_drupal_7_migration) {
+        continue;
+      }
+
+      // Only continue if the migration plugin does not already have cache
+      // counting turned on.
+      if (isset($migrations[$migration_id]['source']['cache_counts'])) {
+        continue;
+      }
+
+      $source_plugin_id = $definition['source']['plugin'] ?? NULL;
+      try {
+        $source_plugin_definition = $this->sourcePluginManager->getDefinition($source_plugin_id);
+      }
+      catch (PluginNotFoundException $e) {
+        continue;
+      }
+      $source_plugin_class = $source_plugin_definition['class'];
+
+      // Cache counts for migration plugins for which AM:A does fingerprinting.
+      // @see \Drupal\acquia_migrate\MigrationFingerprinter::compute()
+      if (is_a($source_plugin_class, SqlBase::class, TRUE)) {
+        $migrations[$migration_id]['source']['cache_counts'] = TRUE;
+        $migrations[$migration_id]['source']['cache_key'] = "acquia_migrate__cached_source_count:" . $migration_id;
+      }
+      else {
+        if (in_array($source_plugin_id, self::KNOWN_UNCACHED_MIGRATION_SOURCE_PLUGINS)) {
+          continue;
+        }
+        $this->logger->debug('Unknown uncacheable migration source plugin encountered in @migration-plugin-id: @migration-source-plugin-id (@migration-source-plugin-class).', [
+          '@migration-plugin-id' => $migration_id,
+          '@migration-source-plugin-id' => $source_plugin_id,
+          '@migration-source-plugin-class' => $source_plugin_class,
+        ]);
+      }
+    }
+  }
+
+  /**
+   * Force-adds migration dependencies to content entity migrations.
+   *
+   * Migration field plugins may add additional migration dependencies to the
+   * migration they apply to (e.g. paragraphs, media, location), but this
+   * happens only when
+   * \Drupal\migrate_drupal\FieldDiscoveryInterface::addBundleFieldProcesses()
+   * or
+   * \Drupal\migrate_drupal\FieldDiscoveryInterface::addEntityFieldProcesses()
+   * are called. Derived entity migrations usually have this since their
+   * migration deriver class usually calls ::addBundleFieldProcesses(). But for
+   * e.g. the user migration, this only happens right before the user migration
+   * gets executed.
+   *
+   * Since Acquia Migrate: Accelerate's MigrationClusterer requires finalized
+   * migration dependencies, this callback adds the migration dependencies by
+   * calling ::getProcesses() on the stub migration.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   */
+  public function addDependenciesFromFieldPlugins(array &$migrations) {
+    // D7 migrations.
+    $d7_migrations = array_filter($migrations, function (array $migration_definition) {
+      $tags = $migration_definition['migration_tags'] ?? [];
+      return in_array($this->migrationTag, $tags, TRUE);
+    });
+    $fieldable_entity_migrations = array_filter($d7_migrations, function (array $migration_definition) {
+      $destination_plugin_id = $migration_definition['destination']['plugin'] ?? NULL;
+      if (!is_string($destination_plugin_id) || !strpos($destination_plugin_id, PluginBase::DERIVATIVE_SEPARATOR)) {
+        return FALSE;
+      }
+
+      $parts = explode(PluginBase::DERIVATIVE_SEPARATOR, $destination_plugin_id);
+
+      if (!in_array($parts[0], ['entity', 'entity_complete'], TRUE)) {
+        return FALSE;
+      }
+
+      $migration_deps = array_unique(array_merge(
+        array_values($migration_definition['migration_dependencies']['required'] ?? []),
+        array_values($migration_definition['migration_dependencies']['optional'] ?? [])
+      ));
+      $field_migration_dep_present = array_reduce($migration_deps, function (bool $carry, $dependency) {
+        if (!$carry) {
+          $carry = strpos($dependency, 'd7_field_instance') === 0;
+        }
+        return $carry;
+      }, FALSE);
+
+      if (!$field_migration_dep_present) {
+        return FALSE;
+      }
+
+      $migration_class = $migration_definition['class'] ?? NULL;
+      $target_entity_type_def = $this->entityTypeManager->getDefinition($parts[1], FALSE);
+
+      if (!$migration_class || !($target_entity_type_def instanceof ContentEntityTypeInterface)) {
+        return FALSE;
+      }
+
+      if (ltrim($migration_class, '\\') === MigrationPlugin::class) {
+        return FALSE;
+      }
+
+      if (!is_subclass_of($migration_class, FieldMigration::class)) {
+        return FALSE;
+      }
+
+      return TRUE;
+    });
+
+    foreach ($fieldable_entity_migrations as $migration_plugin_id => $migration_definition) {
+      $class = $migration_definition['class'];
+
+      try {
+        $stubmigration = $class::create($this->container, [], $migration_plugin_id, $migration_definition);
+        assert($stubmigration instanceof MigrationPlugin);
+        // Force field processes to be added.
+        $stubmigration->getProcess();
+        $migrations[$migration_plugin_id]['migration_dependencies'] = $stubmigration->getMigrationDependencies();
+      }
+      catch (\Throwable $throwable) {
+        continue;
       }
     }
   }
@@ -959,26 +1131,80 @@ final class MigrationAlterer {
     return $process;
   }
 
-}
-
-/**
- * StubMigrationPlugin to allow inspecting @MigrateSource plugins.
- */
-class StubMigrationPlugin extends MigrationPlugin {
-
   /**
-   * StubMigrationPlugin constructor.
+   * Maps view mode migration dependencies to the more specific derivative.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
    */
-  public function __construct() {
-    // Intentionally ignore parent constructor.
+  public function refineViewModeDependencies(array &$migrations) {
+    foreach ($migrations as $migration_id => $migration_plugin_def) {
+      // Skip unsupported migrations based on migration tags. For now this means
+      // migrations that aren't tagged with "Drupal 7".
+      $migration_tags = $migration_plugin_def['migration_tags'] ?? [];
+      if (!in_array($this->migrationTag, $migration_tags, TRUE)) {
+        continue;
+      }
+
+      $all_dependencies = $migration_plugin_def['migration_dependencies'] ?? [];
+
+      // Try to refine both required and optional "d7_view_modes" dependencies.
+      foreach (['required', 'optional'] as $dependency_type) {
+        if (empty($all_dependencies[$dependency_type])) {
+          continue;
+        }
+
+        $d7_view_mode_key = array_search('d7_view_modes', $all_dependencies[$dependency_type]);
+        $entity_type_param = $migration_plugin_def['source']['entity_type'] ?? NULL;
+        if ($d7_view_mode_key === FALSE || !$entity_type_param) {
+          // "d7_view_mode" is not a dependency, or there is no "entity_type"
+          // source configuration available.
+          continue;
+        }
+
+        // If the derived view mode migration exists, refine the original,
+        // non-derived "d7_view_modes" migration dependency ID to a more
+        // specific "d7_view_modes:<entity-type-param>".
+        // TODO Shouldn't we remove this dependency if we haven't found a
+        // derived view mode migration plugin instance?
+        $derived_view_mode_migration_id = 'd7_view_modes' . PluginBase::DERIVATIVE_SEPARATOR . $entity_type_param;
+        if (array_key_exists($derived_view_mode_migration_id, $migrations)) {
+          $migrations[$migration_id]['migration_dependencies'][$dependency_type][$d7_view_mode_key] = $derived_view_mode_migration_id;
+        }
+      }
+    }
   }
 
   /**
-   * {@inheritdoc}
+   * Returns a fully initialized source plugin instance with optional config.
+   *
+   * @param string $source_plugin_id
+   *   The source plugin ID.
+   * @param array $configuration
+   *   The configuration for the source plugin. Optional, defaults to an empty
+   *   array. "ignore_map" and "plugin" configurations are always overwritten.
+   *
+   * @return \Drupal\migrate\Plugin\MigrateSourceInterface|\Drupal\migrate\Plugin\RequirementsInterface
+   *   The fully initialized source plugin.
+   *
+   * @see \Drupal\migrate\Plugin\MigrationDeriverTrait::getSourcePlugin()
    */
-  public function getIdMap() {
-    // Avoid creating an ID map plugin.
-    return NULL;
+  public static function getSourcePlugin($source_plugin_id, array $configuration = []) {
+    $source_configuration = [
+      'ignore_map' => TRUE,
+      'plugin' => $source_plugin_id,
+    ] + $configuration;
+    $definition = [
+      'source' => $source_configuration,
+      'destination' => [
+        'plugin' => 'null',
+      ],
+      'idMap' => [
+        'plugin' => 'null',
+      ],
+    ];
+    return \Drupal::service('plugin.manager.migration')->createStubMigration($definition)->getSourcePlugin();
   }
 
 }

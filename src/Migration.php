@@ -170,7 +170,6 @@ final class Migration {
     assert(Inspector::assertAllObjects($migration_plugins, MigrationPlugin::class));
     $this->migrationPlugins = $migration_plugins;
     assert(Inspector::assertAllStrings($data_migration_plugin_ids));
-    assert(array_diff(array_keys(array_splice($migration_plugins, count($migration_plugins) - count($data_migration_plugin_ids))), $data_migration_plugin_ids) === [], 'The data migration plugin are executed last for migration ' . $id . ' — (all migration plugins: ' . implode(', ', array_keys($migration_plugins)) . ', data migration plugins: ' . implode(', ', $data_migration_plugin_ids) . '.');
     $this->dataMigrationPluginIds = $data_migration_plugin_ids;
     $this->completed = $completed;
     $this->skipped = $skipped;

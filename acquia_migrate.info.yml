@@ -3,7 +3,7 @@ description: An enhanced UI and assistant for Drupal migrations
 package: Migration
 
 type: module
-core_version_requirement: ^9
+core_version_requirement: ^9.0.6
 
 dependencies:
   - drupal:migrate
