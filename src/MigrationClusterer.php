@@ -838,7 +838,7 @@ class MigrationClusterer {
     $dependencyless = empty($migration->getMetadata('after'));
 
     if ($migration_is_bundle_agnostic && $entity_type_has_bundles && !$dependencyless) {
-      throw new \LogicException(sprintf('The currently known shared structure migrations do not have any dependencies. This assumption does not hold for %s.', $migration->id()));
+      throw new \LogicException(sprintf('The currently known shared structure migrations do not have any dependencies. This assumption does not hold for %s. It depends on: %s.', $migration->id(), implode(', ', $migration->getMetadata('after'))));
     }
 
     return $migration_is_bundle_agnostic && $entity_type_has_bundles;

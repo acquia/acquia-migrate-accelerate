@@ -42,12 +42,6 @@ function acquia_migrate_install($is_syncing) {
     ->set('admin', 'claro')
     ->save();
 
-  // Turn on verbose error logging: migration sites aren't production sites, so
-  // hiding errors only slows things down.
-  \Drupal::configFactory()->getEditable('system.logging')
-    ->set('error_level', 'verbose')
-    ->save();
-
   // Avoid sending e-mails. Modules that add more mail interfaces should
   // behave gracefully, like webform does.
   // @see \Drupal\webform\WebformEmailProvider::check()
@@ -96,11 +90,6 @@ function acquia_migrate_uninstall($is_syncing) {
   $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
   $role->revokePermission('view the administration theme');
   $role->trustData()->save();
-
-  // Turn off verbose error logging.
-  \Drupal::configFactory()->getEditable('system.logging')
-    ->set('error_level', 'hide')
-    ->save();
 
   // Warn the site owner to also uninstall other modules.
   \Drupal::messenger()->addWarning(t('You probably also want to uninstall the <code>migrate</code>, <code>migrate_drupal</code>, <code>migrate_drupal_ui</code>, <code>migrate_plus</code>, <code>decoupled_pages</code>, <code>media_migration</code> and <code>webform_migrate</code> modules!'));

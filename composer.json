@@ -5,6 +5,7 @@
     "homepage": "https://www.acquia.com/drupal9/accelerate-your-migration",
     "require": {
         "acquia/drupal-environment-detector": "^1.2",
+        "drupal/core": "^9.0.6",
         "drupal/decoupled_pages": "^1.0",
         "drupal/migrate_plus": "^5",
         "league/uri": "^6.3",

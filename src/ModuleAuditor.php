@@ -25,11 +25,18 @@ final class ModuleAuditor {
   use StringTranslationTrait;
 
   /**
-   * State key for storing the last fingerprint canary time.
+   * State key for storing the initial info that generated this Drupal 9 site.
    *
    * @const string
    */
   const KEY_INITIAL_INFO = 'acquia_migrate.initial_info';
+
+  /**
+   * State key for storing the most recent info.
+   *
+   * @const string
+   */
+  const KEY_RECENT_INFO = 'acquia_migrate.recent_info';
 
   /**
    * The module extension list.
@@ -62,6 +69,13 @@ final class ModuleAuditor {
   protected $initialInfo;
 
   /**
+   * Recent module information.
+   *
+   * @var array
+   */
+  protected $recentInfo;
+
+  /**
    * ModuleAuditor constructor.
    *
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
@@ -84,6 +98,8 @@ final class ModuleAuditor {
     // this module. The value should be the output of the ah-migrate-info
     // command.
     $this->initialInfo = $state->get(static::KEY_INITIAL_INFO, []);
+    // Same as the above. Updated for every refresh.
+    $this->recentInfo = $state->get(static::KEY_RECENT_INFO, []);
   }
 
   /**

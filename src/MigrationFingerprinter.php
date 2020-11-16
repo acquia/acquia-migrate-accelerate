@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\acquia_migrate;
 
+use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use DateInterval;
 use DateTime;
 use Drupal\Core\Database\Connection;
@@ -152,7 +153,7 @@ final class MigrationFingerprinter {
    * Computes all migration fingerprints and updates stored values as needed.
    */
   public function compute() {
-    $this->state->set('acquia_migrate_last_fingerprint_compute_time', date_create('now')->format(DATE_RFC3339));
+    $this->state->set(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME, date_create('now')->format(DATE_RFC3339));
     $fingerprints = $this->database->select('acquia_migrate_migration_flags', 't')
       ->fields('t', [
         'migration_id',
@@ -397,8 +398,31 @@ final class MigrationFingerprinter {
     if (!static::isSourceDatabaseSupported()) {
       return FALSE;
     }
+
+    // On Acquia hosting environments, only perform a refresh if and only if
+    // the current recent info was generated after the last fingerprint compute
+    // time. This avoids performing fingerprinting of tables mid-refresh.
+    if (AcquiaDrupalEnvironmentDetector::isAhEnv()) {
+      // Ensure it is computed initially, regardless of whether recent_info is
+      // populated.
+      $last_fingerprint_compute_time = $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME);
+      if ($last_fingerprint_compute_time === NULL) {
+        return TRUE;
+      }
+      // Do not recompute it until the recent info has been populated.
+      $recent_info = $this->state->get(ModuleAuditor::KEY_RECENT_INFO);
+      if ($recent_info === NULL) {
+        return FALSE;
+      }
+      // Recompute whenever the recent info was updated after the fingerprint
+      // was computed.
+      $recent_info_time = DateTime::createFromFormat(DATE_RFC3339, $recent_info['generated']);
+      $last_compute_time = DateTime::createFromFormat(DATE_RFC3339, $last_fingerprint_compute_time);
+      return $recent_info_time > $last_compute_time;
+    }
+
     $compute_max_age = new DateInterval(static::COMPUTE_MAX_AGE);
-    $last_compute = DateTime::createFromFormat(DATE_RFC3339, $this->state->get('acquia_migrate_last_fingerprint_compute_time', '2019-03-09T03:01:00-06:00'));
+    $last_compute = DateTime::createFromFormat(DATE_RFC3339, $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME, '2019-03-09T03:01:00-06:00'));
     $expiry = $last_compute->add($compute_max_age);
     if ($expiry < date_create('now')) {
       return TRUE;
@@ -412,7 +436,7 @@ final class MigrationFingerprinter {
     if ($fingerprint === static::FINGERPRINT_FAILED) {
       return FALSE;
     }
-    $this->state->set('acquia_migrate_last_canary_fingerprint', $fingerprint);
+    $this->state->set(self::KEY_LAST_FINGERPRINT_CANARY_TIME, $fingerprint);
     return MigrationFingerprinter::detectChange($last_canary_fingerprint, $fingerprint);
   }
 

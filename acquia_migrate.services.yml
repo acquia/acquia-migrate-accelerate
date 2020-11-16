@@ -200,3 +200,8 @@ services:
     arguments:
       - '@string_translation'
     lazy: true
+
+  acquia_migrate.config_factory_override:
+    class: Drupal\acquia_migrate\Config\OptimalMigrationConfigurationEnforcer
+    tags:
+      - { name: config.factory.override }
