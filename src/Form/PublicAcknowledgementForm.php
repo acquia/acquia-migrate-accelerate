@@ -65,7 +65,7 @@ final class PublicAcknowledgementForm extends FormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'acquia_migrate_public_acknowledgement_form';
@@ -77,15 +77,14 @@ final class PublicAcknowledgementForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // @see ::reset()
     // @see ::hasBeenConfigured()
+    // @codingStandardsIgnoreLine
     \Drupal::keyValue('acquia_migrate')->set(static::KEY, TRUE);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // TODO: Implement buildForm() method.
-
     $html = <<<HTML
 <p>This environment was created specifically for migrating from Drupal 7 to
 Drupal 9. It is an Acquia Cloud environment like any other, which means it's

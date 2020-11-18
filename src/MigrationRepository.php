@@ -4,7 +4,6 @@ namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -208,17 +207,15 @@ class MigrationRepository {
         $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $initial_migration_plugin_ids, $data_migration_plugin_ids_of_content_entity_migrations));
       }
 
-      // Also include all dependencies of data migration plugins if they live in
-      // a "Shared structure for <entity type>" migration that we depend upon.
-      $shared_structure_dependencies = array_filter($migration->getDependenciesWithReasons(), function ($k) {
-        return strpos($k, 'Shared structure for ') !== FALSE;
-      }, ARRAY_FILTER_USE_KEY);
-      $shared_structure_migration_plugin_ids = NestedArray::mergeDeepArray($shared_structure_dependencies);
-      foreach ($migration->getDataMigrationPluginIds() as $id) {
-        $dependencies = array_merge($dependencies, array_intersect($instances[$id]->getMigrationDependencies()['required'], $shared_structure_migration_plugin_ids));
+      // Also include all migration plugins for all "Shared structure for
+      // <entity type>" migrations.
+      $shared_structure_migration_plugin_ids = [];
+      $is_shared_structure_migration = strpos($migration->label(), 'Shared structure for ') !== FALSE;
+      if ($is_shared_structure_migration) {
+        $shared_structure_migration_plugin_ids = array_merge($shared_structure_migration_plugin_ids, array_diff($migration->getMigrationPluginIds(), $non_data_migration_plugin_ids, $initial_migration_plugin_ids, $shared_structure_migration_plugin_ids));
       }
 
-      $initial_migration_plugin_ids = array_merge($initial_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids);
+      $initial_migration_plugin_ids = array_merge($initial_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids, $shared_structure_migration_plugin_ids);
     }
 
     return $initial_migration_plugin_ids;

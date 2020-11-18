@@ -137,6 +137,13 @@ services:
       - [setValidator, []]
     tags:
       - { name: event_subscriber, priority: 1000 }
+  acquia_migrate.instantaneous_batch_interruptor:
+    class: Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor
+    arguments:
+      - '@state'
+      - '@lock.persistent'
+    tags:
+      - { name: event_subscriber }
   acquia_migrate.post_entity_save_validator:
     class: Drupal\acquia_migrate\EventSubscriber\PostEntitySaveValidator
     arguments: ['@entity_type.manager']

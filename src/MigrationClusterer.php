@@ -491,24 +491,25 @@ class MigrationClusterer {
         $entity_type_param = $source_config['entity_type'] ?? NULL;
         $bundle_param = $source_config['bundle'] ?? NULL;
 
-        if ($entity_type_param && $bundle_param) {
-          $parent_cluster_main_migration_id_candidates = [
+        if ($entity_type_param) {
+          $parent_cluster_main_migration_id_candidates = [];
+          if ($bundle_param) {
             // Per-bundle derived "regular" and "complete" migrations.
             // Example: "d7_node_complete:article".
-            implode(PluginBase::DERIVATIVE_SEPARATOR, [
+            $parent_cluster_main_migration_id_candidates[] = implode(PluginBase::DERIVATIVE_SEPARATOR, [
               "d7_{$entity_type_param}_complete",
               $bundle_param,
-            ]),
+            ]);
             // Example: "d7_taxonomy_term:tags".
-            implode(PluginBase::DERIVATIVE_SEPARATOR, [
+            $parent_cluster_main_migration_id_candidates[] = implode(PluginBase::DERIVATIVE_SEPARATOR, [
               "d7_$entity_type_param",
               $bundle_param,
-            ]),
-            // "All bundle" regular and complete migrations.
-            "d7_{$entity_type_param}_complete",
-            // Example: "d7_user".
-            "d7_$entity_type_param",
-          ];
+            ]);
+          }
+          // "All bundle" regular and complete migrations.
+          $parent_cluster_main_migration_id_candidates[] = "d7_{$entity_type_param}_complete";
+          // Example: "d7_user".
+          $parent_cluster_main_migration_id_candidates[] = "d7_$entity_type_param";
 
           // Let's try to find the cluster to which the current migration
           // belongs.
@@ -903,6 +904,19 @@ class MigrationClusterer {
   }
 
   /**
+   * Checks whether a migration's source has "entity_type" parameter.
+   *
+   * @param \Drupal\migrate\Plugin\Migration $migration
+   *   The migration plugin instance to check.
+   *
+   * @return bool
+   *   Whether the migration's source has "entity_type" parameter.
+   */
+  protected static function isEntityTypeSpecificMigration(Migration $migration) : bool {
+    return array_key_exists('entity_type', $migration->getSourceConfiguration());
+  }
+
+  /**
    * Checks whether this is a migration that can be imported at any time.
    *
    * Any time migrations don't have dependencies, no other migration depends on
@@ -917,7 +931,19 @@ class MigrationClusterer {
    * @throws \Drupal\migrate\MigrateSkipRowException
    */
   protected static function isAnyTimeMigration(Migration $migration) : bool {
-    return !self::isConfigNeedingHumanMigration($migration) && empty($migration->getMetadata('before')) && empty($migration->getMetadata('after')) && !self::isNoDataMigration($migration) && !self::isContentEntityDestination($migration);
+    return !self::isConfigNeedingHumanMigration($migration) &&
+      empty($migration->getMetadata('before')) &&
+      empty($migration->getMetadata('after')) &&
+      !self::isNoDataMigration($migration) &&
+      !self::isContentEntityDestination($migration) &&
+      // @todo While these migrations could in theory run at any time,
+      // "any time" migrations gets clustered into the "Site configuration
+      // cluster, and this usually does not make sense. For example, the default
+      // path auto pattern migrations end up in "Site configuration", but they
+      // should remain available for the "pushing" into the corresponding
+      // "Shared structure for <entity type>" cluster. This should be cleaned
+      // up.
+      !self::isEntityTypeSpecificMigration($migration);
   }
 
   /**

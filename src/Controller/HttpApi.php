@@ -4,6 +4,7 @@ namespace Drupal\acquia_migrate\Controller;
 
 use Drupal\acquia_migrate\Batch\BatchUnknown;
 use Drupal\acquia_migrate\Batch\MigrationBatchManager;
+use Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor;
 use Drupal\acquia_migrate\Exception\AcquiaMigrateHttpExceptionInterface;
 use Drupal\acquia_migrate\Exception\BadRequestHttpException;
 use Drupal\acquia_migrate\Exception\FailedAtomicOperationException;
@@ -990,14 +991,19 @@ final class HttpApi {
     if (!$data) {
       throw new BadRequestHttpException('Request document is missing the data member.');
     }
-    // @todo Allow PATCHing of more fields than only the "completed" and "skipped" attributes.
-    if (isset($data['relationships']) || !empty(array_diff(array_keys($data['attributes']), ['completed', 'skipped']))) {
+    // @todo Allow PATCHing of more fields.
+    $patchable_attributes = [
+      'activity',
+      'completed',
+      'skipped',
+    ];
+    if (isset($data['relationships']) || !empty(array_diff(array_keys($data['attributes']), $patchable_attributes))) {
       return JsonResponse::create([
         'errors' => [
           [
             'code' => (string) 403,
             'status' => Response::$statusTexts[403],
-            'detail' => 'Only the `completed` and `skipped` fields can be updated.',
+            'detail' => 'Only the `activity`, `completed` and `skipped` fields can be updated.',
             'links' => [
               'via' => [
                 'href' => $request->getUri(),
@@ -1006,6 +1012,49 @@ final class HttpApi {
           ],
         ],
       ], 403, static::$defaultResponseHeaders);
+    }
+
+    if (isset($data['attributes']['activity'])) {
+      $new_activity = $data['attributes']['activity'];
+      unset($data['attributes']['activity']);
+
+      // Only allow stopping the current activity.
+      if ($new_activity !== Migration::ACTIVITY_IDLE) {
+        return JsonResponse::create([
+          'errors' => [
+            [
+              'code' => (string) 403,
+              'status' => Response::$statusTexts[403],
+              'detail' => "Only 'idle' is allowed for the `activity` attribute.",
+              'links' => [
+                'via' => [
+                  'href' => $request->getUri(),
+                ],
+              ],
+            ],
+          ],
+        ], 403, static::$defaultResponseHeaders);
+      }
+      elseif ($migration->getActivity() === Migration::ACTIVITY_IDLE) {
+        return JsonResponse::create([
+          'errors' => [
+            [
+              'code' => (string) 409,
+              'status' => Response::$statusTexts[409],
+              'detail' => "The migration already has its `activity` attribute set to 'idle'.",
+              'links' => [
+                'via' => [
+                  'href' => $request->getUri(),
+                ],
+              ],
+            ],
+          ],
+        ], 409, static::$defaultResponseHeaders);
+      }
+
+      // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor
+      // @codingStandardsIgnoreLine
+      \Drupal::state()->set(InstantaneousBatchInterruptor::KEY, TRUE);
     }
 
     foreach ($data['attributes'] as $attribute => $value) {
@@ -1246,7 +1295,8 @@ final class HttpApi {
       'required' => ['migrationId'],
     ]);
 
-    if (!$this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH)) {
+    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
+    if (!$lock_acquired) {
       return JsonResponse::create([
         'errors' => [
           [
@@ -1323,7 +1373,6 @@ final class HttpApi {
       // @todo: should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.
       return JsonResponse::create(NULL, 404, static::$defaultResponseHeaders);
     }
-    $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
     $data = [
       'type' => 'migrationProcess',
       'id' => (string) $process_id,
@@ -1334,6 +1383,12 @@ final class HttpApi {
     $self_url = Url::fromUri($request->getUri())->setAbsolute();
     $links = ['self' => ['href' => $self_url->toString()]];
     if ($batch_status->getProgress() < 1) {
+      // If the currently active migration operation (which runs in a batch) is
+      // interrupted, then the persistent lock must be released. Unfortunately,
+      // a batch contains multiple migration plugin instances to execute, and
+      // the interruption happens at that level. So while the lock must also be
+      // released in this case, we cannot do it here.
+      // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor::interruptMigrateExecutable
       $links['next'] = ['href' => $self_url->toString()];
     }
     else {

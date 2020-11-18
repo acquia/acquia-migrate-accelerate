@@ -26,6 +26,41 @@ use Drupal\migrate_drupal\MigrationPluginManager as BaseMigrationPluginManager;
 class MigrationPluginManager extends BaseMigrationPluginManager {
 
   /**
+   * Category label of content migrations.
+   *
+   * @const string
+   */
+  const CATEGORY_CONTENT = 'Content';
+
+  /**
+   * Category label of configuration entity migrations.
+   *
+   * @const string
+   */
+  const CATEGORY_CONFIG_ENTITY = 'Configuration entity';
+
+  /**
+   * Category label of simple configuration migrations (e.g. settings).
+   *
+   * @const string
+   */
+  const CATEGORY_SIMPLE_CONFIG = 'Simple configuration';
+
+  /**
+   * Category label of unclassifiable migrations.
+   *
+   * @const string
+   */
+  const CATEGORY_OTHER = 'Other';
+
+  /**
+   * Category label for migrations which have no rows to process.
+   *
+   * @const string
+   */
+  const CATEGORY_NO_DATA = 'No data';
+
+  /**
    * MigrationPluginManager constructor.
    *
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $decorated
@@ -201,14 +236,14 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
         // Migrations for configuration entities can have migration dependencies
         // whereas migrations of simple configuration cannot.
         $category = ($migration->getDestinationPlugin() instanceof Entity || in_array($migration->getDestinationPlugin()->getPluginId(), ['component_entity_display', 'component_entity_form_display'], TRUE))
-          ? 'Configuration entity'
-          : 'Simple configuration';
+          ? self::CATEGORY_CONFIG_ENTITY
+          : self::CATEGORY_SIMPLE_CONFIG;
       }
       elseif (in_array('Content', $migration->getMigrationTags())) {
-        $category = 'Content';
+        $category = self::CATEGORY_CONTENT;
       }
       else {
-        $category = 'Other';
+        $category = self::CATEGORY_OTHER;
       }
       $migration->setMetadata('category', $category);
 
@@ -224,7 +259,7 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
       if ($only_migration_with_requirements_met) {
         if ($migration->allRowsProcessed() === TRUE && $migration->getSourcePlugin()->count() === 0) {
           $weight += 9999;
-          $migration->setMetadata('category', 'No data');
+          $migration->setMetadata('category', self::CATEGORY_NO_DATA);
         }
       }
 

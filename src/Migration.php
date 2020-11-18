@@ -501,15 +501,17 @@ final class Migration {
    *   An array of link URLs.
    */
   protected function getAvailableLinkUrls() : array {
-    // If this migration is not idle, do not allow any other activities.
-    if ($this->getActivity() !== self::ACTIVITY_IDLE) {
-      return [];
-    }
-
     $urls = [];
 
     $update_resource_url = Url::fromRoute('acquia_migrate.api.migration.patch')
       ->setRouteParameter('migration', $this->id());
+
+    // If this migration is not idle, do not allow any other activities, except
+    // stopping the current activity.
+    if ($this->getActivity() !== self::ACTIVITY_IDLE) {
+      $urls['stop'] = $update_resource_url;
+      return $urls;
+    }
 
     // Until preselections have been made, only preselectable migrations should
     // have skip/unskip links. This unintuitive boolean order exists to prevent
@@ -685,6 +687,7 @@ final class Migration {
    *   - Migration::ACTIVITY_IDLE
    *   - Migration::ACTIVITY_IMPORTING
    *   - Migration::ACTIVITY_ROLLING_BACK
+   *   - Migration::ACTIVITY_REFRESHING
    */
   public function getActivity() : string {
     $max_migration_plugin_status = array_reduce($this->dataMigrationPluginIds, function (int $max, string $id) {
@@ -710,7 +713,9 @@ final class Migration {
       default:
         // Note that MigrationInterface::STATUS_STOPPING is irrelevant to us,
         // since it is used by MigrateUpgradeImportBatch to signal the end of
-        // the processing within a single batch request.
+        // the processing within a single batch request. It is also used for
+        // instantaneously triggering a stop.
+        // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor::interruptMigrateExecutable
         // Note that MigrationInterface::STATUS_DISABLED is irrelevant to us,
         // since we do not use this functionality and it does not actually
         // reflect an activity.
@@ -872,6 +877,20 @@ final class Migration {
         case 'refresh':
           $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
           $link_title = t('Refresh');
+          break;
+
+        case 'stop':
+          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+          $link_title = t('Stop operation');
+          $link_params = [
+            'data' => [
+              'type' => 'migration',
+              'id' => $migration->id(),
+              'attributes' => [
+                'activity' => 'idle',
+              ],
+            ],
+          ];
           break;
 
         case 'complete':

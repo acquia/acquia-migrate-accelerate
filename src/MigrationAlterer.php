@@ -5,6 +5,7 @@ namespace Drupal\acquia_migrate;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -1174,6 +1175,172 @@ final class MigrationAlterer {
         }
       }
     }
+  }
+
+  /**
+   * Gets all migrations for derived config entity bundle types.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   *
+   * @see \Drupal\Core\Config\Entity\ConfigEntityBundleBase
+   */
+  private function getDerivedConfigEntityBundleMigrations(array $migrations) {
+    $derived_config_entity_bundle_migrations = [];
+    foreach ($migrations as $id => $definition) {
+      $destination_plugin_id = $definition['destination']['plugin'] ?? NULL;
+      if (
+        !$destination_plugin_id ||
+        strpos($destination_plugin_id, PluginBase::DERIVATIVE_SEPARATOR) === FALSE
+      ) {
+        continue;
+      }
+      if (count(explode(PluginBase::DERIVATIVE_SEPARATOR, $id)) !== 2) {
+        continue;
+      }
+      $destination_entity_type = explode(PluginBase::DERIVATIVE_SEPARATOR, $destination_plugin_id)[0] === 'entity'
+        ? explode(PluginBase::DERIVATIVE_SEPARATOR, $destination_plugin_id)[1]
+        : NULL;
+      if (!$destination_entity_type) {
+        continue;
+      }
+      // Only consider migrations that have a config entity type as their
+      // destination.
+      $destination_entity_type_definition = $this->entityTypeManager->getDefinition($destination_entity_type, FALSE);
+      if (!($destination_entity_type_definition instanceof ConfigEntityTypeInterface)) {
+        continue;
+      }
+
+      $bundle_of = $destination_entity_type_definition->getBundleOf();
+      if (!empty($bundle_of)) {
+        $derived_config_entity_bundle_migrations[$id] = $definition;
+      }
+    }
+
+    return $derived_config_entity_bundle_migrations;
+  }
+
+  /**
+   * Maps entity bundle migration dependencies to the more specific derivative.
+   *
+   * Examples:
+   * - d7_node_type gets refined to d7_node_type:blog, d7_node_type:article etc.
+   * - d7_taxonomy_vocabulary gets refined to d7_taxonomy_vocabulary:tags.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   *
+   * @see \Drupal\Core\Config\Entity\ConfigEntityBundleBase
+   */
+  public function refineEntityBundleMigrationDependencies(array &$migrations) {
+    $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
+
+    $d7_derived_config_entity_bundle_migration_ids = array_keys($this->getDerivedConfigEntityBundleMigrations($d7_migrations));
+    // Collect the corresponding base migration plugin IDs, because they are the
+    // migration dependencies we want to refine.
+    $d7_derived_config_entity_bundle_migration_base_ids = array_reduce($d7_derived_config_entity_bundle_migration_ids, function (array $carry, string $plugin_id) {
+      $plugin_id_parts = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id);
+      $carry = array_unique(
+        array_merge(
+          $carry,
+          [$plugin_id_parts[0]]
+        )
+      );
+      return $carry;
+    }, []);
+
+    // Now that we know which migration dependencies to look for (to refine), go
+    // ahead and refine them.
+    foreach ($d7_migrations as $migration_id => $migration_plugin_def) {
+      $all_dependencies = $migration_plugin_def['migration_dependencies'] ?? [];
+
+      // Try to refine both required and optional entity type migration
+      // dependencies.
+      foreach (['required', 'optional'] as $dependency_type) {
+        if (empty($all_dependencies[$dependency_type])) {
+          continue;
+        }
+
+        $affected_dependencies = array_intersect($d7_derived_config_entity_bundle_migration_base_ids, $all_dependencies[$dependency_type]);
+        foreach ($affected_dependencies as $config_entity_bundle_migration_base_id) {
+          $array_key = array_search($config_entity_bundle_migration_base_id, $all_dependencies[$dependency_type]);
+          assert($array_key !== FALSE);
+          $bundle_param = $migration_plugin_def['source']['node_type'] ?? $migration_plugin_def['source']['bundle'] ?? NULL;
+          if (!$bundle_param) {
+            // No entity type migration dependency was found, or there is no
+            // "entity_type" source configuration available.
+            continue;
+          }
+
+          // If a dependency on a derived config entity bundle migration exists,
+          // refine the original, non-derived migration dependency ID to a more
+          // specific one.
+          $derived_config_entity_bundle_migration_id = implode(PluginBase::DERIVATIVE_SEPARATOR, [
+            $config_entity_bundle_migration_base_id,
+            $bundle_param,
+          ]);
+          if (in_array($derived_config_entity_bundle_migration_id, $d7_derived_config_entity_bundle_migration_ids, TRUE)) {
+            $migrations[$migration_id]['migration_dependencies'][$dependency_type][$array_key] = $derived_config_entity_bundle_migration_id;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Converts optional dependencies to required dependencies.
+   *
+   * Temporary work-around for pathauto pattern migrations.
+   * TODO Reconsider after [OCTO-3763].
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   */
+  public function moveOptionalDependenciesToRequired(array &$migrations) {
+    $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
+    foreach ($d7_migrations as $migration_plugin_id => $migration_definition) {
+      if ($migration_definition['id'] !== 'd7_pathauto_patterns') {
+        continue;
+      }
+      if (empty($migration_definition['migration_dependencies']['optional'])) {
+        continue;
+      }
+      $dependencies_to_move = [];
+      foreach ($migration_definition['migration_dependencies']['optional'] as $dependency_key => $dependency_id) {
+        if (!array_key_exists($dependency_id, $d7_migrations)) {
+          continue;
+        }
+        $dependencies_to_move[] = $dependency_id;
+        unset($migrations[$migration_plugin_id]['migration_dependencies']['optional'][$dependency_key]);
+      }
+      $migrations[$migration_plugin_id]['migration_dependencies']['required'] = array_unique(
+        array_merge(
+          array_values($migration_definition['migration_dependencies']['required'] ?? []),
+          $dependencies_to_move
+        )
+      );
+    }
+  }
+
+  /**
+   * Returns the migrations which have the specified migration tag.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   * @param string $migration_tag
+   *   The required tag.
+   *
+   * @return array[][]
+   *   The migrations which have the specified tag.
+   */
+  protected static function getMigrationsWithTag(array $migrations, string $migration_tag) {
+    return array_filter($migrations, function (array $definition) use ($migration_tag) {
+      return in_array($migration_tag, $definition['migration_tags'] ?? [], TRUE);
+    });
   }
 
   /**
