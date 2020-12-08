@@ -1,0 +1,10 @@
+services:
+  acquia_migrate.commands:
+    class: \Drupal\acquia_migrate\Commands\AcquiaMigrateCommands
+    arguments:
+      - '@acquia_migrate.migration_repository'
+      - '@keyvalue'
+      - '@extension.list.module'
+      - '@acquia_migrate.recommendations'
+    tags:
+      - { name: drush.command }

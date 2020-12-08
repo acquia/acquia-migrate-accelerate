@@ -7,7 +7,6 @@ namespace Drupal\acquia_migrate;
 use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
@@ -23,20 +22,6 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 final class ModuleAuditor {
 
   use StringTranslationTrait;
-
-  /**
-   * State key for storing the initial info that generated this Drupal 9 site.
-   *
-   * @const string
-   */
-  const KEY_INITIAL_INFO = 'acquia_migrate.initial_info';
-
-  /**
-   * State key for storing the most recent info.
-   *
-   * @const string
-   */
-  const KEY_RECENT_INFO = 'acquia_migrate.recent_info';
 
   /**
    * The module extension list.
@@ -62,18 +47,11 @@ final class ModuleAuditor {
   protected $infoParser;
 
   /**
-   * Initial module information.
+   * The recommendations.
    *
-   * @var array
+   * @var \Drupal\acquia_migrate\Recommendations
    */
-  protected $initialInfo;
-
-  /**
-   * Recent module information.
-   *
-   * @var array
-   */
-  protected $recentInfo;
+  protected $recommendations;
 
   /**
    * ModuleAuditor constructor.
@@ -84,22 +62,17 @@ final class ModuleAuditor {
    *   The module handler service.
    * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
    *   The info parser.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
+   * @param \Drupal\acquia_migrate\Recommendations $recommendations
+   *   The recommendations.
    */
-  public function __construct(ModuleExtensionList $module_extension_list, ModuleHandlerInterface $module_handler, InfoParserInterface $info_parser, StateInterface $state, TranslationInterface $string_translation) {
+  public function __construct(ModuleExtensionList $module_extension_list, ModuleHandlerInterface $module_handler, InfoParserInterface $info_parser, TranslationInterface $string_translation, Recommendations $recommendations) {
     $this->moduleExtensionList = $module_extension_list;
     $this->moduleHandler = $module_handler;
     $this->infoParser = $info_parser;
     $this->stringTranslation = $string_translation;
-    // This key should be set during the initial installation of the site using
-    // this module. The value should be the output of the ah-migrate-info
-    // command.
-    $this->initialInfo = $state->get(static::KEY_INITIAL_INFO, []);
-    // Same as the above. Updated for every refresh.
-    $this->recentInfo = $state->get(static::KEY_RECENT_INFO, []);
+    $this->recommendations = $recommendations;
   }
 
   /**
@@ -110,7 +83,7 @@ final class ModuleAuditor {
    */
   public function getSourceModules() {
     $recognized_modules = static::getRecognizedModules($this->getRecommendations());
-    return array_values(array_reduce($this->initialInfo['sourceModules'] ?? [], function (array $acc, array $module) use ($recognized_modules) {
+    return array_values(array_reduce($this->recommendations->getSourceModules(), function (array $acc, array $module) use ($recognized_modules) {
       // The state and its label for the current module. Modules with a
       // corresponding recommendation are "Found" and modules without a
       // recommendation are "Unknown".
@@ -140,7 +113,7 @@ final class ModuleAuditor {
    */
   public function getRecommendations() {
     // Map the recommendations into resource objects suitable for the response.
-    return array_map([$this, 'buildRecommendationResourceObject'], array_values($this->initialInfo['recommendations'] ?? []));
+    return array_map([$this, 'buildRecommendationResourceObject'], $this->recommendations->getRaw());
   }
 
   /**

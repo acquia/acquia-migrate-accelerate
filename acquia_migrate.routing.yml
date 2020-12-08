@@ -306,3 +306,11 @@ acquia_migrate.acquia_site_studio:
   options:
     no_cache: 'TRUE'
     _admin_route: 'TRUE'
+
+system.modules_list_migration_breaking_confirm:
+  path: '/admin/modules/list/confirm-potentially-migration-breaking'
+  defaults:
+    _form: '\Drupal\acquia_migrate\Form\PotentialMigrationBreakingModuleInstallationConfirmForm'
+    _title: 'Potentially migration-breaking modules'
+  requirements:
+    _permission: 'administer modules'

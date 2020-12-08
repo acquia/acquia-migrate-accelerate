@@ -61,8 +61,14 @@ services:
       - '@extension.list.module'
       - '@module_handler'
       - '@info_parser'
-      - '@state'
       - '@string_translation'
+      - '@acquia_migrate.recommendations'
+  acquia_migrate.recommendations:
+    public: public
+    class: \Drupal\acquia_migrate\Recommendations
+    arguments:
+      - '@state'
+      - '@extension.list.module'
 
   # Fingerprints migration data to detect when a migration needs to be rerun.
   acquia_migrate.migration_fingerprinter:
@@ -158,6 +164,10 @@ services:
       - { name: event_subscriber }
   acquia_migrate.api_exception_subscriber:
     class: Drupal\acquia_migrate\Exception\AcquiaMigrateApiExceptionSubscriber
+    tags:
+      - { name: event_subscriber }
+  acquia_migrate.route_alterer:
+    class: Drupal\acquia_migrate\EventSubscriber\RouteAlterer
     tags:
       - { name: event_subscriber }
 

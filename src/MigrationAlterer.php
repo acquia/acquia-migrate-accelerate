@@ -147,6 +147,8 @@ final class MigrationAlterer {
     'empty',
     // @see \Drupal\migrate_drupal\Plugin\migrate\source\EmptySource
     'md_empty',
+    // @see \Drupal\migrate_drupal\Plugin\migrate\source\ContentEntity
+    'content_entity',
   ];
 
   /**
@@ -990,6 +992,7 @@ final class MigrationAlterer {
         continue;
       }
 
+      // This is the full (derived) ID of the migration's source plugin.
       $source_plugin_id = $definition['source']['plugin'] ?? NULL;
       try {
         $source_plugin_definition = $this->sourcePluginManager->getDefinition($source_plugin_id);
@@ -1006,7 +1009,8 @@ final class MigrationAlterer {
         $migrations[$migration_id]['source']['cache_key'] = "acquia_migrate__cached_source_count:" . $migration_id;
       }
       else {
-        if (in_array($source_plugin_id, self::KNOWN_UNCACHED_MIGRATION_SOURCE_PLUGINS)) {
+        $base_plugin_id = $source_plugin_definition['id'];
+        if (in_array($base_plugin_id, self::KNOWN_UNCACHED_MIGRATION_SOURCE_PLUGINS)) {
           continue;
         }
         $this->logger->debug('Unknown uncacheable migration source plugin encountered in @migration-plugin-id: @migration-source-plugin-id (@migration-source-plugin-class).', [

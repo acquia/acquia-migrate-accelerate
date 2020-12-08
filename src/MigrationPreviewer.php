@@ -13,10 +13,12 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Row;
@@ -32,7 +34,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @internal
  */
-final class MigrationPreviewer {
+final class MigrationPreviewer implements TrustedCallbackInterface {
 
   use StringTranslationTrait;
 
@@ -111,6 +113,45 @@ final class MigrationPreviewer {
    */
   public function isPreviewableMigration(Migration $migration) : bool {
     return $this->getDataMigrationPluginToPreview($migration) !== NULL;
+  }
+
+  /**
+   * Checks whether given previewable migration is ready to generate previews.
+   *
+   * There's nothing to preview if not all supporting configuration has been
+   * processed.
+   *
+   * @param \Drupal\acquia_migrate\Migration $migration
+   *   A migration.
+   *
+   * @return \Drupal\acquia_migrate\Exception\RowPreviewException|null
+   *   If ready to preview, nothing is returned. Otherwise, a
+   *   RowPreviewException is returned.
+   *
+   * @see ::isPreviewableMigration
+   */
+  public function isReadyForPreview(Migration $migration) : ?RowPreviewException {
+    assert($this->isPreviewableMigration($migration));
+
+    $todo = $migration->getSupportingConfigurationMigrationsPluginIdsWithRowsToProcess();
+
+    if (!empty($todo)) {
+      $missing = '';
+      $blocking_migration_plugins_keyed_by_migration = [];
+      foreach ($todo as $migration_plugin_id => $migration_id) {
+        $migration_label = Migration::labelForId($migration_id);
+        $blocking_migration_plugins_keyed_by_migration[$migration_label][] = $migration_plugin_id;
+      }
+      foreach ($blocking_migration_plugins_keyed_by_migration as $migration_label => $migration_plugin_ids) {
+        if (!empty($missing)) {
+          $missing .= ', ';
+        }
+        $missing .= sprintf("%s (specifically: %s)", $migration_label, implode(', ', $migration_plugin_ids));
+      }
+      return new RowPreviewException(sprintf('Not all supporting configuration has been processed yet: %s.', ltrim($missing)));
+    }
+
+    return NULL;
   }
 
   /**
@@ -321,8 +362,18 @@ final class MigrationPreviewer {
     // … but is not declared on \Drupal\migrate\Plugin\MigrateSourceInterface.
     assert(method_exists($data_migration_plugin->getSourcePlugin(), 'query'));
 
-    if (!$migration->allDependencyRowsProcessed()) {
-      throw new RowPreviewException(sprintf('Not all rows in dependent migrations (%s) have been processed yet.', implode(', ', $migration->getDependencies())));
+    $preview_exception = $this->isReadyForPreview($migration);
+    if ($preview_exception) {
+      throw $preview_exception;
+    }
+
+    $todo = $migration->getSupportingConfigurationMigrationsPluginIdsWithRowsToProcess();
+    if (!empty($todo)) {
+      $missing = '';
+      foreach ($todo as $migration_plugin_id => $migration_id) {
+        $missing .= " $migration_plugin_id (part of the $migration_id migration)";
+      }
+      throw new RowPreviewException(sprintf('Not all supporting configuration has been imported yet. Not yet imported: %s.', ltrim($missing)));
     }
 
     $source = $data_migration_plugin->getSourcePlugin();
@@ -604,10 +655,31 @@ final class MigrationPreviewer {
   private function buildPreview(Row $row, EntityTypeInterface $entity_type, array $destination_configuration) : array {
     if ($entity_type->hasLinkTemplate('canonical')) {
       $stub_entity = $this->generatePreviewEntity($row, $entity_type, $destination_configuration);
-      $build = $this->entityTypeManager
+      $build['entity'] = $this->entityTypeManager
         ->getViewBuilder($entity_type->id())
         ->view($stub_entity);
-      $build['#title'] = $stub_entity->label();
+      $build['entity']['#title'] = $stub_entity->label();
+
+      $build['entity']['#pre_render'][] = [$this, 'postEntityPreviewBuild'];
+      $build['entity']['#acquia_migrate__entity'] = $stub_entity;
+      $build['entity']['#acquia_migrate__fields_with_unmigrated_dependencies'] = [];
+      foreach ($stub_entity->getFields(FALSE) as $field_name => $items) {
+        // For now, this only inspects entity reference fields. This is likely
+        // sufficient for 99% of migrations to work reliably.
+        if ($items instanceof EntityReferenceFieldItemListInterface) {
+          if ($items->isEmpty()) {
+            continue;
+          }
+          if (count($items->referencedEntities()) === $items->count()) {
+            continue;
+          }
+          $missing_content = [];
+          for ($i = 0; $i < $items->count(); $i++) {
+            $missing_content[] = $items->get($i)->target_id;
+          }
+          $build['entity']['#acquia_migrate__fields_with_unmigrated_dependencies'][$field_name] = $missing_content;
+        }
+      }
     }
     else {
       $build = [
@@ -619,6 +691,64 @@ final class MigrationPreviewer {
 
     // Don't render cache previews.
     unset($build['#cache']);
+
+    return $build;
+  }
+
+  /**
+   * Builds an dry-run-migrated entity's view's fields with unmigrated data.
+   *
+   * This function is assigned as a #pre_render callback in ::buildPreview().
+   *
+   * @param array $build
+   *   A renderable array containing build information and context for an entity
+   *   view.
+   *
+   * @return array
+   *   The updated renderable array.
+   *
+   * @see \Drupal\Core\Entity\EntityViewBuilder::build()
+   */
+  public function postEntityPreviewBuild(array $build) : array {
+    foreach ($build['#acquia_migrate__fields_with_unmigrated_dependencies'] as $field_name => $missing_content) {
+      $field_definition = $build['#acquia_migrate__entity']->getFieldDefinition($field_name);
+      $label = $field_definition->getLabel();
+
+      $target_entity_type_id = $field_definition->getItemDefinition()->getSetting('target_type');
+      $target_entity_type = $this->entityTypeManager->getDefinition($target_entity_type_id);
+
+      $message = $this->t('Necessary data not yet migrated: missing @missing-entities (@missing-entity-ids).', [
+        '@missing-entities' => $target_entity_type->getCountLabel(count($missing_content)),
+        '@missing-entity-ids' => Markup::create(implode(', ', array_map(function ($entity_id) : string {
+          return "<code>$entity_id</code>";
+        }, $missing_content))),
+      ]);
+      $template = <<<HTML
+<div class="field field--label-inline">
+  <div class="field__label">⚠️ {{label}}</div>
+  <div class="field__item"><p>{{ message }}</p></div>
+</div>
+HTML;
+      $alternative_field_build = [
+        '#type' => 'inline_template',
+        '#template' => $template,
+        '#context' => [
+          'label' => $label,
+          'message' => $message,
+        ],
+        '#weight' => 1000,
+      ];
+
+      // Override the existing formatted field (if the EntityViewDisplay was
+      // configured to render it), otherwise forcibly render it to make the user
+      // aware.
+      if (isset($build[$field_name])) {
+        $build[$field_name] = $alternative_field_build;
+      }
+      else {
+        $build['acquia_migrate__missing_' . $field_name] = $alternative_field_build;
+      }
+    }
 
     return $build;
   }
@@ -657,6 +787,15 @@ final class MigrationPreviewer {
     $entity->in_preview = TRUE;
 
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks() {
+    return [
+      'postEntityPreviewBuild',
+    ];
   }
 
 }

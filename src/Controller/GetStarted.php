@@ -305,18 +305,24 @@ final class GetStarted extends ControllerBase {
       '#markup' => Markup::create(<<<HTML
 <style>
 #acquia-site-studio .hero {
-    display: flex;
     margin-bottom: 1.5rem;
 }
-/* Match margins for Claro's .page-content. */
-@media screen and (min-width: 38em) {
+@media screen and (min-width: 61rem) {
   #acquia-site-studio .hero {
+    display: flex;
     margin-bottom: 2rem;
   }
 }
 #acquia-site-studio .hero iframe {
-    max-width: 560px;
-    max-height: 315px;
+    min-width: 100%;
+    min-height: 315px;
+}
+@media screen and (min-width: 61rem) {
+    #acquia-site-studio .hero iframe {
+        min-width: unset;
+        max-width: 560px;
+        max-height: 315px;
+    }
 }
 #acquia-site-studio .hero article {
     flex: 1;
@@ -325,27 +331,32 @@ final class GetStarted extends ControllerBase {
 #acquia-site-studio .hero article h2 {
     margin-top: 0;
 }
-#acquia-site-studio .resources {
+#acquia-site-studio .resources,
+#acquia-site-studio .alternatives {
     text-align: center;
 }
 #acquia-site-studio .resources .resource-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: minmax(100px, auto);
   padding: 0 2em;
 }
-#acquia-site-studio .resources .resource-cards .resource-card {
-    box-shadow: 0px 3px 10px grey;
+@media screen and (min-width: 61rem) {
+    #acquia-site-studio .resources .resource-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+#acquia-site-studio .resource-card {
+    background: white;
     margin: 1em;
     padding: 1em;
     text-align: left;
     color: inherit;
     text-decoration: none;
 }
-#acquia-site-studio .resources .resource-cards .resource-card:hover {
-    box-shadow: 0px 3px 10px black;
+#acquia-site-studio .resource-card:hover {
+    outline: 1px solid black;
 }
-#acquia-site-studio .resources .resource-cards .resource-card img {
+#acquia-site-studio .resource-card img {
     box-shadow: 0px 3px 5px grey;
     transform: scale(0.95);
     transition: all .2s ease-in-out;
@@ -353,17 +364,17 @@ final class GetStarted extends ControllerBase {
     margin-left: auto;
     margin-right: auto;
 }
-#acquia-site-studio .resources .resource-cards .resource-card img.transparent {
+#acquia-site-studio .resource-card img.transparent {
     box-shadow: none;
 }
-#acquia-site-studio .resources .resource-cards .resource-card:hover img {
+#acquia-site-studio .resource-card:hover img {
   transform: scale(1.05);
 }
-@media screen and (min-width: 85.375rem) {
-    #acquia-site-studio .resources .resource-cards .resource-card {
+@media screen and (min-width: 38em) {
+    #acquia-site-studio .resource-card {
         display: flex;
     }
-    #acquia-site-studio .resources .resource-cards .resource-card img {
+    #acquia-site-studio .resource-card img {
         align-self: center;
         flex-grow: unset;
         max-width: 30%;
@@ -372,21 +383,21 @@ final class GetStarted extends ControllerBase {
     }
 }
 
-#acquia-site-studio .resources .resource-cards .resource-card article h3 {
+#acquia-site-studio .resource-card article h3 {
     font-size: 1.2rem;
 }
-#acquia-site-studio .resources .resource-cards .resource-card article p {
+#acquia-site-studio .resource-card article p {
     color: gray
 }
-#acquia-site-studio .resources .resource-cards .resource-card article .read-more {
+#acquia-site-studio .resource-card article .read-more {
     color: #767676;
     font-weight: bold;
     float: right;
 }
-#acquia-site-studio .resources .resource-cards .resource-card:hover article .read-more {
+#acquia-site-studio .resource-card:hover article .read-more {
     text-decoration: underline;
 }
-#acquia-site-studio .resources .resource-cards .resource-card article .read-more::after {
+#acquia-site-studio .resource-card article .read-more::after {
     content: ' ›'
 }
 </style>
@@ -470,6 +481,24 @@ At the heart of component design is the philosophy: Create once, use many.</p>
           </a>
         </div>
         <!-- <a href="#" class="button button--primary">View all</a> -->
+    </div>
+    <div class="alternatives">
+      <h2>Alternatives to Acquia Site Studio</h2>
+      <a class="resource-card" href="https://www.drupal.org/docs/theming-drupal">
+        <article>
+          <h3>DIY: Port the theme yourself</h3>
+          <p>drupal.org has lots of resources covering theming in Drupal 9! It covers everything from the new <code>*.info.yml</code> files to the vastly improved asset library system, granular overrides, all things Twig, subthemes based on the <q>Stable</q> or <q>Classy</q> base themes in core, breakpoints, and much more.</p>
+          <span class="read-more">Read more</span>
+        </article>
+      </a>
+      <a class="resource-card" href="https://docs.acquia.com/guide/ps/#ps-guide-drupal8-layout-theming">
+        <article>
+          <h3>Need help? Call our Professional Services to guide you through next steps</h3>
+          <p>If you're stuck with Acquia Site Studio or with porting the theme yourself, or are just looking for guidance in finishing either, contact your account manager to arrange for Acquia's Professional Service to determine the optimal approach for your situation.</p>
+          <p>Or better yet, get comprehensive training on Drupal 8 &amp; 9 layout and theming!</p>
+          <span class="read-more">Read more</span>
+        </article>
+      </a>
     </div>
 </div>
 HTML)

@@ -171,7 +171,16 @@ class MigrationRepository {
    *   A set of plugin IDs.
    */
   public function getInitialMigrationPluginIds() : array {
-    $initial_migration_plugin_ids = [];
+    // This may be called repeatedly within a request, but the computed value
+    // will not change. Hence this is safe to statically cache.
+    // @see Migration::getSupportingConfigurationMigrationsPluginIds()
+    static $initial_migration_plugin_ids;
+    if (!isset($initial_migration_plugin_ids)) {
+      $initial_migration_plugin_ids = [];
+    }
+    else {
+      return $initial_migration_plugin_ids;
+    }
 
     $migrations = $this->getMigrations();
     $all_instances = [];
@@ -218,7 +227,28 @@ class MigrationRepository {
       $initial_migration_plugin_ids = array_merge($initial_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids, $shared_structure_migration_plugin_ids);
     }
 
-    return $initial_migration_plugin_ids;
+    // Remove missing initial migration plugins and also those plugins whose
+    // dependency is not an initial migration.
+    // Right now the latter will be "d7_shortcut_set_users": this depends on
+    // "d7_shortcut_set" and "d7_user". "d7_shortcut_set" considered as an
+    // initial migration plugin, it is in the "$initial_migration_plugin_ids"
+    // array. But "d7_user" is not an initial migration, so
+    // "d7_shortcut_set_users" cannot be migrated.
+    return array_filter($initial_migration_plugin_ids, function (string $initial_plugin_id) use ($all_instances, $initial_migration_plugin_ids) {
+      // The initial migration plugin is not present.
+      if (!array_key_exists($initial_plugin_id, $all_instances)) {
+        return FALSE;
+      }
+      foreach ($all_instances[$initial_plugin_id]->getMigrationDependencies()['required'] as $initial_plugin_requirement_plugin_id) {
+        if (!in_array($initial_plugin_requirement_plugin_id, $initial_migration_plugin_ids, TRUE)) {
+          // The current dependency of the actual initial migration plugin ID is
+          // not an initial migration.
+          return FALSE;
+        }
+      }
+
+      return TRUE;
+    });
   }
 
   /**
@@ -228,10 +258,19 @@ class MigrationRepository {
    *   A set of plugin IDs.
    */
   public function getInitialMigrationPluginIdsWithRowsToProcess() : array {
+    // This may be called repeatedly within a request, but the computed value
+    // will not change. Hence this is safe to statically cache.
+    // @see Migration::getSupportingConfigurationMigrationsPluginIdsWithRowsToProcess()
+    static $todo;
+    if (!isset($todo)) {
+      $todo = [];
+    }
+    else {
+      return $todo;
+    }
+
     $initial_migration_plugin_ids = $this->getInitialMigrationPluginIds();
     $migrations = $this->getMigrations();
-
-    $todo = [];
 
     $all_instances = [];
 
@@ -301,19 +340,7 @@ class MigrationRepository {
       // Create a temporary data structure for this cluster if it doesn't exist
       // already.
       if (!isset($migration_info[$cluster])) {
-        // Generate an opaque identifier with a legible suffix at the end, to
-        // balance:
-        // - not baking in assumptions as we get this project off the ground
-        // - easier debugging while we get this project off the ground
-        // The intent is to change the opaque identifiers in the future, and
-        // if they truly are treated as opaque, that will be easy to do.
-        // This opaque identifier must be at most 225 ASCII characters long due
-        // to MySQL 5.6 restrictions (767-255-255-32). An MD5-hash is 32
-        // characters, the dash is one and that leaves 192 characters of the
-        // cluster label.
-        // @see acquia_migrate_schema()
-        // @see \Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface::ROLLBACK_DATA_TABLE
-        $migration_id = md5($cluster) . '-' . substr(str_replace('/', '-', $cluster), 0, 192);
+        $migration_id = Migration::generateIdFromLabel($cluster);
         if (!isset($flags[$migration_id])) {
           // Insert default flags.
           $this->connection->insert('acquia_migrate_migration_flags')

@@ -6,7 +6,7 @@
  */
 
 use Drupal\acquia_migrate\MigrationFingerprinter;
-use Drupal\acquia_migrate\ModuleAuditor;
+use Drupal\acquia_migrate\Recommendations;
 use Drupal\acquia_migrate\Plugin\migrate\destination\RollbackableInterface;
 use Drupal\acquia_migrate\Form\PublicAcknowledgementForm;
 use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
@@ -67,7 +67,7 @@ function acquia_migrate_uninstall($is_syncing) {
 
   // Delete all state.
   \Drupal::state()->deleteMultiple([
-    ModuleAuditor::KEY_INITIAL_INFO,
+    Recommendations::KEY_INITIAL_INFO,
     MigrationFingerprinter::KEY_LAST_FINGERPRINT_CANARY_TIME,
     MigrationFingerprinter::KEY_LAST_FINGERPRINT_COMPUTE_TIME,
   ]);

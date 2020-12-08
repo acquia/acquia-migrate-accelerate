@@ -5,6 +5,7 @@
     "homepage": "https://www.acquia.com/drupal9/accelerate-your-migration",
     "require": {
         "acquia/drupal-environment-detector": "^1.2",
+        "composer/semver": "^3.0",
         "drupal/core": "^9.0.6",
         "drupal/decoupled_pages": "^1.0",
         "drupal/migrate_plus": "^5",
@@ -15,9 +16,15 @@
         "acquia/coding-standards": "dev-master",
         "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
         "ergebnis/composer-normalize": "^2.0.0",
+        "phpspec/prophecy-phpunit": "^2",
         "squizlabs/php_codesniffer": "^3.0@dev"
     },
     "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^10"
+            }
+        },
         "patches": {
             "drupal/core": {
                 "Avoid https://www.drupal.org/project/drupal/issues/2796755 breaking this module": "https://gist.githubusercontent.com/wimleers/4c8742d5efb74ea5dad1475b4478bd40/raw/99e35617a292b730fdbb36be4f3ce48d5c9863a1/migration-metadata.patch",

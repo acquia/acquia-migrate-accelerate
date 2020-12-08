@@ -10,6 +10,7 @@ use Drupal\acquia_migrate\Plugin\migrate\destination\AcquiaMigrateUser;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -21,6 +22,10 @@ use Drupal\Core\Session\AccountInterface;
  */
 function acquia_migrate_toolbar() {
   $items['acquia_migrate'] = [
+    // Set weight to be heavier than the "home" toolbar tab, but lighter than
+    // the "administration" toolbar tab. In short, attempt to be the first
+    // toolbar tab, to ensure this toolbar tab gets activated by default.
+    '#weight' => -19,
     '#type' => 'toolbar_item',
     'tab' => [
       '#type' => 'link',
@@ -165,4 +170,52 @@ function acquia_migrate_entity_field_access($operation, FieldDefinitionInterface
       ->setCacheMaxAge(0);
   }
   return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function acquia_migrate_modules_installed($modules) {
+  $timestamp = \Drupal::time()->getRequestTime();
+  foreach ($modules as $module) {
+    // @see \Drupal\acquia_migrate\Commands\AcquiaMigrateCommands::auditModules()
+    $key = "module_install_timestamp:$module";
+    \Drupal::keyValue('acquia_migrate')->set($key, $timestamp);
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * The source data AM:A migrates might have broken configurations: for example,
+ * in the Drupal 7 source database fixture, the article node's are referencing
+ * each other while the corresponding field formatter is set to
+ * "rendered entity" (with default view mode). This means that Drupal runs into
+ * an "infinite" loop when these nodes are rendered.
+ *
+ * The described case does not cause until one tries to view the migrated
+ * entity, but for example, cron can easily trigger a render when the "search"
+ * module is enabled – and that will break AM:A.
+ *
+ * So the safest solution is to temporarily disable every cron implementation
+ * while AM:A is enabled – except of "system" and "update".
+ */
+function acquia_migrate_module_implements_alter(&$implementations, $hook) {
+  if ($hook !== 'cron') {
+    return;
+  }
+
+  // Only allow "system" and "update" crons while Acquia Migrate is enabled.
+  $allowed_crons = [
+    'system',
+    'update',
+  ];
+
+  $skipped_crons_implementations = array_diff(array_keys($implementations), $allowed_crons);
+  if (!empty($skipped_crons_implementations)) {
+    $implementations = array_intersect_key($implementations, array_flip($allowed_crons));
+    \Drupal::logger('acquia_migrate')->log(RfcLogLevel::DEBUG, 'hook_cron() implementations were skipped because Acquia Migrate: Accelerate is enabled. The affected modules are: @module-list.', [
+      '@module-list' => implode(',', $skipped_crons_implementations),
+    ]);
+  }
 }

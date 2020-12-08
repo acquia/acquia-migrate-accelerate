@@ -49,4 +49,16 @@ class AcquiaMigrateUser extends EntityUser {
     return parent::import($row, $old_destination_id_values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function rollback(array $destination_identifier) {
+    $user_id = (int) reset($destination_identifier);
+    // Explicitly prevent the deletion of user "1" and "0".
+    if ($user_id < 2 && !$this->isTranslationDestination()) {
+      return;
+    }
+    parent::rollback($destination_identifier);
+  }
+
 }
