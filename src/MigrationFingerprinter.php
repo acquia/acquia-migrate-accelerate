@@ -410,7 +410,7 @@ final class MigrationFingerprinter {
         return TRUE;
       }
       // Do not recompute it until the recent info has been populated.
-      $recent_info = $this->state->get(ModuleAuditor::KEY_RECENT_INFO);
+      $recent_info = $this->state->get(Recommendations::KEY_RECENT_INFO);
       if ($recent_info === NULL) {
         return FALSE;
       }

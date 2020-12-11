@@ -605,11 +605,13 @@ final class Migration {
       ]);
     }
 
-    if (!$this->isCompleted()) {
-      $urls['complete'] = $update_resource_url;
-    }
-    else {
-      $urls['uncomplete'] = $update_resource_url;
+    if ($this->allRowsProcessed()) {
+      if (!$this->isCompleted()) {
+        $urls['complete'] = $update_resource_url;
+      }
+      else {
+        $urls['uncomplete'] = $update_resource_url;
+      }
     }
 
     // It does not make sense to mark an already completed migration as skipped.

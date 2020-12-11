@@ -234,7 +234,7 @@ class MigrationRepository {
     // initial migration plugin, it is in the "$initial_migration_plugin_ids"
     // array. But "d7_user" is not an initial migration, so
     // "d7_shortcut_set_users" cannot be migrated.
-    return array_filter($initial_migration_plugin_ids, function (string $initial_plugin_id) use ($all_instances, $initial_migration_plugin_ids) {
+    $initial_migration_plugin_ids = array_filter($initial_migration_plugin_ids, function (string $initial_plugin_id) use ($all_instances, $initial_migration_plugin_ids) {
       // The initial migration plugin is not present.
       if (!array_key_exists($initial_plugin_id, $all_instances)) {
         return FALSE;
@@ -249,6 +249,8 @@ class MigrationRepository {
 
       return TRUE;
     });
+
+    return $initial_migration_plugin_ids;
   }
 
   /**
