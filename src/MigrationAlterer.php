@@ -55,6 +55,7 @@ final class MigrationAlterer {
     'config' => 'rollbackable_config',
     'd7_theme_settings' => 'rollbackable_d7_theme_settings',
     'shortcut_set_users' => 'rollbackable_shortcut_set_users',
+    'default_langcode' => 'rollbackable_default_langcode',
   ];
 
   /**
@@ -149,6 +150,11 @@ final class MigrationAlterer {
     'md_empty',
     // @see \Drupal\migrate_drupal\Plugin\migrate\source\ContentEntity
     'content_entity',
+  ];
+
+  const KNOWN_FOLLOW_UP_MIGRATION_PLUGINS = [
+    'd6_entity_reference_translation',
+    'd7_entity_reference_translation',
   ];
 
   /**
@@ -917,6 +923,14 @@ final class MigrationAlterer {
         // exists.
         $candidate_table_aliases = [];
         foreach ($tables as $alias => $table_info) {
+          // If this query contains a subquery, then assume this does not select
+          // the high_water_property source field. This is reasonable because
+          // the source plugin should not need subqueries to retrieve the actual
+          // data; that should be a direct table query. If not, performance will
+          // be atrocious too.
+          if (!is_string($table_info['table'])) {
+            continue;
+          }
           if ($schema->fieldExists($table_info['table'], $source_field)) {
             $candidate_table_aliases[$alias] = $table_info['table'];
           }
@@ -976,7 +990,7 @@ final class MigrationAlterer {
    * @see https://www.drupal.org/project/drupal/issues/2723115
    * @see https://www.drupal.org/project/drupal/issues/3092227
    * @see https://www.drupal.org/project/drupal/issues/2598670
-   * @todo https://backlog.acquia.com/browse/OCTO-3742
+   * @see https://www.drupal.org/project/drupal/issues/3190815
    */
   public function addCachingToSqlBasedMigrationPlugins(array &$migrations) {
     foreach ($migrations as $migration_id => $definition) {
@@ -1005,6 +1019,16 @@ final class MigrationAlterer {
       // Cache counts for migration plugins for which AM:A does fingerprinting.
       // @see \Drupal\acquia_migrate\MigrationFingerprinter::compute()
       if (is_a($source_plugin_class, SqlBase::class, TRUE)) {
+        if (!$this->isCacheableCountSqlSourcePlugin($source_plugin_class)) {
+          $this->logger->warning('Uncacheable migration source plugin encountered due to overridden count() method in @migration-plugin-id: @migration-source-plugin-id (@migration-source-plugin-class).', [
+            '@migration-plugin-id' => $migration_id,
+            '@migration-source-plugin-id' => $source_plugin_id,
+            '@migration-source-plugin-class' => $source_plugin_class,
+          ]);
+          $migrations[$migration_id]['source']['acquia_migrate.uncacheable_source_count'] = TRUE;
+          continue;
+        }
+
         $migrations[$migration_id]['source']['cache_counts'] = TRUE;
         $migrations[$migration_id]['source']['cache_key'] = "acquia_migrate__cached_source_count:" . $migration_id;
       }
@@ -1020,6 +1044,66 @@ final class MigrationAlterer {
         ]);
       }
     }
+  }
+
+  /**
+   * Whether the provided FQCN is a SQL source plugin with cacheable count.
+   *
+   * @param string $class
+   *   A FQCN.
+   *
+   * @return bool
+   *   TRUE when the class is a SqlBase subclass and has a cacheable count.
+   */
+  private function isCacheableCountSqlSourcePlugin(string $class) {
+    if (!is_a($class, SqlBase::class, TRUE)) {
+      return FALSE;
+    }
+
+    // If count() is overridden, then SqlBase::count()'s caching support cannot
+    // work.
+    do {
+      $overridden_methods = $this->getOverriddenMethods($class);
+      if (in_array('count', $overridden_methods)) {
+        return FALSE;
+      }
+      $class = get_parent_class($class);
+    } while ($class !== SqlBase::class);
+
+    return TRUE;
+  }
+
+  /**
+   * Gets the overridden methods for the given class.
+   *
+   * @param string $class
+   *   A FQCN.
+   *
+   * @return string[]
+   *   The list of overridden methods, if any.
+   *
+   * @see https://www.php.net/manual/en/function.get-class-methods.php#51795
+   */
+  private function getOverriddenMethods(string $class) {
+    $reflection_class = new \ReflectionClass($class);
+    $overridden_methods = [];
+
+    foreach ($reflection_class->getMethods() as $method) {
+      try {
+        // Attempt to find method in parent class.
+        new \ReflectionMethod($reflection_class->getParentClass()->getName(), $method->getName());
+        // If the method is explicitly defined in this class, then it is an
+        // override.
+        if ($method->getDeclaringClass()->getName() == $reflection_class->getName()) {
+          $overridden_methods[] .= $method->getName();
+        }
+      }
+      catch (\ReflectionException $e) {
+        // This method was not in the parent class, nothing to do here.
+      }
+    }
+
+    return $overridden_methods;
   }
 
   /**
@@ -1306,7 +1390,12 @@ final class MigrationAlterer {
   public function moveOptionalDependenciesToRequired(array &$migrations) {
     $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
     foreach ($d7_migrations as $migration_plugin_id => $migration_definition) {
-      if ($migration_definition['id'] !== 'd7_pathauto_patterns') {
+      $migrations_to_process = [
+        'd7_pathauto_patterns',
+        'd7_block',
+        'd7_block_translation',
+      ];
+      if (!in_array($migration_definition['id'], $migrations_to_process, TRUE)) {
         continue;
       }
       if (empty($migration_definition['migration_dependencies']['optional'])) {
@@ -1326,6 +1415,67 @@ final class MigrationAlterer {
           $dependencies_to_move
         )
       );
+    }
+  }
+
+  /**
+   * Removes all follow-up migration.
+   *
+   * Specifically, it removes not only all known follow-up migrations
+   * ("d*_entity_reference_translation"), but also all others. For unknown ones,
+   * it does explicit logging so we can be made aware.
+   *
+   * The original "entityreference" and "node_reference" field migration plugins
+   * migrate the same target entity IDs what is in the source field value. These
+   * target IDs get updated by the "d*_entity_reference_translation" follow-up
+   * migrations which are executed by MigrateUpgradeImportBatch after a
+   * migration which implements MigrationWithFollowUpInterface was migrated.
+   *
+   * It seems to be hard to make "d*_entity_reference_translation" migration fit
+   * in AM:A's business logic:
+   * - These migrations are (re-)generated during the migration import batch.
+   * - With an empty destination site, there are no derivatives.
+   * - AM:A has no control when these migrations get executed.
+   *
+   * Luckily, the goal of the currently known "d*_entity_reference_translation"
+   * migrations can be reached with an enhanced field migration value process
+   * pipeline which is able to set the final target entity ID for entity
+   * reference fields with 'node' target.
+   *
+   * So the currently known "d*_entity_reference_translation" migrations are
+   * largely replaced by:
+   * - Improved (node) entity reference migration plugins, which are migrating
+   *   the final target entity ID instead of updating the raw IDs later with the
+   *   entity reference translation follow-up migrations.
+   * - An alternate migration_lookup plugin, which is able to create stubs in
+   *   the right migration derivative's destination plugin; with the help of the
+   *   "acquia_migrate_migration_lookup" migration process plugin.
+   * - A new migrate stub service for "acquia_migrate_migration_lookup".
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   *
+   * @see \Drupal\migrate_drupal_ui\Batch\MigrateUpgradeImportBatch
+   * @see \Drupal\migrate_drupal\Plugin\MigrationWithFollowUpInterface
+   * @see \Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateEntityReference
+   * @see \Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateNodeReference
+   * @see \Drupal\acquia_migrate\Plugin\migrate\process\AcquiaMigrateMigrationLookup
+   * @see \Drupal\acquia_migrate\AcquiaMigrateMigrateStub
+   * @see acquia_migrate_migrate_field_info_alter()
+   */
+  public function removeFollowupMigrations(array &$migrations) {
+    $follow_up_migrations = self::getMigrationsWithTag($migrations, 'Follow-up migration');
+    foreach ($follow_up_migrations as $migration_plugin_id => $migration_definition) {
+      unset($migrations[$migration_plugin_id]);
+
+      // Log unknown follow-up migrations.
+      $base_id = explode(PluginBase::DERIVATIVE_SEPARATOR, $migration_plugin_id)[0];
+      if (!in_array($base_id, static::KNOWN_FOLLOW_UP_MIGRATION_PLUGINS, TRUE)) {
+        $this->logger->debug('Unknown follow-up migration plugin encountered: @migration-plugin-id.', [
+          '@migration-plugin-id' => $migration_plugin_id,
+        ]);
+      }
     }
   }
 

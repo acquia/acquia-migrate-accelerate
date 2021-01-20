@@ -2,6 +2,7 @@
 
 namespace Drupal\acquia_migrate;
 
+use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
 use Drupal\acquia_migrate\Exception\RowPreviewException;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\Component\Assertion\Inspector;
@@ -234,6 +235,7 @@ final class Migration {
       $this->migrationPlugins[$id] = $all_migration_plugins[$id];
     }
     $this->_migrationPlugins = [];
+
     $this->dependencies = [];
     foreach ($this->_dependencies as $key => $dependency_migration_plugin_ids) {
       foreach (array_keys($dependency_migration_plugin_ids) as $id) {
@@ -311,6 +313,18 @@ final class Migration {
   public static function labelForId(string $migration_id) : string {
     assert(preg_match(static::ID_PATTERN, $migration_id));
     return explode('-', $migration_id, 2)[1];
+  }
+
+  /**
+   * Whether this is a supporting config-only migration.
+   *
+   * @return bool
+   *   TRUE if this is a migration containing no data, but only supporting
+   *   configuration.
+   */
+  public function isSupportingConfigOnly() : bool {
+    // @todo Somehow tie this to \Drupal\acquia_migrate\Clusterer\Heuristics\SharedEntityStructure?
+    return $this->label === SharedLanguageConfig::cluster() || strpos($this->label, 'Shared structure for ') !== FALSE;
   }
 
   /**
@@ -465,7 +479,7 @@ final class Migration {
    * essential to any successful migration.
    *
    * @return bool
-   *   TRUE if the migration is preseletable, FALSE otherwise.
+   *   TRUE if the migration is preselectable, FALSE otherwise.
    *
    * @see \Drupal\Component\Plugin\PluginBase::getBaseId()
    */
@@ -684,6 +698,7 @@ final class Migration {
         break;
       }
     }
+
     return $all_rows_processed;
   }
 

@@ -10,7 +10,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery;
 use Drupal\migrate\Plugin\Discovery\ProviderFilterDecorator;
-use Drupal\migrate\Plugin\migrate\destination\Entity;
 use Drupal\migrate\Plugin\MigrateSourcePluginManager;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
@@ -24,41 +23,6 @@ use Drupal\migrate_drupal\MigrationPluginManager as BaseMigrationPluginManager;
  * (zero dependencies) migrations first.
  */
 class MigrationPluginManager extends BaseMigrationPluginManager {
-
-  /**
-   * Category label of content migrations.
-   *
-   * @const string
-   */
-  const CATEGORY_CONTENT = 'Content';
-
-  /**
-   * Category label of configuration entity migrations.
-   *
-   * @const string
-   */
-  const CATEGORY_CONFIG_ENTITY = 'Configuration entity';
-
-  /**
-   * Category label of simple configuration migrations (e.g. settings).
-   *
-   * @const string
-   */
-  const CATEGORY_SIMPLE_CONFIG = 'Simple configuration';
-
-  /**
-   * Category label of unclassifiable migrations.
-   *
-   * @const string
-   */
-  const CATEGORY_OTHER = 'Other';
-
-  /**
-   * Category label for migrations which have no rows to process.
-   *
-   * @const string
-   */
-  const CATEGORY_NO_DATA = 'No data';
 
   /**
    * MigrationPluginManager constructor.
@@ -164,14 +128,11 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
    * @param array $dynamic_ids
    *   Keys are dynamic ids (for example node:*) values are a list of loaded
    *   migration ids (for example node:page, node:article).
-   * @param bool $only_migration_with_requirements_met
-   *   Set to TRUE when the passed $migrations argument contains only migrations
-   *   that have their source and destination requirements met.
    *
    * @return array
    *   An array of migrations.
    */
-  public function buildDependencyMigration(array $migrations, array $dynamic_ids, $only_migration_with_requirements_met = FALSE) {
+  public function buildDependencyMigration(array $migrations, array $dynamic_ids) {
     // Migration dependencies can be optional or required. If an optional
     // dependency does not run, the current migration is still OK to go. Both
     // optional and required dependencies (if run at all) must run before the
@@ -217,7 +178,7 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
 
       // Enrich with complete dependency metadata. Key-value pairs where both
       // key and value are always the same (a migration plugin ID).
-      // @see \Drupal\acquia_migrate\Controller\Overview::getAvailableMigrationsSortedByCluster
+      // @see \Drupal\acquia_migrate\Clusterer\MigrationClusterer
       $migration->setMetadata('after', $dependency_graph[$migration_id]['paths']);
       if (!empty($dependency_graph[$migration_id]['reverse_paths'])) {
         $migration_ids = array_keys($dependency_graph[$migration_id]['reverse_paths']);
@@ -228,40 +189,6 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
       }
       assert(array_keys($migration->getMetadata('after')) == array_values($migration->getMetadata('after')));
       assert(array_keys($migration->getMetadata('before')) == array_values($migration->getMetadata('before')));
-
-      // Category.
-      $category = NULL;
-      // @todo The 'Configuration' tag may not be perfectly reliable, we should consider inspecting the entity destination plugin's entity type ID: check whether it is ConfigEntityType.
-      if (in_array('Configuration', $migration->getMigrationTags())) {
-        // Migrations for configuration entities can have migration dependencies
-        // whereas migrations of simple configuration cannot.
-        $category = ($migration->getDestinationPlugin() instanceof Entity || in_array($migration->getDestinationPlugin()->getPluginId(), ['component_entity_display', 'component_entity_form_display'], TRUE))
-          ? self::CATEGORY_CONFIG_ENTITY
-          : self::CATEGORY_SIMPLE_CONFIG;
-      }
-      elseif (in_array('Content', $migration->getMigrationTags())) {
-        $category = self::CATEGORY_CONTENT;
-      }
-      else {
-        $category = self::CATEGORY_OTHER;
-      }
-      $migration->setMetadata('category', $category);
-
-      // Prioritize migrations on which nothing else depends.
-      if ($weight === 0 && empty($dependency_graph[$migration_id]['reverse_paths'])) {
-        $weight = 1000;
-        // And especially those that are just simple configuration.
-        if ($migration->getMetadata('category') === 'Simple configuration') {
-          $weight = 2000;
-        }
-      }
-
-      if ($only_migration_with_requirements_met) {
-        if ($migration->allRowsProcessed() === TRUE && $migration->getSourcePlugin()->count() === 0) {
-          $weight += 9999;
-          $migration->setMetadata('category', self::CATEGORY_NO_DATA);
-        }
-      }
 
       $weights[] = $weight;
     }

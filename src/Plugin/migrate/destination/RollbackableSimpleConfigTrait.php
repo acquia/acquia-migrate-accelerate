@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\acquia_migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -15,13 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 trait RollbackableSimpleConfigTrait {
 
   use RollbackableConfigTrait;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
 
   /**
    * Constructs a RollbackableConfigBase object.

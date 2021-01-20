@@ -4,8 +4,15 @@ declare(strict_types = 1);
 
 namespace Drupal\acquia_migrate\EventSubscriber;
 
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Utility\Variable;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Exception\EntityValidationException;
@@ -33,13 +40,23 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
+   * The acquia migrate logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
+
+  /**
    * The PostEntitySaveValidator constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelInterface $logger) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->logger = $logger;
   }
 
   /**
@@ -68,20 +85,95 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
     // For now, only content entities can be validated.
     // @see https://www.drupal.org/project/drupal/issues/2870878
     $entity_type_id = static::getEntityTypeId($migration);
-    if (!$this->entityTypeManager->getDefinition($entity_type_id) instanceof ContentEntityType) {
+    $definition = $this->entityTypeManager->getDefinition($entity_type_id, FALSE);
+    if (!$entity_type_id || !($definition instanceof ContentEntityType)) {
       return;
     }
 
-    // Fail explicitly when an assumption of this code is violated.
-    if (count($event->getDestinationIdValues()) !== 1) {
-      throw new \InvalidArgumentException('There should be exactly one destination ID for every entity migration row.');
+    // Destinations can have more than one ID.
+    // @see \Drupal\migrate\Plugin\migrate\destination\EntityContentComplete
+    $destination_id_keys = $migration->getDestinationPlugin()->getIds();
+    $destination_id_values = $event->getDestinationIdValues();
+    // No need for checking that the number of the destination values and the
+    // number of the destination keys are the same: if they don't match, the
+    // entity could not have been saved.
+    $destination_ids = array_combine(array_keys($destination_id_keys), array_values($destination_id_values));
+
+    // Get the (known) identifier keys.
+    $id_key = $definition->getKey('id');
+    $revision_key = $definition->getKey('revision');
+    $langcode_key = $definition->getKey('langcode');
+
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    $entity_id = $destination_ids[$id_key];
+    $entity_revision_id = !empty($revision_key) ? $destination_ids[$revision_key] ?? NULL : NULL;
+    $entity_langcode = !empty($langcode_key) ? $destination_ids[$langcode_key] ?? NULL : NULL;
+
+    // Fail explicitly when the number of the currently known entity identifiers
+    // is not the same as the number of the destination IDs.
+    $identified_destination_ids = array_filter([
+      $entity_id,
+      $entity_revision_id,
+      $entity_langcode,
+    ]);
+    if (count($destination_ids) !== count($identified_destination_ids)) {
+      $destination_ids_with_keys = array_reduce(array_keys($destination_ids), function (array $carry, string $id_key) use ($destination_ids) {
+        $carry[] = "{$id_key}:{$destination_ids[$id_key]}";
+        return $carry;
+      }, []);
+      throw new \LogicException(sprintf('The number of the currently known entity identifiers is not the same as the number of the destination IDs in "%s" migration for the row with destination IDs %s.', $migration->id(), implode(';', $destination_ids_with_keys)));
     }
 
-    // Load the entity.
-    $entity_id = $event->getDestinationIdValues()[0];
-    $entity = $this->entityTypeManager
-      ->getStorage($entity_type_id)
-      ->load($entity_id);
+    if ($entity_revision_id) {
+      assert($storage instanceof RevisionableStorageInterface);
+    }
+    // Load the entity: get the right revision, or if there are no revisions,
+    // load the entity by its ID.
+    $entity = $entity_revision_id
+      ? $storage->loadRevision($entity_revision_id)
+      : $storage->load($entity_id);
+
+    // Get the translation if there is a language code destination ID.
+    if ($entity_langcode) {
+      assert($entity instanceof TranslatableInterface);
+      $entity = $entity->getTranslation($entity_langcode);
+    }
+
+    // Assert that the loaded revision has the expected language when both
+    // "$revision" and "$langcode" are present.
+    if ($entity_revision_id && $entity_langcode) {
+      assert($entity instanceof RevisionableInterface);
+      $loaded_translation_langcode = $entity->language()->getId();
+      // Even though RevisionableInterface::getLoadedRevisionId() says that it
+      // returns an integer, this is not true.
+      $loaded_revision_id = $entity->getLoadedRevisionId();
+      if (
+        // The loaded entity's language is different than the expected one.
+        $loaded_translation_langcode !== $entity_langcode ||
+        // The loaded entity revision is different than the expected one.
+        (string) $loaded_revision_id !== (string) $entity_revision_id
+      ) {
+        $this->logger->log(RfcLogLevel::WARNING, 'The entity loaded for validation does not have the expected IDs. Expected entity IDs: "@expected-ids". Loaded entity IDs: "@loaded-ids".', [
+          '@source-plugin-class' => Variable::export($destination_ids),
+          '@dummy-query-trait-class' => Variable::export([
+            $id_key => $entity->id(),
+            $revision_key => $loaded_revision_id,
+            $langcode_key => $loaded_translation_langcode,
+          ]),
+        ]);
+        return;
+      }
+    }
+
+    // Only validate the default revision. In principle, revisions are migrated
+    // in ascending order, so this won't prevent validation in normal
+    // circumstances.
+    if (
+      $entity instanceof RevisionableInterface &&
+      !$entity->isDefaultRevision()
+    ) {
+      return;
+    }
 
     // If any validation constraint violations occur, construct an exception
     // without throwing it. This allows us the entity to be saved while still
@@ -108,8 +200,16 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
    *   True if we are migrating entities.
    */
   protected static function isEntityMigration(MigrationInterface $migration) : bool {
-    $destination_configuration = $migration->getDestinationConfiguration();
-    return strpos($destination_configuration['plugin'], 'entity:') === 0;
+    $destination_plugin = $migration->getDestinationPlugin();
+    // Destination plugin should be a derived plugin like "entity:user",
+    // "entity_complete:node" or "entity_reference_revisions:paragraph".
+    assert($destination_plugin instanceof PluginBase);
+    $entity_destinations = [
+      'entity',
+      'entity_complete',
+      'entity_reference_revisions',
+    ];
+    return in_array($destination_plugin->getBaseId(), $entity_destinations, TRUE);
   }
 
   /**
@@ -118,13 +218,16 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration for which a row was just saved.
    *
-   * @return string
-   *   The entity type ID.
+   * @return string|null
+   *   The destination entity's type ID.
    */
-  protected static function getEntityTypeId(MigrationInterface $migration) : string {
+  protected static function getEntityTypeId(MigrationInterface $migration) : ?string {
     assert(static::isEntityMigration($migration));
-    $destination_configuration = $migration->getDestinationConfiguration();
-    return substr($destination_configuration['plugin'], 7);
+    $destination_plugin = $migration->getDestinationPlugin();
+    // Destination plugin should be a derived plugin like "entity_complete:node"
+    // or "entity:user".
+    assert($destination_plugin instanceof PluginBase);
+    return $destination_plugin->getDerivativeId();
   }
 
 }

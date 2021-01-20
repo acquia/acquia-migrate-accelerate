@@ -21,6 +21,7 @@ use Drupal\acquia_migrate\MigrationPreviewer;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\ModuleAuditor;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
+use Drupal\acquia_migrate\Recommendations;
 use Drupal\acquia_migrate\UriDefinitions;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
@@ -214,6 +215,13 @@ final class HttpApi {
   protected $migrationFingerprinter;
 
   /**
+   * The recommendations.
+   *
+   * @var \Drupal\acquia_migrate\Recommendations
+   */
+  protected $recommendations;
+
+  /**
    * The persistent lock which is used to lock across requests.
    *
    * @var \Drupal\Core\Lock\LockBackendInterface
@@ -241,12 +249,14 @@ final class HttpApi {
    *   The module auditor.
    * @param \Drupal\acquia_migrate\MigrationFingerprinter $migration_fingerprinter
    *   The migration fingerprinter.
+   * @param \Drupal\acquia_migrate\Recommendations $recommendations
+   *   The recommendations.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Lock\LockBackendInterface $persistent_lock
    *   A persistent lock backend instance.
    */
-  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, ConfigFactoryInterface $config_factory, LockBackendInterface $persistent_lock) {
+  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, Recommendations $recommendations, ConfigFactoryInterface $config_factory, LockBackendInterface $persistent_lock) {
     $this->repository = $repository;
     $this->migrationBatchManager = $batch_manager;
     $this->connection = $connection;
@@ -256,6 +266,7 @@ final class HttpApi {
     $this->messageAnalyzer = $message_analyzer;
     $this->moduleAuditor = $module_auditor;
     $this->migrationFingerprinter = $migration_fingerprinter;
+    $this->recommendations = $recommendations;
     $this->configFactory = $config_factory;
     $this->persistentLock = $persistent_lock;
   }
@@ -327,10 +338,6 @@ final class HttpApi {
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The response.
-   *
-   * @TODO Make sure to invalidate if cached whenever migration plugins are
-   * rebuilt.
-   * @see \Drupal\node\Plugin\migrate\D7NodeTranslation::generateFollowUpMigrations
    */
   public function migrationsCollection(Request $request): JsonResponse {
     // @see system_cron() — we want this to run more frequently and more
@@ -357,6 +364,9 @@ final class HttpApi {
         'self' => [
           'href' => $request->getUri(),
         ],
+      ],
+      'meta' => [
+        'sourceSyncTime' => $this->recommendations->getRecentInfoTime(),
       ],
     ];
     $bulk_update_url = Url::fromRoute('acquia_migrate.api.migrations.bulk_update')

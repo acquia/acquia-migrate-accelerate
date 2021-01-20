@@ -15,6 +15,7 @@ services:
       - '@acquia_migrate.message_analyzer'
       - '@acquia_migrate.module_auditor'
       - '@acquia_migrate.migration_fingerprinter'
+      - '@acquia_migrate.recommendations'
       - '@config.factory'
       - '@lock.persistent'
 
@@ -98,11 +99,10 @@ services:
 
   acquia_migrate.clusterer:
     public: false
-    class: Drupal\acquia_migrate\MigrationClusterer
+    class: Drupal\acquia_migrate\Clusterer\MigrationClusterer
     arguments:
       - '@plugin.manager.migration'
-      - '@entity_type.manager'
-      - '@module_handler'
+      - '@class_resolver'
 
   acquia_migrate.migration_repository:
     class: Drupal\acquia_migrate\MigrationRepository
@@ -133,6 +133,11 @@ services:
     parent: logger.channel_base
     arguments: ['acquia_migrate_silenced_broken_code']
 
+  # Enhanced migration stub.
+  acquia_migrate.stub:
+    class: Drupal\acquia_migrate\AcquiaMigrateMigrateStub
+    arguments: ['@plugin.manager.migration']
+
   # Event subscribers.
   controller.acquia_migrate.http_api.response_validator:
     class: \Drupal\acquia_migrate\EventSubscriber\HttpApiResponseValidator
@@ -152,7 +157,9 @@ services:
       - { name: event_subscriber }
   acquia_migrate.post_entity_save_validator:
     class: Drupal\acquia_migrate\EventSubscriber\PostEntitySaveValidator
-    arguments: ['@entity_type.manager']
+    arguments:
+      - '@entity_type.manager'
+      - '@logger.channel.acquia_migrate'
     tags:
       - { name: event_subscriber }
   acquia_migrate.cacheable_response_subscriber:

@@ -2,6 +2,9 @@
 
 namespace Drupal\acquia_migrate;
 
+use Drupal\acquia_migrate\Clusterer\Heuristics\SharedEntityData;
+use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
+use Drupal\acquia_migrate\Clusterer\MigrationClusterer;
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\Cache;
@@ -55,7 +58,7 @@ class MigrationRepository {
   /**
    * Constructs a new MigrationRepository.
    *
-   * @param \Drupal\acquia_migrate\MigrationClusterer $clusterer
+   * @param \Drupal\acquia_migrate\Clusterer\MigrationClusterer $clusterer
    *   The migration clusterer service.
    * @param \Drupal\Core\Database\Connection $connection
    *   A Database connection to use for reading migration messages.
@@ -216,12 +219,12 @@ class MigrationRepository {
         $dependencies = array_merge($dependencies, array_diff($instances[$id]->getMigrationDependencies()['required'], $non_data_migration_plugin_ids, $initial_migration_plugin_ids, $data_migration_plugin_ids_of_content_entity_migrations));
       }
 
-      // Also include all migration plugins for all "Shared structure for
-      // <entity type>" migrations.
+      // @todo Rename $shared_structure_migration_plugin_ids
+      // @todo Remove the resolving of dependencies above; including the supporting-config-only migrations like we're doing here covers it all. But it will require adding  "Filter format configuration" to Migration::isSupportingConfigOnly().
+      // @todo Rename this method
       $shared_structure_migration_plugin_ids = [];
-      $is_shared_structure_migration = strpos($migration->label(), 'Shared structure for ') !== FALSE;
-      if ($is_shared_structure_migration) {
-        $shared_structure_migration_plugin_ids = array_merge($shared_structure_migration_plugin_ids, array_diff($migration->getMigrationPluginIds(), $non_data_migration_plugin_ids, $initial_migration_plugin_ids, $shared_structure_migration_plugin_ids));
+      if ($migration->isSupportingConfigOnly()) {
+        $shared_structure_migration_plugin_ids = array_diff($migration->getMigrationPluginIds(), $non_data_migration_plugin_ids, $initial_migration_plugin_ids);
       }
 
       $initial_migration_plugin_ids = array_merge($initial_migration_plugin_ids, array_unique($dependencies), $non_data_migration_plugin_ids, $shared_structure_migration_plugin_ids);
@@ -316,27 +319,22 @@ class MigrationRepository {
       throw new MissingSourceDatabaseException();
     }
 
-    $migration_info = [];
-    $drupal_migrations_with_cluster_metadata = $this->clusterer->getAvailableMigrationsSortedByCluster();
+    $migration_plugins = $this->clusterer->getClusteredMigrationPlugins();
 
     $flags = $this->getMigrationFlags();
     $first_time = [];
-
     $lookup_table = [];
 
-    foreach ($drupal_migrations_with_cluster_metadata as $id => $drupal_migration) {
-      // Determine what cluster this Drupal migration belongs in.
-      // @todo Cover translated cluster labels.
-      $cluster = (string) $drupal_migration->getMetadata('cluster');
-      $is_data_migration_plugin = TRUE;
+    // First pass over migration plugins: generate the "migrations" in the
+    // intended order: the order in which they will appear but ignoring any
+    // assigned "LIFTED-*" — these are migration plugins that the key migration
+    // plugin(s) in that cluster depend on but which should not affect the
+    // migration order, since they are merely dependencies.
+    $migration_info = [];
+    foreach ($migration_plugins as $id => $migration_plugin) {
+      $cluster = $migration_plugin->getMetadata('cluster');
       if (strpos($cluster, 'LIFTED-') === 0) {
-        $cluster = substr($cluster, 7);
-        // Treat lifted content migrations as data migrations. This is
-        // particularly the case for Paragraphs-based content types.
-        if (!in_array('Content', $drupal_migration->getMigrationTags(), TRUE)) {
-          assert(!in_array(explode(PluginBase::DERIVATIVE_SEPARATOR, $id)[0], MigrationClusterer::PARAGRAPHS_MIGRATION_BASE_PLUGIN_IDS, TRUE), sprintf('A non-paragraphs-based lifted content migration has been discovered: "%s"', $id));
-          $is_data_migration_plugin = FALSE;
-        }
+        continue;
       }
 
       // Create a temporary data structure for this cluster if it doesn't exist
@@ -369,11 +367,27 @@ class MigrationRepository {
           'last_import_duration' => $flags[$migration_id]->last_import_duration ? (int) $flags[$migration_id]->last_import_duration : NULL,
         ];
       }
+    }
+
+    // Second pass over migration plugins: assign them to the slots created in
+    // $migration_info in the first pass.
+    foreach ($migration_plugins as $id => $migration_plugin) {
+      $cluster = $migration_plugin->getMetadata('cluster');
+      $is_data_migration_plugin = TRUE;
+      if (strpos($cluster, 'LIFTED-') === 0) {
+        $cluster = substr($cluster, 7);
+        // Treat lifted content migrations as data migrations. This is
+        // particularly the case for Paragraphs-based content types.
+        if (!in_array('Content', $migration_plugin->getMigrationTags(), TRUE)) {
+          assert(!in_array(explode(PluginBase::DERIVATIVE_SEPARATOR, $id)[0], SharedEntityData::PARAGRAPHS_MIGRATION_BASE_PLUGIN_IDS, TRUE), sprintf('A non-paragraphs-based lifted content migration has been discovered: "%s"', $id));
+          $is_data_migration_plugin = FALSE;
+        }
+      }
 
       $lookup_table[$id] = $migration_info[$cluster]['id'];
 
       // This Drupal migration is one of the "migration plugins" to be executed.
-      $migration_info[$cluster]['migration_plugins'][$id] = $drupal_migration;
+      $migration_info[$cluster]['migration_plugins'][$id] = $migration_plugin;
       // And it might be one of the "data" migration plugins.
       if ($is_data_migration_plugin) {
         $migration_info[$cluster]['data_migration_plugin_ids'][] = $id;
@@ -382,10 +396,10 @@ class MigrationRepository {
 
     // Resolve inter-cluster dependencies.
     $cluster_id_to_cluster_label = array_combine(array_column($migration_info, 'id'), array_column($migration_info, 'label'));
-    foreach ($drupal_migrations_with_cluster_metadata as $id => $drupal_migration) {
+    foreach ($migration_plugins as $id => $migration_plugin) {
       $cluster_id = $lookup_table[$id];
       $cluster = $cluster_id_to_cluster_label[$cluster_id];
-      foreach ($drupal_migration->getMigrationDependencies()['required'] as $dependency) {
+      foreach ($migration_plugin->getMigrationDependencies()['required'] as $dependency) {
         // Some required migration dependencies may not exist because they were
         // explicitly omitted by the migration plugin manager due to their
         // requirements not having been met.
@@ -400,15 +414,15 @@ class MigrationRepository {
           continue;
         }
         $cluster_id = $lookup_table[$dependency];
-        $migration_info[$cluster]['dependencies'][$cluster_id][$dependency] = $drupal_migrations_with_cluster_metadata[$dependency];
+        $migration_info[$cluster]['dependencies'][$cluster_id][$dependency] = $migration_plugins[$dependency];
       }
     }
 
     // This automatically skips all content migrations or migrations without any
     // rows.
     foreach ($first_time as $migration_label) {
-      $has_rows = array_reduce($migration_info[$migration_label]['data_migration_plugin_ids'], function (bool $has_rows, string $id) use ($drupal_migrations_with_cluster_metadata) {
-        return $has_rows ?: $drupal_migrations_with_cluster_metadata[$id]->getSourcePlugin()->count() > 0;
+      $has_rows = array_reduce($migration_info[$migration_label]['data_migration_plugin_ids'], function (bool $has_rows, string $id) use ($migration_plugins) {
+        return $has_rows ?: $migration_plugins[$id]->getSourcePlugin()->count() > 0;
       }, FALSE);
       $before = $migration_info[$migration_label]['skipped'];
       $after = $migration_info[$migration_label]['skipped'] = (int) !$has_rows;
@@ -548,8 +562,14 @@ class MigrationRepository {
     // The only high-impact migration we exempt from lifting towards is the text
     // format migration: many migrations depend on it, but it does not make
     // sense to lift a majority of migration towards it.
+    // For the same reason, we exempt the Language Settings cluster from getting
+    // lifted towards, because when Multilingual migrations are enabled, almost
+    // everything will depend on it. The clusterer does ensure it runs very
+    // early automatically because of these many dependencies.
     $lifted = [];
-    $lifting_exemption_list = [];
+    $lifting_exemption_list = [
+      Migration::generateIdFromLabel(SharedLanguageConfig::cluster()),
+    ];
     foreach ($migrations as $migration) {
       if ($migration->getDataMigrationPluginIds() === ['d7_filter_format']) {
         $lifting_exemption_list[] = $migration->id();
@@ -567,6 +587,10 @@ class MigrationRepository {
         if (isset($lifted[$dep])) {
           continue;
         }
+
+        // We are about to lift a migration. Never allow a lower high-impact
+        // migration to pull a higher high-impact migration down.
+        assert($weights[$migration_id] < $weights[$dep]);
 
         // Lift up to just below the high-impact migration, if this migration
         // indeed depends on one of the high-impact migrations. Otherwise, lift

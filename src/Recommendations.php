@@ -71,6 +71,16 @@ final class Recommendations {
   }
 
   /**
+   * Gets the time the recent info was last updated.
+   *
+   * @return string|null
+   *   An RFC3339 timestamp.
+   */
+  public function getRecentInfoTime() : ?string {
+    return $this->recentInfo['generated'] ?? $this->initialInfo['generated'] ?? NULL;
+  }
+
+  /**
    * Gets recommendations made for the source site.
    *
    * @return array[]

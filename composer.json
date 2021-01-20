@@ -28,8 +28,7 @@
         "patches": {
             "drupal/core": {
                 "Avoid https://www.drupal.org/project/drupal/issues/2796755 breaking this module": "https://gist.githubusercontent.com/wimleers/4c8742d5efb74ea5dad1475b4478bd40/raw/99e35617a292b730fdbb36be4f3ce48d5c9863a1/migration-metadata.patch",
-                "track_changes should not prevent efficient imports": "https://gist.githubusercontent.com/wimleers/47b888f3abbddbeae66a915fd690691e/raw/c96e2265aae3d496b8a47f1898a5c5b5bde210dd/track_changes_should_not_prevent_efficient_imports.patch",
-                "base SQL source plugin should be able to cache counts": "https://gist.github.com/wimleers/33b25a664c31350bb04120a1a9c463e6/raw/2037ba993fb8fb1081378e0a8561c59849f097c6/sql_base_source_plugin_cache_counts_support.patch"
+                "track_changes should not prevent efficient imports": "https://gist.githubusercontent.com/wimleers/47b888f3abbddbeae66a915fd690691e/raw/c96e2265aae3d496b8a47f1898a5c5b5bde210dd/track_changes_should_not_prevent_efficient_imports.patch"
             }
         },
         "phpcodesniffer-search-depth": 4
