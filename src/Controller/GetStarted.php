@@ -109,7 +109,7 @@ final class GetStarted extends ControllerBase {
       'content' => [
         'label' => [
           '#type' => 'link',
-          '#title' => $this->t('Configure user 1.'),
+          '#title' => $this->t('Essential configuration'),
           '#url' => Url::fromRoute('acquia_migrate.get_started.configure_user_one', [], [
             'query' => ['destination' => $current_url],
           ]),
@@ -118,7 +118,7 @@ final class GetStarted extends ControllerBase {
           ],
         ],
         'description' => [
-          '#markup' => $this->t("You can choose the credentials for your site's admin account."),
+          '#markup' => $this->t("You can enter the Drupal 7 source site's base URL and choose the credentials for your site's admin account."),
         ],
       ],
     ];

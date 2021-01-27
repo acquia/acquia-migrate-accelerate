@@ -895,10 +895,13 @@ final class Migration {
     $consists_of_relationship_data = array_map(function (string $migration_plugin_id) use ($data_migration_plugin_ids, $migration) {
       $suffix = '';
       if (in_array($migration_plugin_id, $data_migration_plugin_ids)) {
-        $count = $migration->getMigrationPluginInstances()[$migration_plugin_id]
-          ->getSourcePlugin()
-          ->count();
-        $suffix = " ($count)";
+        $migration_plugin = $migration->getMigrationPluginInstances()[$migration_plugin_id];
+        $source_records_count = $migration_plugin->getSourcePlugin()->count();
+        $plugin_idmap = $migration_plugin->getIdMap();
+        // Imported count also contains fully imported records and records which
+        // need an update (e.g stubs).
+        $fully_imported_count = $plugin_idmap->importedCount() - $plugin_idmap->updateCount();
+        $suffix = " ($fully_imported_count of $source_records_count)";
       }
 
       return [

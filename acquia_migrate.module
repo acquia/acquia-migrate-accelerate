@@ -15,9 +15,13 @@ use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -275,4 +279,84 @@ function acquia_migrate_module_implements_alter(&$implementations, $hook) {
       '@module-list' => implode(',', $skipped_crons_implementations),
     ]);
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL
+ * @see _acquia_migrate_entity_form_submit()
+ */
+function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_state->getFormObject() instanceof EntityFormInterface) {
+    $affected_entity = $form_state->getFormObject()->getEntity();
+
+    // Allow all config entities to be edited.
+    // @todo Refine this to not allow editing *some* migrated config entities, or if doing so, require dependent migrations to be rolled back and re-imported.
+    if ($affected_entity instanceof ConfigEntityInterface) {
+      return;
+    }
+
+    // Allow the first user to be edited.
+    // @see \Drupal\acquia_migrate\Plugin\migrate\destination\AcquiaMigrateUser
+    if ($affected_entity->getEntityTypeId() === 'user' && $affected_entity->id() == 1) {
+      return;
+    }
+
+    // Delete all actions other than the 'submit' action.
+    foreach (Element::children($form['actions']) as $key) {
+      if ($key !== 'submit') {
+        unset($form['actions'][$key]);
+      }
+    }
+
+    // Change the 'submit' action's label and submit handlers: instead of saving
+    // the entity, we will only validate it and show a message.
+    // @see _acquia_migrate_entity_form_submit()
+    $form['actions']['submit']['#value'] = t('Validate');
+    $form['actions']['submit']['#submit'] = ['_acquia_migrate_entity_form_submit'];
+
+    // If the source site base URL is known, generate an "edit on source site"
+    // button. Also generate a message informing the user of this.
+    $base_url = \Drupal::keyValue('acquia_migrate')->get(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL);
+    if ($base_url !== NULL) {
+      $path = \Drupal::request()->getPathInfo();
+      $url = Url::fromUri($base_url . $path);
+      $form['actions']['edit_on_source_site'] = [
+        '#type' => 'link',
+        '#title' => t('Edit on source site'),
+        '#access' => TRUE,
+        '#attributes' => [
+          'class' => ['button', 'button--danger'],
+          'target' => '_blank',
+        ],
+        '#url' => $url,
+        '#weight' => 100,
+      ];
+
+      \Drupal::messenger()->addWarning(t('Changes can be validated but will not be saved while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Change this @entity-type-label on the source site instead.</a>', [
+        '@entity-type-label' => $affected_entity->getEntityType()->getSingularLabel(),
+        ':url' => $url->toString(TRUE)->getGeneratedUrl(),
+      ]));
+    }
+    else {
+      \Drupal::messenger()->addWarning(t('Changes you make will not be saved. Please make the changes on the source site directly.'));
+    }
+  }
+}
+
+
+/**
+ * Submit callback for entity form.
+ *
+ * @see acquia_migrate_form_alter()
+ */
+function _acquia_migrate_entity_form_submit(array $form, FormStateInterface $form_state) {
+  $entity = $form_state->getFormObject()->getEntity();
+  assert($entity instanceof \Drupal\Core\Entity\EntityInterface);
+  $form_state->setRebuild(TRUE);
+
+  \Drupal::messenger()->addStatus(t('Validated @entity-type-label: no validation errors. Your changes were not saved.', [
+    '@entity-type-label' => $entity->getEntityType()->getSingularLabel(),
+  ]));
 }

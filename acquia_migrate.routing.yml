@@ -195,7 +195,7 @@ acquia_migrate.get_started.configure_user_one:
   path: '/acquia-migrate-accelerate/get_started/user_one'
   defaults:
     _entity_form: 'user.acquia_migrate_configure_user_one'
-    _title: 'Configure user 1'
+    _title: 'Essential configuration'
   options:
     no_cache: 'TRUE'
     _admin_route: 'TRUE'
