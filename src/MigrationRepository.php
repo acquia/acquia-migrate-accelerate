@@ -3,10 +3,10 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Clusterer\Heuristics\SharedEntityData;
-use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
 use Drupal\acquia_migrate\Clusterer\MigrationClusterer;
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -159,6 +159,9 @@ class MigrationRepository {
     if ($reset || !$cached) {
       $migrations = $this->doGetMigrations();
       $this->cache->set(static::CID, $migrations, Cache::PERMANENT, ['migration_plugins']);
+      // Also compute the virtual initial migration once, to ensure its flags
+      // have also been populated.
+      $this->computeVirtualInitialMigration();
     }
     else {
       $migrations = $cached->data;
@@ -306,6 +309,70 @@ class MigrationRepository {
   }
 
   /**
+   * Computes the list of initial migration plugins, in import order.
+   *
+   * TRICKY: we keep ::getInitialMigrationPluginIdsWithRowsToProcess() around
+   * for the superior performance, we only use this virtual Migration object to
+   * be able to standardize logging and tracking of import duration.
+   *
+   * @return string
+   *   A list of initial migration plugin IDs, in import order.
+   *
+   * @todo Improve Migration::isSupportingConfigOnly() by stopping hardcoding it to specific patterns and moving the patterns into the specific heuristics.
+   * @todo Try to refactor ::getInitialMigrationPluginIds() and ::getInitialMigrationPluginIdsWithRowsToProcess() away, and make it all rely on this computed virtual migration instead.
+   * @todo Everywhere in this + related functions: s/initial/supportingConfig/
+   */
+  public function computeVirtualInitialMigration() : Migration {
+    $inital_migration_plugin_ids = $this->getInitialMigrationPluginIds();
+
+    $migrations = $this->getMigrations();
+    $all_instances = [];
+    foreach ($migrations as $migration) {
+      $instances = $migration->getMigrationPluginInstances();
+      $all_instances += $instances;
+    }
+
+    // We can trust that the required migration dependencies are listed in
+    // the correct dependency order, because MigrationRepository does not
+    // reorder the migration plugins it receives from the clusterer.
+    $initial_migrations = array_intersect_key($all_instances, array_combine($inital_migration_plugin_ids, $inital_migration_plugin_ids));
+    $ordered_initial_migration_plugin_ids = array_keys($initial_migrations);
+
+    $virtual_migration_label = '_INITIAL_';
+    $flags = $this->getMigrationFlags();
+    $migration_id = Migration::generateIdFromLabel($virtual_migration_label);
+    if (!isset($flags[$migration_id])) {
+      // Insert default flags.
+      $total_count = array_reduce($initial_migrations, function (int $sum, $initial_migration_plugin) {
+        $sum += $initial_migration_plugin->getSourcePlugin()->count();
+        return $sum;
+      }, 0);
+      $this->connection->insert('acquia_migrate_migration_flags')
+        ->fields([
+          'migration_id' => $migration_id,
+          'last_computed_fingerprint' => sprintf("%d/%d", 0, $total_count),
+          'last_import_fingerprint' => sprintf("%d/%d", 0, $total_count),
+          'completed' => 0,
+          'skipped' => 0,
+        ])
+        ->execute();
+    }
+    return new Migration(
+      $migration_id,
+      $virtual_migration_label,
+      [],
+      $initial_migrations,
+      $ordered_initial_migration_plugin_ids,
+      FALSE,
+      FALSE,
+      'n/a',
+      'n/a',
+      NULL,
+      NULL
+    );
+  }
+
+  /**
    * Gets all available migrations, in recommended execution order. Uncached.
    *
    * @return \Drupal\acquia_migrate\Migration[]
@@ -396,10 +463,34 @@ class MigrationRepository {
 
     // Resolve inter-cluster dependencies.
     $cluster_id_to_cluster_label = array_combine(array_column($migration_info, 'id'), array_column($migration_info, 'label'));
+    $offset = 1;
     foreach ($migration_plugins as $id => $migration_plugin) {
+      $offset++;
       $cluster_id = $lookup_table[$id];
       $cluster = $cluster_id_to_cluster_label[$cluster_id];
-      foreach ($migration_plugin->getMigrationDependencies()['required'] as $dependency) {
+      // By default, required migration plugin dependencies are what determines
+      // the inter-cluster dependencies.
+      $dependencies = $migration_plugin->getMigrationDependencies()['required'];
+      // If there aren't any, fall back to the optional dependencies (for data
+      // migrations, since supporting config migrations will already have been
+      // migrated by the initial migration)
+      if (empty($dependencies) && in_array($id, $migration_info[$cluster]['data_migration_plugin_ids'], TRUE)) {
+        // When treating optional dependencies as a (UI) reason for an
+        // inter-cluster dependency, it is crucial that it is sorted to run
+        // earlier. This ensures the core migration system's dependency
+        // resolution logic to continue to be respected.
+        $dependencies = array_intersect(
+          $migration_plugin->getMigrationDependencies()['optional'],
+          array_slice(array_keys($migration_plugins), 0, $offset)
+        );
+        // It is possible that the optional dependency itself has an optional
+        // dependency on this: avoid generating an inter-cluster dependency for
+        // this. For example: d7_file would depend on d7_user.
+        $dependencies = array_filter($dependencies, function (string $dep) use ($id, $migration_plugins) {
+          return !in_array($id, NestedArray::mergeDeepArray($migration_plugins[$dep]->getMigrationDependencies()));
+        });
+      }
+      foreach ($dependencies as $dependency) {
         // Some required migration dependencies may not exist because they were
         // explicitly omitted by the migration plugin manager due to their
         // requirements not having been met.
@@ -452,206 +543,6 @@ class MigrationRepository {
         $info['last_import_duration']
       );
     }
-
-    return static::sort($migrations);
-  }
-
-  /**
-   * Gets migration dependency counts.
-   *
-   * @param \Drupal\acquia_migrate\Migration[] $migrations
-   *   A list of migrations, keyed by migration ID.
-   * @param bool $omit_dependencyless
-   *   Whether to omit dependencyless migrations.
-   *
-   * @return int[]
-   *   The dependency counts, keyed by migration ID.
-   */
-  private static function getDependencyCount(array $migrations, bool $omit_dependencyless) : array {
-    $weights = [];
-
-    if (!$omit_dependencyless) {
-      foreach (array_keys($migrations) as $migration_id) {
-        $weights[$migration_id] = 0;
-      }
-    }
-
-    foreach ($migrations as $migration) {
-      foreach ($migration->getDependencies() as $dependency) {
-        if (!isset($weights[$dependency])) {
-          $weights[$dependency] = 0;
-        }
-        $weights[$dependency]++;
-      }
-    }
-
-    return $weights;
-  }
-
-  /**
-   * Sorts migrations.
-   *
-   * @param \Drupal\acquia_migrate\Migration[] $migrations
-   *   The migrations to sort, keyed by migration ID.
-   *
-   * @return \Drupal\acquia_migrate\Migration[]
-   *   The sorted migrations, keyed by migration ID.
-   */
-  private static function sort(array $migrations) : array {
-    // Initialize the first sorting order array for array_multisort(): one based
-    // on labels (for alphabetical sorting).
-    $labels = [];
-    foreach ($migrations as $migration) {
-      $labels[$migration->id()] = $migration->label();
-    }
-
-    // If fewer than 10 migrations, just sort alphabetically.
-    // (This will never happen in the real world, but does happen in some of our
-    // low-level tests.)
-    // @see \Drupal\Tests\acquia_migrate\Functional\HttpApiTest::testMigrationsCollection()
-    if (count($migrations) < 10) {
-      array_multisort(
-        $labels, SORT_ASC, SORT_NATURAL,
-        $migrations
-      );
-      return $migrations;
-    }
-
-    // Initialize the other sorting ordering array for array_multisort(): a
-    // weight-based array that we prime with the most heavily depended upon
-    // migrations getting the heaviest weight.
-    $weights = static::getDependencyCount($migrations, FALSE);
-
-    // Some migrations now have non-zero weights, many still have weight zero.
-    // The latter are the leaves in the tree: they only depend on others,
-    // nothing depends on them.
-    // @codingStandardsIgnoreStart
-    assert(!empty(array_filter($weights, function (int $w) { return $w === 0; })));
-    assert(!empty(array_filter($weights, function (int $w) { return $w !== 0; })));
-    // @codingStandardsIgnoreEnd
-
-    // We assume that non-leaf nodes in the tree (weight >0) are the ones the
-    // user cares most about, because are at the heart of the site's content
-    // model.
-    // $weights currently is based on dependency count, but that is too
-    // simplistic: we want to ensure that sites with many migrations for one
-    // entity type (e.g. lots of vocabularies) does not cause that to rise to
-    // the top, before more impactful migrations (e.g. nodes).
-    $non_leaf_migrations = array_filter($migrations, function (Migration $migration) use ($weights) {
-      return $weights[$migration->id()] > 0;
-    });
-    $very_high_impact_weights = static::getDependencyCount($non_leaf_migrations, TRUE);
-    arsort($very_high_impact_weights, SORT_NUMERIC);
-    // Very high-impact migrations.
-    foreach ($very_high_impact_weights as $migration_id => $weight) {
-      $weights[$migration_id] = ($weights[$migration_id] + $weight) * 100000;
-    }
-    // High-impact migrations.
-    foreach (array_keys(array_diff_key($non_leaf_migrations, $very_high_impact_weights)) as $migration_id) {
-      $weights[$migration_id] *= 10000;
-    }
-
-    // The high-impact migrations now have significantly higher weights. It is
-    // now possible to lift the migrations that depend on those high-impact
-    // migrations. The order of dependencies of a given migration matters: the
-    // first dependency on a high-impact migration determines where the
-    // migration is lifted.
-    // Amongst others, this ensures that migrations with the same base data
-    // migration plugin ID are contiguous (e.g. all bundle-specific migrations
-    // of the same entity type).
-    // The only high-impact migration we exempt from lifting towards is the text
-    // format migration: many migrations depend on it, but it does not make
-    // sense to lift a majority of migration towards it.
-    // For the same reason, we exempt the Language Settings cluster from getting
-    // lifted towards, because when Multilingual migrations are enabled, almost
-    // everything will depend on it. The clusterer does ensure it runs very
-    // early automatically because of these many dependencies.
-    $lifted = [];
-    $lifting_exemption_list = [
-      Migration::generateIdFromLabel(SharedLanguageConfig::cluster()),
-    ];
-    foreach ($migrations as $migration) {
-      if ($migration->getDataMigrationPluginIds() === ['d7_filter_format']) {
-        $lifting_exemption_list[] = $migration->id();
-      }
-    }
-    foreach (array_keys($migrations) as $migration_id) {
-      foreach ($migrations[$migration_id]->getDependencies() as $dep) {
-        if (in_array($dep, $lifting_exemption_list, TRUE)) {
-          continue;
-        }
-
-        // Avoid indirect dependencies from getting lifted just below their
-        // highest-weight dependency, and instead keeps them anchored to one of
-        // the high-impact migrations, if any.
-        if (isset($lifted[$dep])) {
-          continue;
-        }
-
-        // We are about to lift a migration. Never allow a lower high-impact
-        // migration to pull a higher high-impact migration down.
-        assert($weights[$migration_id] < $weights[$dep]);
-
-        // Lift up to just below the high-impact migration, if this migration
-        // indeed depends on one of the high-impact migrations. Otherwise, lift
-        // to just below the first non-exempted, non-lifted dependency.
-        if (isset($very_high_impact_weights[$dep])) {
-          $weights[$migration_id] = $weights[$dep] - 1;
-          $lifted[$migration_id] = TRUE;
-        }
-        else {
-          $weights[$migration_id] = $weights[$dep] - 1;
-        }
-        break;
-      }
-    }
-
-    // Last but not least: a correcting factor. This started out with the most
-    // heavily depended upon migrations, then calculated high-impact migrations
-    // based on that. This yields a generally sensible order that makes sense to
-    // humans. But, it's not guaranteed, because there may be migrations that
-    // fail to correctly declare all their dependencies. A common example is
-    // that almost every entity depends on the `User` entity type, but many
-    // migrations do not declare the correct dependency. This then results in
-    // the user migration (which is certainly high-impact) from getting weighted
-    // lower, which means it may be listed far below migrations that actually
-    // depend on it. Blocking migrations should be listed before the migrations
-    // that they block.
-    // To correct this, we inspect at all lifted migrations and and ensure all
-    // high-impact migrations that they depend upon are in fact listed before
-    // them: pull them up.
-    foreach (array_keys($lifted) as $migration_id) {
-      $weight = $weights[$migration_id];
-      $depended_unblocking_migrations = array_intersect(array_keys($very_high_impact_weights), $migrations[$migration_id]->getDependencies());
-      foreach ($depended_unblocking_migrations as $dep) {
-        $blocker_weight = $weights[$dep];
-        if ($weight > $blocker_weight) {
-          $other_unblocking_migrations = array_diff($depended_unblocking_migrations, [$dep]);
-          $other_unblocking_migrations_weights = [];
-          foreach ($other_unblocking_migrations as $unblocking_migration_id) {
-            $other_unblocking_migrations_weights[$unblocking_migration_id] = $weights[$unblocking_migration_id];
-          }
-          assert($weight > $weights[$dep]);
-          // Pull up the blocking high-impact migration to just after the lowest
-          // other blocking high-impact migration. It's possible that that
-          // lowest one is insufficiently weighted yet: in that case fall back
-          // to running just before the migration.
-          $pulled_weight = min($other_unblocking_migrations_weights) > $weight
-            ? min($other_unblocking_migrations_weights) + 100
-            : $weight + 100;
-          $weights[$dep] = $pulled_weight;
-          assert($weight < $weights[$dep]);
-        }
-      }
-    }
-
-    array_multisort(
-      // Use the numerical weight as the primary sort.
-      $weights, SORT_DESC, SORT_NUMERIC,
-      // When migrations have the same weight, sort alphabetically by label.
-      $labels, SORT_ASC, SORT_NATURAL,
-      $migrations
-    );
 
     return $migrations;
   }

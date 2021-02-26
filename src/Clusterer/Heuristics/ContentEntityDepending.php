@@ -34,13 +34,17 @@ abstract class ContentEntityDepending implements DependentHeuristicWithComputedD
   public function matches(MigrationPlugin $migration_plugin, array $dependent_heuristic_matches) : bool {
     $entity_migrations_plus_dependencies = array_merge(
       $dependent_heuristic_matches[ContentEntityBundles::id()],
-      $dependent_heuristic_matches[ContentEntityBundlesDependencies::id()]
+      $dependent_heuristic_matches[ContentEntityBundlesDependencies::id()],
+      // F.e.: d7_comment_entity_display depends on d7_comment_field_instance.
+      $dependent_heuristic_matches[static::id()]
     );
-    $clustered_dependees = array_intersect($entity_migrations_plus_dependencies, $migration_plugin->getMigrationDependencies()['required']);
+    $required_dependencies = $migration_plugin->getMigrationDependencies()['required'];
+    $clustered_dependees = array_intersect($entity_migrations_plus_dependencies, $required_dependencies);
     $is_cluster_depender = !empty($clustered_dependees);
     $is_non_dependee = empty($migration_plugin->getMetadata('before'));
+    $is_pure_cluster_depender = $is_cluster_depender && count($clustered_dependees) === count($required_dependencies);
 
-    return $is_cluster_depender && $is_non_dependee;
+    return $is_cluster_depender && ($is_pure_cluster_depender || $is_non_dependee);
   }
 
   /**
@@ -49,7 +53,8 @@ abstract class ContentEntityDepending implements DependentHeuristicWithComputedD
   public function computeCluster(MigrationPlugin $migration_plugin, array $dependent_heuristic_matches, array $all_migration_plugins) : string {
     $entity_migrations_plus_dependencies = array_merge(
       $dependent_heuristic_matches[ContentEntityBundles::id()],
-      $dependent_heuristic_matches[ContentEntityBundlesDependencies::id()]
+      $dependent_heuristic_matches[ContentEntityBundlesDependencies::id()],
+      $dependent_heuristic_matches[static::id()]
     );
     $clustered_dependees = array_intersect($entity_migrations_plus_dependencies, $migration_plugin->getMigrationDependencies()['required']);
 

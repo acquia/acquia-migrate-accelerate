@@ -142,7 +142,6 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   $migration_alterer->omitFieldMigrationsForMissingEntityTypes($migrations);
   $migration_alterer->refineViewModeDependencies($migrations);
   $migration_alterer->refineEntityBundleMigrationDependencies($migrations);
-  $migration_alterer->moveOptionalDependenciesToRequired($migrations);
   $migration_alterer->removeFollowupMigrations($migrations);
 
   // Enable change tracking on migration plugins so that they can be re-imported

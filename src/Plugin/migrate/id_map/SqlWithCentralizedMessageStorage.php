@@ -451,4 +451,22 @@ final class SqlWithCentralizedMessageStorage extends Sql {
     return $this->processedCount();
   }
 
+  /**
+   * Gets all unimported rows: processed but not imported: failed, skipped, etc.
+   *
+   * @return array
+   *   The raw DB rows.
+   */
+  public function getUnimportedRows() {
+    $rows = [];
+    $result = $this->getDatabase()->select($this->mapTableName(), 'map')
+      ->fields('map')
+      ->condition('source_row_status', MigrateIdMapInterface::STATUS_IMPORTED, '!=')
+      ->execute();
+    foreach ($result as $row) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
 }

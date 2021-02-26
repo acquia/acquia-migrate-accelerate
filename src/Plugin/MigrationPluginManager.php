@@ -140,6 +140,9 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     $dependency_graph = [];
     $required_dependency_graph = [];
     $have_optional = FALSE;
+    if (!empty($dynamic_ids)) {
+      throw new \LogicException('AMA does not support this.');
+    }
     foreach ($migrations as $migration) {
       /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
       $id = $migration->id();

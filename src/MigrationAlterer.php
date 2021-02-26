@@ -1378,47 +1378,6 @@ final class MigrationAlterer {
   }
 
   /**
-   * Converts optional dependencies to required dependencies.
-   *
-   * Temporary work-around for pathauto pattern migrations.
-   * TODO Reconsider after [OCTO-3763].
-   *
-   * @param array[] $migrations
-   *   An associative array of migrations keyed by migration ID, the same that
-   *   is passed to hook_migration_plugins_alter() hooks.
-   */
-  public function moveOptionalDependenciesToRequired(array &$migrations) {
-    $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
-    foreach ($d7_migrations as $migration_plugin_id => $migration_definition) {
-      $migrations_to_process = [
-        'd7_pathauto_patterns',
-        'd7_block',
-        'd7_block_translation',
-      ];
-      if (!in_array($migration_definition['id'], $migrations_to_process, TRUE)) {
-        continue;
-      }
-      if (empty($migration_definition['migration_dependencies']['optional'])) {
-        continue;
-      }
-      $dependencies_to_move = [];
-      foreach ($migration_definition['migration_dependencies']['optional'] as $dependency_key => $dependency_id) {
-        if (!array_key_exists($dependency_id, $d7_migrations)) {
-          continue;
-        }
-        $dependencies_to_move[] = $dependency_id;
-        unset($migrations[$migration_plugin_id]['migration_dependencies']['optional'][$dependency_key]);
-      }
-      $migrations[$migration_plugin_id]['migration_dependencies']['required'] = array_unique(
-        array_merge(
-          array_values($migration_definition['migration_dependencies']['required'] ?? []),
-          $dependencies_to_move
-        )
-      );
-    }
-  }
-
-  /**
    * Removes all follow-up migration.
    *
    * Specifically, it removes not only all known follow-up migrations

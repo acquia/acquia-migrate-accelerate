@@ -136,33 +136,31 @@ final class MigrationBatchManager {
    * @todo Remove or rewrite this once the "Content structure" screen is built.
    */
   public function createInitialMigrationBatch() : BatchStatus {
-    $inital_migration_plugin_ids = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess();
     $config = [];
 
     $migrations = $this->repository->getMigrations();
-    $all_instances = [];
-    foreach ($migrations as $migration) {
-      $instances = $migration->getMigrationPluginInstances();
-      $all_instances += $instances;
-    }
+    $virtual_initial_migration = $this->repository->computeVirtualInitialMigration();
+    $ordered_initial_migration_plugin_ids = $virtual_initial_migration->getDataMigrationPluginIds();
 
-    // We cannot trust that the required migration dependencies are listed in
-    // the correct dependency order. Explicitly ensure they're ordered correctly
-    // to ensure we can successfully import them.
-    $initial_migrations = array_intersect_key($all_instances, array_combine($inital_migration_plugin_ids, $inital_migration_plugin_ids));
-    $ordered_initial_migrations = $this->migrationPluginManager->buildDependencyMigration($initial_migrations, []);
-    $ordered_initial_migration_plugin_ids = array_keys($ordered_initial_migrations);
+    \Drupal::logger('acquia_migrate')->debug('Initial migration plugins (@count) in import order: @initial-migration-plugin-ids', [
+      '@count' => count($ordered_initial_migration_plugin_ids),
+      '@initial-migration-plugin-ids' => implode(', ', $ordered_initial_migration_plugin_ids),
+    ]);
 
     // Determine which migrations would effectively be completely imported
     // because of this initial import.
     $completely_imported = [];
     foreach ($migrations as $migration) {
-      if (empty(array_diff($migration->getMigrationPluginIds(), $inital_migration_plugin_ids))) {
+      if (empty(array_diff($migration->getMigrationPluginIds(), $ordered_initial_migration_plugin_ids))) {
         $completely_imported[] = $migration->id();
       }
     }
 
     $operations = [];
+    $operations[] = [
+      [__CLASS__, 'recordImportStart'],
+      [$virtual_initial_migration->id()],
+    ];
     $operations[] = [[__CLASS__, 'overrideErrorHandler'], []];
     // Import all completely imported migrations first. Ensure their import
     // duration is recorded. (They are already ordered in migration order, which
@@ -195,6 +193,7 @@ final class MigrationBatchManager {
         $config,
       ],
     ];
+    $operations[] = [[__CLASS__, 'recordInitialImportSuccessfulness'], []];
     $operations[] = [[__CLASS__, 'restoreErrorHandler'], []];
 
     $new_batch = [
@@ -479,6 +478,62 @@ final class MigrationBatchManager {
     // array is intentionally left empty.
     // @see \Drupal\acquia_migrate\Cache\AcquiaMigrateCacheTagsInvalidator::invalidateTags()
     Cache::invalidateTags([]);
+  }
+
+  /**
+   * Records the duration of the initial import, and logs debug details.
+   */
+  public static function recordInitialImportSuccessfulness() : void {
+    $repository = \Drupal::service('acquia_migrate.migration_repository');
+    assert($repository instanceof MigrationRepository);
+
+    $todo = $repository->getInitialMigrationPluginIdsWithRowsToProcess();
+
+    // 1. Log locally to simplify debugging.
+    if (count($todo) === 0) {
+      \Drupal::logger('acquia_migrate')->info('Initial import: 100%.');
+    }
+    else {
+      $all = $repository->getInitialMigrationPluginIds();
+      \Drupal::logger('acquia_migrate')->warning('Initial import: @percentage%. @remaining-count remain: @remaining-migration-plugin-ids.', [
+        '@percentage' => round((count($all) - count($todo)) / count($all)),
+        '@remaining-count' => count($todo),
+        '@remaining-migration-plugin-ids' => implode(', ', $todo),
+      ]);
+    }
+
+    // 2. Send to logger for aggregate analysis. Pretend this is just another
+    // migration by pretending the migration ID was "_INITIAL_".
+    $migration = $repository->computeVirtualInitialMigration();
+    $special_fingerprint_processed = sprintf("%d/%d", $migration->getProcessedCount(), $migration->getTotalCount());
+    $special_fingerprint_imported = sprintf("%d/%d", $migration->getImportedCount(), $migration->getTotalCount());
+    \Drupal::database()->update('acquia_migrate_migration_flags')
+      ->fields([
+        'completed' => (int) (count($todo) === 0),
+        // NOTE: we do not actually store a fingerprint for the virtual
+        // "initial" migration, but the processed, imported and total count.
+        'last_computed_fingerprint' => $special_fingerprint_processed,
+        'last_import_fingerprint' => $special_fingerprint_imported,
+      ])
+      ->expression('last_import_duration', ':current_timestamp - last_import_timestamp', [':current_timestamp' => \Drupal::time()->getCurrentTime()])
+      ->condition('migration_id', $migration->id())
+      ->execute();
+    \Drupal::service('logger.channel.acquia_migrate_statistics')->info(
+      sprintf("migration_id=%s|duration=%d|count=%d|total=%d|messages=%d|status=%s",
+        $migration->label(),
+        $migration->getLastImportDuration(),
+        // NOTE: all other migrations (non-initial) use ::getImportedCount()!
+        // @see ::recordImportDuration
+        $migration->getProcessedCount(),
+        $migration->getTotalCount(),
+        $migration->getMessageCount(),
+        // @see \Drupal\migrate\Plugin\Migration::$statusLabels
+        'Idle'
+      )
+    );
+
+    // No need for the cache-related shenanigans like in ::recordImportDuration
+    // because this is not (currently) displayed in the UI.
   }
 
   /**

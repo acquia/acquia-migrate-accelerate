@@ -221,11 +221,11 @@ final class MigrationClusterer {
     return [
       Heuristics\SharedLanguageConfig::class => 0,
       Heuristics\ConfigNeedingHuman::class => 0,
-      Heuristics\BlockPlacements::class => 0,
+      Heuristics\BlockPlacements::class => 500,
       Heuristics\SharedEntityStructure::class => 0,
       Heuristics\SharedEntityData::class => 0,
-      Heuristics\SharedBookData::class => 0,
-      Heuristics\SiteConfiguration::class => 0,
+      Heuristics\SharedBookData::class => 500,
+      Heuristics\SiteConfiguration::class => 500,
       // First the key data migration plugin for the entity type + bundle
       // cluster must be identified.
       // For example: d7_node_complete:article, d7_taxonomy_term:tags.
@@ -252,8 +252,8 @@ final class MigrationClusterer {
       // configuration cluster, or if they have a config entity type as the
       // destination, generate their own clusters. Finally, if all else fails,
       // put them in a catch-all "Other" cluster.
-      Heuristics\PushedToSiteConfiguration::class => 0,
-      Heuristics\ConfigEntity::class => 0,
+      Heuristics\PushedToSiteConfiguration::class => 500,
+      Heuristics\ConfigEntity::class => 500,
       Heuristics\Other::class => 1000,
     ];
     // @codingStandardsIgnoreEnd

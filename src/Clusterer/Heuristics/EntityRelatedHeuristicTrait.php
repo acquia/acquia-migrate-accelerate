@@ -56,7 +56,7 @@ trait EntityRelatedHeuristicTrait {
         break;
 
       default:
-        $entity_type = $source_config['entity_type'] ?? NULL;
+        $entity_type = $source_config['entity_type'] ?? $source_config['constants']['entity_type'] ?? NULL;
         $bundle = $source_config['node_type'] ?? $source_config['bundle'] ?? NULL;
     }
 

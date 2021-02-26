@@ -6,5 +6,6 @@ services:
       - '@keyvalue'
       - '@extension.list.module'
       - '@acquia_migrate.recommendations'
+      - '@plugin.manager.migrate.source'
     tags:
       - { name: drush.command }

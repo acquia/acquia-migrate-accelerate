@@ -295,8 +295,21 @@ final class Migration {
     // restrictions (767-255-255-32). An MD5-hash is 32 characters, the dash is
     // one and that leaves 192 characters of the label.
     $migration_id = md5($label) . '-' . substr(str_replace('/', '-', $label), 0, 192);
-    assert(preg_match(Migration::ID_PATTERN, $migration_id));
+    assert(static::isValidMigrationId($migration_id));
     return $migration_id;
+  }
+
+  /**
+   * Checks whether the given string is a valid migration ID.
+   *
+   * @param string $potential_migration_id
+   *   A string to evaluate.
+   *
+   * @return bool
+   *   Whether the given string is a valid migration ID.
+   */
+  public static function isValidMigrationId(string $potential_migration_id) : bool {
+    return preg_match(Migration::ID_PATTERN, $potential_migration_id);
   }
 
   /**
@@ -556,6 +569,26 @@ final class Migration {
    *   The duration, if any.
    */
   public function getLastImportDuration() : ?int {
+    // Ensure the last import duration is always up-to-date.
+    // @todo Somehow we can get a Migration object with a stale "last import
+    // duration" value, even though it is never cached: not in Page Cache,
+    // Dynamic Page Cache, HttpApi, MigrationConverter or MigrationRepository.
+    // For now, this work-around solves the mystery…
+    // @codingStandardsIgnoreStart
+    $before = $this->lastImportDuration;
+    $fresh_flags = (array) \Drupal::database()->select('acquia_migrate_migration_flags', 'm')
+      ->fields('m', [
+        'migration_id',
+        'last_import_duration',
+      ])
+      ->condition('migration_id', $this->id)
+      ->execute()
+      ->fetchAllAssoc('migration_id')[$this->id];
+    $this->lastImportDuration = $after = $fresh_flags['last_import_duration'];
+    if ($before != $after) {
+      \Drupal::logger('acquia_migrate')->debug('last_import_duration race condition work-around saved the day again: instead of ' . (string) $before . ' it now is ' . (string) $after . ' for the @migration-id migration.', ['@migration-id' => $this->id]);
+    }
+    // @codingStandardsIgnoreEnd
     return $this->lastImportDuration;
   }
 
@@ -946,26 +979,6 @@ final class Migration {
     ];
 
     if ($migration->isImported()) {
-      // @todo Somehow we can get a Migration object with a stale "last import
-      // duration" value, even though it is never cached: not in Page Cache,
-      // Dynamic Page Cache, HttpApi, MigrationConverter or MigrationRepository.
-      // For now, this work-around solves the mystery…
-      // @codingStandardsIgnoreStart
-      $before = $migration->getLastImportDuration();
-      $fresh_flags = (array) \Drupal::database()->select('acquia_migrate_migration_flags', 'm')
-        ->fields('m', [
-          'migration_id',
-          'last_import_duration',
-        ])
-        ->condition('migration_id', $resource_object['id'])
-        ->execute()
-        ->fetchAllAssoc('migration_id')[$resource_object['id']];
-      $migration->lastImportDuration = $after = $fresh_flags['last_import_duration'];
-      if ($before != $after) {
-        \Drupal::logger('acquia_migrate')->debug('last_import_duration race condition work-around saved the day again: instead of ' . (string) $before . ' it now is ' . (string) $after . ' for the %s migration.', [$migration->id()]);
-      }
-      // @codingStandardsIgnoreEnd
-
       $end_time = NULL;
       if ($migration->getLastImportDuration() !== NULL) {
         $end_time = (new \DateTime())->setTimestamp($migration->getLastImportTimestamp() + $migration->getLastImportDuration())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339);
