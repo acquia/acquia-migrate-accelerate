@@ -2,6 +2,7 @@
 
 namespace Drupal\acquia_migrate\Plugin\Discovery;
 
+use Drupal\acquia_migrate\Timers;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\migrate\Plugin\Migration;
@@ -32,6 +33,8 @@ class ProfiledContainerDerivativeDiscoveryDecorator extends ContainerDerivativeD
    * {@inheritdoc}
    */
   protected function getDerivatives(array $base_plugin_definitions) {
+    Timer::start(Timers::COMPUTE_MIGRATION_PLUGINS_DERIVED);
+
     $plugin_definitions = [];
     foreach ($base_plugin_definitions as $base_plugin_id => $plugin_definition) {
       Timer::start("acquia_migrate:migration_plugin:$base_plugin_id");
@@ -73,6 +76,16 @@ class ProfiledContainerDerivativeDiscoveryDecorator extends ContainerDerivativeD
         )
       );
     }
+
+    $duration = Timer::stop(Timers::COMPUTE_MIGRATION_PLUGINS_DERIVED)['time'];
+    \Drupal::service('logger.channel.acquia_migrate_profiling_statistics')->info(
+      sprintf("stats_type=plugin_derivatives|original_definition_count=%d|derived_definition_count=%d|duration=%d",
+        count($base_plugin_definitions),
+        count($plugin_definitions),
+        round($duration)
+      )
+    );
+
     return $plugin_definitions;
   }
 

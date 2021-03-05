@@ -169,6 +169,12 @@ services:
       - '@cache_tags.invalidator'
     tags:
       - { name: event_subscriber }
+  acquia_migrate.server_timing_header_subscriber:
+    class: Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber
+    arguments:
+      - '@current_route_match'
+    tags:
+      - { name: event_subscriber }
   acquia_migrate.api_exception_subscriber:
     class: Drupal\acquia_migrate\Exception\AcquiaMigrateApiExceptionSubscriber
     tags:

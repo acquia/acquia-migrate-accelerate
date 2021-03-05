@@ -103,11 +103,18 @@ abstract class ContentEntityIndependentButRelated implements DependentHeuristicW
         "d7_$entity_type_id",
         $bundle,
       ]);
+      // Example: "bean:image".
+      $candidates[] = implode(PluginBase::DERIVATIVE_SEPARATOR, [
+        $entity_type_id,
+        $bundle,
+      ]);
     }
     // "All bundle" regular and complete migrations.
     $candidates[] = "d7_{$entity_type_id}_complete";
     // Example: "d7_user".
     $candidates[] = "d7_$entity_type_id";
+    // Example: "bean".
+    $candidates[] = $entity_type_id;
     return $candidates;
   }
 

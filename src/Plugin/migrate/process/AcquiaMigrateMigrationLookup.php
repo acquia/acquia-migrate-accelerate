@@ -2,13 +2,13 @@
 
 namespace Drupal\acquia_migrate\Plugin\migrate\process;
 
+use Drupal\acquia_migrate\AcquiaMigrateMigrateStub;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\MigrateSkipRowException;
-use Drupal\migrate\MigrateStubInterface;
 use Drupal\migrate\Plugin\migrate\process\MigrationLookup;
 use Drupal\migrate\Plugin\MigrationDeriverTrait;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -39,6 +39,13 @@ class AcquiaMigrateMigrationLookup extends MigrationLookup {
   use MigrationDeriverTrait;
 
   /**
+   * The migrate stub service.
+   *
+   * @var \Drupal\acquia_migrate\AcquiaMigrateMigrateStub
+   */
+  protected $migrateStub;
+
+  /**
    * The migration plugin manager service.
    *
    * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
@@ -58,12 +65,12 @@ class AcquiaMigrateMigrationLookup extends MigrationLookup {
    *   The Migration the plugin is being used in.
    * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
-   * @param \Drupal\migrate\MigrateStubInterface $migrate_stub
+   * @param \Drupal\acquia_migrate\AcquiaMigrateMigrateStub $migrate_stub
    *   The migrate stub service.
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin's manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup, MigrateStubInterface $migrate_stub, MigrationPluginManagerInterface $migration_plugin_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup, AcquiaMigrateMigrateStub $migrate_stub, MigrationPluginManagerInterface $migration_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $migrate_lookup, $migrate_stub);
     $this->migrationPluginManager = $migration_plugin_manager;
   }
@@ -240,8 +247,8 @@ class AcquiaMigrateMigrationLookup extends MigrationLookup {
           // we pass a full migration plugin ID param, but the original clause
           // also caught LogicException thrown in MigrateStub::doCreateStub().
           // So we have to continue to catch this for BC.
-          // TODO instead of this, shouldn't MigrateStub::doCreateStub() catch
-          // the expected Throwables and thrown them as MigrateException?
+          // @todo Instead of this, MigrateStub::doCreateStub() should catch
+          //   the expected Throwables and thrown them as MigrateException.
         }
         catch (PluginNotFoundException $e) {
           // This also catches PluginNotFoundException thrown in
@@ -289,6 +296,7 @@ class AcquiaMigrateMigrationLookup extends MigrationLookup {
     // Use the simplest Drupal source plugins.
     $source_db = static::getSourcePlugin('variable')->getDatabase();
     $legacy_core_version = static::getLegacyDrupalVersion($source_db);
+    // @codingStandardsIgnoreLine
     $node_migration_is_complete = class_exists(NodeMigrateType::class) && is_callable([NodeMigrateType::class, 'getNodeMigrateType'])
       ? NodeMigrateType::getNodeMigrateType($source_db, $legacy_core_version) === NodeMigrateType::NODE_MIGRATE_TYPE_COMPLETE
       : FALSE;

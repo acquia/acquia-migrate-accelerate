@@ -3,6 +3,8 @@
 namespace Drupal\acquia_migrate\EventSubscriber;
 
 use Drupal\acquia_migrate\Cache\AcquiaMigrateCacheTagsInvalidator;
+use Drupal\acquia_migrate\Timers;
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;
@@ -122,6 +124,14 @@ class CacheableAcquiaMigrateResponseSubscriber implements EventSubscriberInterfa
     if (!$request->headers->has('If-None-Match')) {
       return;
     }
+    // Allow a `Server-Timing: always` cookie to force 200 responses, to ensure
+    // the Server-Timing response headers remain available.
+    // Clients can then force this using @code
+    // document.cookie = "Server-Timing=always" @endcode in their browser.
+    // @see \Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber
+    if ($event->getRequest()->cookies->get('Server-Timing') === 'always') {
+      return;
+    }
     $match = $request->headers->get('If-None-Match');
     if ($response->getStatusCode() !== 304 && $match === $etag) {
       $not_modified_response = new CacheableResponse(NULL, 304);
@@ -178,12 +188,14 @@ class CacheableAcquiaMigrateResponseSubscriber implements EventSubscriberInterfa
    *   The etag.
    */
   private function calculateEtag(Response $response) {
+    Timer::start(Timers::RESPONSE_ETAG);
     if (!isset($this->etagCache[$response])) {
       $etag = $response->headers->has('Etag')
         ? $response->headers->get('Etag')
         : md5($response->getContent());
       $this->etagCache[$response] = $etag;
     }
+    Timer::stop(Timers::RESPONSE_ETAG);
     return $this->etagCache[$response];
   }
 

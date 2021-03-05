@@ -7,6 +7,7 @@ use Drupal\acquia_migrate\Exception\RowPreviewException;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Url;
@@ -906,6 +907,8 @@ final class Migration {
    *   A JSON:API resource object array.
    */
   public static function toResourceObject(Migration $migration, RefinableCacheableDependencyInterface $cacheability) : array {
+    Timer::start(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION);
+
     // This may be called repeatedly within a request, but the service will not
     // change. Hence this is safe to statically cache.
     static $previewer;
@@ -914,6 +917,7 @@ final class Migration {
       assert($previewer instanceof MigrationPreviewer);
     }
 
+    Timer::start(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION_ATTRIBUTES);
     $dependencies_relationship_data = array_map(function (string $migration_id, array $reasons) {
       return [
         'type' => 'migration',
@@ -1011,11 +1015,15 @@ final class Migration {
         ]),
       ];
     }
+    Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION_ATTRIBUTES);
 
     // Get links to act on this migration based on the it current state. E.g. a
     // migration that doesn't have any imported data will not have a 'rollback'
     // link.
+    Timer::start(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION_LINKS);
     $available_urls = $migration->getAvailableLinkUrls();
+    Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION_LINKS);
+
     foreach ($available_urls as $key => $url) {
       assert($url instanceof Url);
       $link_params = [];
@@ -1178,6 +1186,18 @@ final class Migration {
       if (!empty($link_template)) {
         $resource_object['links'][$key] += $link_template;
       }
+    }
+
+    $duration = Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION)['time'];
+    if ($duration > 500) {
+      \Drupal::service('logger.channel.acquia_migrate_profiling_statistics')
+        ->info(
+          sprintf("stats_type=jsonapi_resource_object_migration|migration_id=%s|duration=%d|links=%s",
+            $migration->id(),
+            round($duration),
+            implode(',', array_keys($resource_object['links']))
+          )
+        );
     }
 
     return $resource_object;

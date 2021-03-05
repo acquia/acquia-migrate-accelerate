@@ -57,7 +57,7 @@ trait EntityRelatedHeuristicTrait {
 
       default:
         $entity_type = $source_config['entity_type'] ?? $source_config['constants']['entity_type'] ?? NULL;
-        $bundle = $source_config['node_type'] ?? $source_config['bundle'] ?? NULL;
+        $bundle = $source_config['node_type'] ?? $source_config['bundle'] ?? $source_config['type'] ?? NULL;
     }
 
     // Some of the comment related migrations are derived based on their host

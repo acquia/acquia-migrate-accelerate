@@ -136,9 +136,13 @@ final class MigrationAlterer {
   ];
 
   const ENTITY_TYPE_KNOWN_REMAP = [
-    // @see \Drupal\paragraphs\MigrationPluginsAlterer::PARAGRAPHS_ENTITY_TYPE_ID_MAPs
+    // @see \Drupal\paragraphs\MigrationPluginsAlterer::PARAGRAPHS_ENTITY_TYPE_ID_MAP
     'field_collection_item' => 'paragraph',
     'paragraphs_item' => 'paragraph',
+    // Media migration.
+    'file' => 'media',
+    // @see \Drupal\bean_migrate\MigrationRowPreparer::mapBeanToBlockContent
+    'bean' => 'block_content',
   ];
 
   const KNOWN_UNCACHED_MIGRATION_SOURCE_PLUGINS = [
@@ -341,6 +345,15 @@ final class MigrationAlterer {
         // @codingStandardsIgnoreStart
         $general_category = $this->t($new_label_str, $label_args, $label_options);
         // @codingStandardsIgnoreEnd
+      }
+
+      if ($migration['id'] === 'bean') {
+        $migration['label'] = $this->t('@category @entity-type-plural from @source', [
+          '@category' => $general_category,
+          '@entity-type-plural' => $entity_type->getPluralLabel(),
+          '@source' => 'Bean',
+        ], $new_label_options);
+        return;
       }
 
       switch ($target_entity_type_id) {

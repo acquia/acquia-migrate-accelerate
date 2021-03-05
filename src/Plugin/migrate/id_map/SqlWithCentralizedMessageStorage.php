@@ -5,6 +5,8 @@ namespace Drupal\acquia_migrate\Plugin\migrate\id_map;
 use Drupal\acquia_migrate\Controller\HttpApi;
 use Drupal\acquia_migrate\MessageAnalyzer;
 use Drupal\acquia_migrate\Migration;
+use Drupal\acquia_migrate\Timers;
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
@@ -467,6 +469,16 @@ final class SqlWithCentralizedMessageStorage extends Sql {
       $rows[] = $row;
     }
     return $rows;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function countHelper($status = NULL, $table = NULL) {
+    Timer::start(Timers::COUNT_ID_MAP);
+    $result = parent::countHelper($status, $table);
+    Timer::stop(Timers::COUNT_ID_MAP);
+    return $result;
   }
 
 }

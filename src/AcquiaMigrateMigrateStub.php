@@ -29,6 +29,17 @@ use Drupal\migrate\Row;
 class AcquiaMigrateMigrateStub extends MigrateStub {
 
   /**
+   * Static cache for identifying the main stub process.
+   *
+   * If this property is set to true, it means that the current process belongs
+   * to an entity being stubbed, so the service won't try to create the
+   * 'sub-stub' entity.
+   *
+   * @var bool
+   */
+  protected static $mainStubProcessHasStarted = FALSE;
+
+  /**
    * Creates a stub.
    *
    * @param string $migration_id
@@ -65,6 +76,16 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
    * @throws \LogicException
    */
   public function createStub($migration_id, array $source_ids, array $default_values = [], $key_by_destination_ids = NULL, bool $create_only_valid = FALSE) {
+    // If the main stub process was started, then this process would create a
+    // stub for an entity being stubbed.
+    // We will return FALSE.
+    if (self::$mainStubProcessHasStarted) {
+      return FALSE;
+    }
+    else {
+      self::$mainStubProcessHasStarted = TRUE;
+    }
+
     $migrations = $this->migrationPluginManager->createInstances([$migration_id]);
     if (!$migrations) {
       throw new PluginNotFoundException($migration_id);
@@ -92,23 +113,20 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
     $sql_succeed = $source_plugin instanceof SqlBase;
     if (!$stub_should_be_created && $source_plugin instanceof SqlBase) {
       $source_plugin_query = $source_plugin->query();
-      $source_plugin_query_data = $source_plugin->query();
-
       try {
         foreach ($source_ids_with_aliases as $source_id => $source_id_value) {
           $source_plugin_query->condition($source_id, $source_id_value);
-          $source_plugin_query_data->condition($source_id, $source_id_value);
         }
-        $number_of_matching_rows = $source_plugin_query
-          ->countQuery()
-          ->execute()
-          ->fetchField();
+        $rows_to_stub = array_reduce($source_plugin_query->execute()->fetchAll(), function (array $carry, $source_data) use ($source_plugin, $migration) {
+          $row = new Row($source_data, $migration->getSourcePlugin()->getIds(), TRUE);
+          // Stubbing nodes with core node migrations needs prepareRow.
+          if ($source_plugin->prepareRow($row)) {
+            $carry[] = $row;
+          }
+          return $carry;
+        }, []);
 
-        $rows_to_stub = $source_plugin_query_data
-          ->execute()
-          ->fetchAll();
-
-        $stub_should_be_created = (bool) $number_of_matching_rows;
+        $stub_should_be_created = (bool) count($rows_to_stub);
       }
       catch (DatabaseExceptionWrapper $e) {
         $sql_succeed = FALSE;
@@ -126,7 +144,7 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
             }
           }
           $stub_should_be_created = TRUE;
-          $rows_to_stub[] = $row->getSource();
+          $rows_to_stub[] = $row;
         }
       }
       catch (\Exception $e) {
@@ -144,10 +162,11 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
       // populated (because it was not a field in D7). For now we work around
       // this by passing every source row column as the set of default values,
       // which will cause the status field to get populated.
-      $stub = NULL;
+      assert($row_to_stub instanceof Row);
       try {
-        $stub = $this->doCreateStub($migration, $row_to_stub, $default_values);
-        $stubs[] = $stub;
+        if ($stub = $this->doCreateStub($migration, $row_to_stub->getSource(), $default_values)) {
+          $stubs[] = $stub;
+        }
       }
       // ::doCreateStub() also throws MigrateSkipRowException.
       // @todo Remove after https://www.drupal.org/i/3188455 is fixed.
@@ -160,13 +179,16 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
     // If the return from ::import is numerically indexed, and we aren't
     // requesting the raw return value, index it associatively using the
     // destination id keys.
-    if (empty($stubs)) {
-      return FALSE;
-    }
-    $stub = reset($stubs);
-    if (($key_by_destination_ids !== FALSE) && array_keys($stub) === range(0, count($stub) - 1)) {
+    $stub = empty($stubs)
+      ? FALSE
+      : reset($stubs);
+    if ($stub && ($key_by_destination_ids !== FALSE) && array_keys($stub) === range(0, count($stub) - 1)) {
       $stub = array_combine(array_keys($migration->getDestinationPlugin()->getIds()), $stub);
     }
+
+    // The main stub process finished, reset the static variable.
+    self::$mainStubProcessHasStarted = FALSE;
+
     return $stub;
   }
 

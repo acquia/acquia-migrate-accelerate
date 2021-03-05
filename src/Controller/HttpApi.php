@@ -5,6 +5,7 @@ namespace Drupal\acquia_migrate\Controller;
 use Drupal\acquia_migrate\Batch\BatchUnknown;
 use Drupal\acquia_migrate\Batch\MigrationBatchManager;
 use Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor;
+use Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber;
 use Drupal\acquia_migrate\Exception\AcquiaMigrateHttpExceptionInterface;
 use Drupal\acquia_migrate\Exception\BadRequestHttpException;
 use Drupal\acquia_migrate\Exception\FailedAtomicOperationException;
@@ -22,13 +23,16 @@ use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\ModuleAuditor;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\acquia_migrate\Recommendations;
+use Drupal\acquia_migrate\Timers;
 use Drupal\acquia_migrate\UriDefinitions;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -340,10 +344,16 @@ final class HttpApi {
    *   The response.
    */
   public function migrationsCollection(Request $request): JsonResponse {
+    Timer::start(Timers::RESPONSE_MIGRATIONS_COLLECTION);
+    Database::startLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-dst', 'default');
+    Database::startLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-src', 'migrate');
+
     // @see system_cron() — we want this to run more frequently and more
     // reliably than cron so that expired locks are quickly cleaned up.
     // @codingStandardsIgnoreLine
+    Timer::start(Timers::QUERY_LOCK_GC);
     \Drupal::service('keyvalue.expirable.database')->garbageCollection();
+    Timer::stop(Timers::QUERY_LOCK_GC);
 
     $this->validateRequest($request);
     $cacheability = new CacheableMetadata();
@@ -475,6 +485,13 @@ final class HttpApi {
     }
     $response = CacheableJsonResponse::create($document, 200, static::$defaultResponseHeaders);
     $response->addCacheableDependency($cacheability);
+
+    Timer::stop(Timers::RESPONSE_MIGRATIONS_COLLECTION);
+    $dst_queries = Database::getLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-dst', 'default');
+    ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-dst', count($dst_queries));
+    $src_queries = Database::getLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-src', 'migrate');
+    ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::RESPONSE_MIGRATIONS_COLLECTION . '-src', count($src_queries));
+
     return $response;
   }
 
@@ -1212,6 +1229,8 @@ final class HttpApi {
    *   The response.
    */
   public function messagesCollection(Request $request): JsonResponse {
+    Timer::start(Timers::RESPONSE_MESSAGES_COLLECTION);
+
     $this->validateRequest($request, [
       'optional' => ['filter'],
     ]);
@@ -1223,7 +1242,7 @@ final class HttpApi {
     $categories = $this->getFilterCategories();
     $generated_messages_url = Url::fromRoute('acquia_migrate.api.messages.get')->setAbsolute()->toString(TRUE);
     $cacheability->addCacheableDependency($generated_messages_url);
-    return (new CacheableJsonResponse([
+    $response = (new CacheableJsonResponse([
       'data' => $data,
       'links' => [
         'self' => [
@@ -1285,6 +1304,8 @@ final class HttpApi {
     ], 200, array_merge(static::$defaultResponseHeaders, [
       'Content-Type' => 'application/vnd.api+json; ext="' . UriDefinitions::EXTENSION_URI_TEMPLATE . '"',
     ])))->addCacheableDependency($cacheability);
+    Timer::stop(Timers::RESPONSE_MESSAGES_COLLECTION);
+    return $response;
   }
 
   /**

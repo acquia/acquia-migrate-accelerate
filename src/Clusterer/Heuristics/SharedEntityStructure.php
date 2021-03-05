@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\acquia_migrate\Clusterer\Heuristics;
 
+use Drupal\acquia_migrate\MigrationAlterer;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -140,27 +141,15 @@ final class SharedEntityStructure implements IndependentHeuristicInterface, Heur
 
     // @todo Remove this line when derivatives for non-existing entity types
     //   cease to be generated.
-    // @todo Document why the source 'entity_type' is checked. I'm almost sure
-    //   that we have to check the destination entity type here.
-    if (
-      !$this->entityTypeManager->hasDefinition($source_entity_type) &&
-      // D7 media's field storage config also belongs to shared structure when
-      // media_migration is installed.
-      ($source_entity_type === 'file' && !$this->moduleHandler->moduleExists('media_migration'))
-    ) {
+    $expected_destination_entity_type = MigrationAlterer::ENTITY_TYPE_KNOWN_REMAP[$source_entity_type] ?? $source_entity_type;
+    if (!$this->entityTypeManager->hasDefinition($expected_destination_entity_type)) {
       return FALSE;
     }
 
     // We only care about "shared structure" if there is something to share,
     // that is, if there are multiple bundles.
-    // @todo If we checked the destination entity type here, we might avoid
-    //   the 'or if media is present' condition here.
-    $definition_from_source = $this->entityTypeManager->getDefinition($source_entity_type, FALSE);
-    $entity_type_has_bundles = ($definition_from_source && $definition_from_source->getBundleEntityType() !== NULL)
-      // If media is available, we assume that we migrate D7 file entities to
-      // media entities, and media has bundles.
-      || ($source_entity_type === 'file' && $this->moduleHandler->moduleExists('media_migration'));
-
+    $destination_definition = $this->entityTypeManager->getDefinition($expected_destination_entity_type, FALSE);
+    $entity_type_has_bundles = $destination_definition && $destination_definition->getBundleEntityType() !== NULL;
     $dependencyless = empty($migration_plugin->getMetadata('after'));
 
     if ($entity_type_has_bundles && !$dependencyless) {

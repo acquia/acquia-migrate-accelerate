@@ -222,6 +222,7 @@ final class MigrationClusterer {
       Heuristics\SharedLanguageConfig::class => 0,
       Heuristics\ConfigNeedingHuman::class => 0,
       Heuristics\BlockPlacements::class => 500,
+      Heuristics\BeanBlockPlacements::class => 500,
       Heuristics\SharedEntityStructure::class => 0,
       Heuristics\SharedEntityData::class => 0,
       Heuristics\SharedBookData::class => 500,

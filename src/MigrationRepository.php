@@ -4,12 +4,15 @@ namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Clusterer\Heuristics\SharedEntityData;
 use Drupal\acquia_migrate\Clusterer\MigrationClusterer;
+use Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber;
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 
 /**
  * Provides the repository of available migrations.
@@ -147,17 +150,36 @@ class MigrationRepository {
    * @see \Drupal\acquia_migrate\Migration::__wakeup()
    */
   public function getMigrations(bool $reset = FALSE) : array {
+    Timer::start(Timers::CACHE_MIGRATIONS);
+
     // Static caching added only for the to-JSON:API-normalization logic,
     // because it can potentially call this many times.
     // @see \Drupal\acquia_migrate\Migration::toResourceObject()
     static $migrations;
     if (!$reset && isset($migrations)) {
+      Timer::stop(Timers::CACHE_MIGRATIONS);
       return $migrations;
     }
 
     $cached = $this->cache->get(static::CID);
     if ($reset || !$cached) {
+      Timer::start(Timers::COMPUTE_MIGRATIONS);
+      Database::startLog(Timers::COMPUTE_MIGRATIONS . '-dst', 'default');
+      Database::startLog(Timers::COMPUTE_MIGRATIONS . '-src', 'migrate');
       $migrations = $this->doGetMigrations();
+      $duration = Timer::stop(Timers::COMPUTE_MIGRATIONS)['time'];
+      $dst_queries = Database::getLog(Timers::COMPUTE_MIGRATIONS . '-dst', 'default');
+      ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::COMPUTE_MIGRATIONS . '-dst', count($dst_queries));
+      $src_queries = Database::getLog(Timers::COMPUTE_MIGRATIONS . '-src', 'migrate');
+      ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::COMPUTE_MIGRATIONS . '-src', count($src_queries));
+      \Drupal::service('logger.channel.acquia_migrate_profiling_statistics')->info(
+        sprintf("stats_type=migration_repository|migration_count=%d|duration=%d|query_count_dst_db=%d|query_count_src_db=%d",
+          count($migrations),
+          round($duration),
+          count($dst_queries),
+          count($src_queries)
+        )
+      );
       $this->cache->set(static::CID, $migrations, Cache::PERMANENT, ['migration_plugins']);
       // Also compute the virtual initial migration once, to ensure its flags
       // have also been populated.
@@ -166,6 +188,8 @@ class MigrationRepository {
     else {
       $migrations = $cached->data;
     }
+
+    Timer::stop(Timers::CACHE_MIGRATIONS);
 
     return $migrations;
   }
@@ -187,6 +211,8 @@ class MigrationRepository {
     else {
       return $initial_migration_plugin_ids;
     }
+
+    Timer::start(Timers::COMPUTE_MIGRATION_PLUGINS_INITIAL);
 
     $migrations = $this->getMigrations();
     $all_instances = [];
@@ -256,6 +282,8 @@ class MigrationRepository {
       return TRUE;
     });
 
+    Timer::stop(Timers::COMPUTE_MIGRATION_PLUGINS_INITIAL);
+
     return $initial_migration_plugin_ids;
   }
 
@@ -276,6 +304,8 @@ class MigrationRepository {
     else {
       return $todo;
     }
+
+    Timer::start(Timers::COMPUTE_MIGRATION_PLUGINS_INITIAL_TODO);
 
     $initial_migration_plugin_ids = $this->getInitialMigrationPluginIds();
     $migrations = $this->getMigrations();
@@ -304,6 +334,8 @@ class MigrationRepository {
         $todo[] = $id;
       }
     }
+
+    Timer::stop(Timers::COMPUTE_MIGRATION_PLUGINS_INITIAL_TODO);
 
     return $todo;
   }

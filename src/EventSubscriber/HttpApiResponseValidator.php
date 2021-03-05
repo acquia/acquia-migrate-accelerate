@@ -2,7 +2,9 @@
 
 namespace Drupal\acquia_migrate\EventSubscriber;
 
+use Drupal\acquia_migrate\Timers;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Timer;
 use JsonSchema\Validator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -108,7 +110,9 @@ final class HttpApiResponseValidator implements EventSubscriberInterface {
    * @see self::validateResponse
    */
   public function doValidateResponse(Response $response, Request $request) {
+    Timer::start(Timers::RESPONSE_JSONAPI_VALIDATION);
     assert($this->validateResponse($response, $request), 'A JSON:API response failed validation (see the logs for details). Please report this in the issue queue on drupal.org');
+    Timer::stop(Timers::RESPONSE_JSONAPI_VALIDATION);
   }
 
   /**
