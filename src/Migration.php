@@ -142,6 +142,13 @@ final class Migration {
   protected $lastImportDuration;
 
   /**
+   * Whether this migration supports rollbacks.
+   *
+   * @var bool
+   */
+  private $supportsRollback;
+
+  /**
    * Constructs a new Migration.
    *
    * @param string $id
@@ -189,6 +196,27 @@ final class Migration {
     $this->lastComputedFingerprint = $last_computed_fingerprint;
     $this->lastImportTimestamp = $last_import_timestamp;
     $this->lastImportDuration = $last_import_duration;
+
+    // Computed properties, that can only change when the migration
+    // change, which automatically causes these objects to be reconstructed.
+    // @see \Drupal\acquia_migrate\MigrationRepository::getMigrations()
+    $this->supportsRollback = $this->computeSupportsRollback();
+  }
+
+  /**
+   * Computes whether this migration supports rollbacks.
+   *
+   * @return bool
+   *   Whether this migration supports rollbacks.
+   */
+  private function computeSupportsRollback() : bool {
+    // @todo: should there be a special case here when *some*, but not *all*, plugins support rollback?
+    $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
+      return $migration_plugin->getDestinationPlugin()->supportsRollback()
+        ? array_merge($rollback_capable_plugins, [$migration_plugin])
+        : $rollback_capable_plugins;
+    }, []);
+    return count($rollback_capable_plugins) > 0 && count($rollback_capable_plugins) === count($this->migrationPlugins);
   }
 
   /**
@@ -706,16 +734,7 @@ final class Migration {
    *   plugins can be rolled back, FALSE otherwise.
    */
   protected function canBeRolledBack() : bool {
-    if ($this->getProcessedCount() === 0) {
-      return FALSE;
-    }
-    // @todo: should there be a special case here when *some*, but not *all*, plugins support rollback?
-    $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
-      return $migration_plugin->getDestinationPlugin()->supportsRollback()
-        ? array_merge($rollback_capable_plugins, [$migration_plugin])
-        : $rollback_capable_plugins;
-    }, []);
-    return count($rollback_capable_plugins) > 0 && count($rollback_capable_plugins) === count($this->migrationPlugins);
+    return $this->supportsRollback && $this->getProcessedCount() > 0;
   }
 
   /**

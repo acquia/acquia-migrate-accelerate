@@ -48,11 +48,12 @@ final class Timers {
   const COUNT_ID_MAP = 'ama-count-id-map';
 
   /**
-   * DB query-level timer: lock garbage collection.
+   * DB query-level timers.
    *
    * @see \Drupal\acquia_migrate\Controller\HttpApi::migrationsCollection
    */
   const QUERY_LOCK_GC = 'ama-query-lock-gc';
+  const QUERY_COUNT_ID_MAP = 'ama-query-id-map-count';
 
   /**
    * JSON:API resource object-level timers: migration resource objects parts.
@@ -103,6 +104,7 @@ final class Timers {
         static::COUNT_ID_MAP => 'Counts (%d): mapping',
         // DB queries.
         static::QUERY_LOCK_GC => 'Query: GC lock',
+        static::QUERY_COUNT_ID_MAP => 'Queries (%d): mapping counts',
         // JSON:API resource objects.
         static::JSONAPI_RESOURCE_OBJECT_MIGRATION => 'JSON:API migration resource objects (%d)',
         static::JSONAPI_RESOURCE_OBJECT_MIGRATION_ATTRIBUTES => 'JSON:API migration resource objects: attributes (%d)',

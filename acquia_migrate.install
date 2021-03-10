@@ -253,3 +253,12 @@ function acquia_migrate_update_9100() {
     $schema->addField('acquia_migrate_migration_flags', $field_name, $spec);
   }
 }
+
+/**
+ * Rollback support is now computed at construction time and hence cached.
+ *
+ * @see \Drupal\acquia_migrate\Migration::__construct()
+ * @see \Drupal\acquia_migrate\MigrationRepository::getMigrations
+ */
+function acquia_migrate_update_9101() {
+}

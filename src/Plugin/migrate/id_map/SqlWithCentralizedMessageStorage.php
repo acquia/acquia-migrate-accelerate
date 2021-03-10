@@ -7,6 +7,7 @@ use Drupal\acquia_migrate\MessageAnalyzer;
 use Drupal\acquia_migrate\Migration;
 use Drupal\acquia_migrate\Timers;
 use Drupal\Component\Utility\Timer;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
@@ -97,6 +98,17 @@ final class SqlWithCentralizedMessageStorage extends Sql {
    * @var \Drupal\acquia_migrate\MessageAnalyzer
    */
   protected $messageAnalyzer;
+
+  /**
+   * An array with the memoized mapping counts.
+   *
+   * The key is one of MigrateIdMapInterface::STATUS_*.
+   *
+   * @var array
+   *
+   * @see \Drupal\migrate\Plugin\MigrateIdMapInterface
+   */
+  protected $memoizedCounts = [];
 
   /**
    * Constructs a SqlWithCentralizedMessageStorage object.
@@ -475,10 +487,70 @@ final class SqlWithCentralizedMessageStorage extends Sql {
    * {@inheritdoc}
    */
   protected function countHelper($status = NULL, $table = NULL) {
+    if (empty($this->memoizedCounts)) {
+      if ($table !== NULL && $table !== $this->mapTableName()) {
+        throw new \InvalidArgumentException('Invalid table name provided.');
+      }
+      $this->memoizedCounts = $this->computeAllCounts();
+    }
+
     Timer::start(Timers::COUNT_ID_MAP);
-    $result = parent::countHelper($status, $table);
+
+    switch (gettype($status)) {
+      case "NULL":
+        $result = array_sum($this->memoizedCounts);
+        break;
+
+      case "array":
+        $result = array_reduce($status, function (int $sum, int $key) {
+          return $sum + $this->memoizedCounts[$key];
+        }, 0);
+        break;
+
+      default:
+        $result = $this->memoizedCounts[(int) $status];
+        break;
+    }
+
     Timer::stop(Timers::COUNT_ID_MAP);
+
     return $result;
+  }
+
+  /**
+   * Helper for ::countHelper(): computes all counts in a single DB query.
+   *
+   * @return array
+   *   An array with all counts: for all of MigrateIdMapInterface::STATUS_*.
+   */
+  private function computeAllCounts() : array {
+    Timer::start(Timers::QUERY_COUNT_ID_MAP);
+
+    $all_counts = [
+      MigrateIdMapInterface::STATUS_IMPORTED => 0,
+      MigrateIdMapInterface::STATUS_NEEDS_UPDATE => 0,
+      MigrateIdMapInterface::STATUS_IGNORED => 0,
+      MigrateIdMapInterface::STATUS_FAILED => 0,
+    ];
+
+    $query = $this->database->select($this->mapTableName())
+      ->fields(NULL, ['source_row_status'])
+      ->groupBy('source_row_status');
+    $query->addExpression('COUNT(*)', 'count');
+    $query->groupBy('source_row_status');
+    try {
+      $records = $query->execute()->fetchAllAssoc('source_row_status');
+      foreach ($records as $source_row_status => $record) {
+        $all_counts[(int) $source_row_status] = (int) $record->count;
+      }
+    }
+    catch (DatabaseException $e) {
+      // The table does not exist, therefore there are no records.
+    }
+
+    Timer::stop(Timers::QUERY_COUNT_ID_MAP);
+
+    return $all_counts;
   }
 
 }

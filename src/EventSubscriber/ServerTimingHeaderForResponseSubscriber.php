@@ -91,6 +91,7 @@ class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterfac
 
       // Queries.
       $this->generateHeaderIfTimed(Timers::QUERY_LOCK_GC, $response->headers);
+      $this->generateHeaderIfTimed(Timers::QUERY_COUNT_ID_MAP, $response->headers);
 
       // JSON:API resource objects.
       $this->generateHeaderIfTimed(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION, $response->headers);
