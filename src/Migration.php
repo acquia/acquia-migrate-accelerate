@@ -3,6 +3,7 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
+use Drupal\acquia_migrate\Controller\HttpApi;
 use Drupal\acquia_migrate\Exception\RowPreviewException;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\Component\Assertion\Inspector;
@@ -493,11 +494,15 @@ final class Migration {
   /**
    * Gets the message count (*data* migration plugins only).
    *
+   * @param string|null $category
+   *   (optional) One of \Drupal\acquia_migrate\Controller\HttpApi::MESSAGE_*.
+   *
    * @return int
    *   The message count.
    */
-  public function getMessageCount() : int {
+  public function getMessageCount(string $category = NULL) : int {
     // @codingStandardsIgnoreStart
+    assert($category === NULL || in_array($category, [HttpApi::MESSAGE_CATEGORY_OTHER, HttpApi::MESSAGE_CATEGORY_ENTITY_VALIDATION]));
     $connection = \Drupal::database();
     // @codingStandardsIgnoreEnd
 
@@ -505,8 +510,14 @@ final class Migration {
       return 0;
     }
 
-    return $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)
-      ->condition(SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_ID, $this->id)
+    $query = $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)
+      ->condition(SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_ID, $this->id);
+
+    if ($category !== NULL) {
+      $query->condition(SqlWithCentralizedMessageStorage::COLUMN_CATEGORY, $category);
+    }
+
+    return $query
       ->countQuery()
       ->execute()
       ->fetchField();

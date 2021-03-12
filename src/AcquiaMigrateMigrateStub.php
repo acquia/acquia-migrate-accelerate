@@ -76,6 +76,10 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
    * @throws \LogicException
    */
   public function createStub($migration_id, array $source_ids, array $default_values = [], $key_by_destination_ids = NULL, bool $create_only_valid = FALSE) {
+    if (!$create_only_valid) {
+      return parent::createStub($migration_id, $source_ids, $default_values, $key_by_destination_ids);
+    }
+
     // If the main stub process was started, then this process would create a
     // stub for an entity being stubbed.
     // We will return FALSE.
@@ -91,7 +95,7 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
       throw new PluginNotFoundException($migration_id);
     }
     if (count($migrations) !== 1) {
-      throw new \LogicException(sprintf('Cannot stub derivable migration "%s".  You must specify the id of a specific derivative to stub.', $migration_id));
+      throw new \LogicException(sprintf('Cannot stub derivable migration "%s". You must specify the id of a specific derivative to stub.', $migration_id));
     }
     $migration = reset($migrations);
     $source_plugin = $migration->getSourcePlugin();
@@ -109,7 +113,7 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
 
     // Check the existence of a source that matches the source IDs before
     // blindly create a stub.
-    $stub_should_be_created = !$create_only_valid;
+    $stub_should_be_created = FALSE;
     $sql_succeed = $source_plugin instanceof SqlBase;
     if (!$stub_should_be_created && $source_plugin instanceof SqlBase) {
       $source_plugin_query = $source_plugin->query();
@@ -151,28 +155,26 @@ class AcquiaMigrateMigrateStub extends MigrateStub {
       }
     }
 
-    if (!$stub_should_be_created) {
-      return FALSE;
-    }
-
     $stubs = [];
-    // We will create stubs from every matching row.
-    foreach ($rows_to_stub as $row_to_stub) {
-      // @todo Needs core issue to fix upstream: the "status" field won't get
-      // populated (because it was not a field in D7). For now we work around
-      // this by passing every source row column as the set of default values,
-      // which will cause the status field to get populated.
-      assert($row_to_stub instanceof Row);
-      try {
-        if ($stub = $this->doCreateStub($migration, $row_to_stub->getSource(), $default_values)) {
-          $stubs[] = $stub;
+    if ($stub_should_be_created) {
+      // We will create stubs from every matching row.
+      foreach ($rows_to_stub as $row_to_stub) {
+        // @todo Needs core issue to fix upstream: the "status" field won't get
+        // populated (because it was not a field in D7). For now we work around
+        // this by passing every source row column as the set of default values,
+        // which will cause the status field to get populated.
+        assert($row_to_stub instanceof Row);
+        try {
+          if ($stub = $this->doCreateStub($migration, $row_to_stub->getSource(), $default_values)) {
+            $stubs[] = $stub;
+          }
         }
-      }
-      // ::doCreateStub() also throws MigrateSkipRowException.
-      // @todo Remove after https://www.drupal.org/i/3188455 is fixed.
-      catch (MigrateSkipRowException $e) {
-      }
-      catch (MigrateException $e) {
+        // ::doCreateStub() also throws MigrateSkipRowException.
+        // @todo Remove after https://www.drupal.org/i/3188455 is fixed.
+        catch (MigrateSkipRowException $e) {
+        }
+        catch (MigrateException $e) {
+        }
       }
     }
 
