@@ -286,11 +286,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
         'processed_count' => sprintf("%6d", $processed_count),
         'imported_count' => $processed_count > 0 ? sprintf("%6d", $migration->getUiImportedCount()) : NULL,
         'total_count' => sprintf("%6d", $migration->getTotalCount()),
-        'processed_pct' => $migration->getTotalCount() === 0
-          ? "100%"
-          : sprintf("%3d%%", round($migration->getUiProcessedCount() / $migration->getTotalCount(), 2) * 100),
+        'processed_pct' => sprintf("%3d%%", static::getPercentage($migration->getUiProcessedCount(), $migration->getTotalCount())),
         'imported_pct' => $processed_count > 0
-          ? ($migration->getTotalCount() === 0 ? "100%" : sprintf("%3d%%", round($migration->getUiImportedCount() / $migration->getTotalCount(), 2) * 100))
+          ? sprintf("%3d%%", static::getPercentage($migration->getUiImportedCount(), $migration->getTotalCount()))
           : NULL,
         'message_count' => sprintf("%6d", $message_count),
         'validation_message_count' => $message_count > 0
@@ -323,11 +321,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
             ? sprintf("%6d", $imported_count)
             : NULL,
           'total_count' => sprintf("%6d", $total_count),
-          'processed_pct' => $total_count === 0
-            ? "100%"
-            : sprintf("%3d%%", round($processed_count / $total_count, 2) * 100),
+          'processed_pct' => sprintf("%3d%%", static::getPercentage($processed_count, $total_count)),
           'imported_pct' => $processed_count > 0
-            ? ($total_count === 0 ? "100%" : sprintf("%3d%%", round($imported_count / $total_count, 2) * 100))
+            ? sprintf("%3d%%", static::getPercentage($imported_count, $total_count))
             : NULL,
         ];
         // @codingStandardsIgnoreEnd
@@ -335,6 +331,28 @@ final class AcquiaMigrateCommands extends DrushCommands {
     }
 
     return new RowsOfFields($table);
+  }
+
+  /**
+   * Gets a percentage without decimals, that rounds down instead of up.
+   *
+   * For example, 99/100 yields 99, but 199/200 and 16497/16499 still yield 99.
+   *
+   * Also handles the case of a zero denominator: returns 100.
+   *
+   * @param int $numerator
+   *   The numerator.
+   * @param int $denominator
+   *   The denominator.
+   *
+   * @return int
+   *   An integer between 0 and 100.
+   */
+  private static function getPercentage(int $numerator, int $denominator) : int {
+    if ($denominator === 0) {
+      return 100;
+    }
+    return (int) floor($numerator / $denominator * 100);
   }
 
   /**
