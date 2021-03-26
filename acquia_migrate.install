@@ -54,6 +54,16 @@ function acquia_migrate_install($is_syncing) {
 
   UserOneConfigurationForm::reset();
   PublicAcknowledgementForm::reset();
+
+  // Hide the Acquia Connector sign-up message if on Acquia Cloud.
+  // @see acquia_connector_show_free_tier_promo()
+  // @see acquia_migrate_modules_installed()
+  if (\Drupal::moduleHandler()->moduleExists('acquia_connector')) {
+    \Drupal::configFactory()
+      ->getEditable('acquia_connector.settings')
+      ->set('hide_signup_messages', 1)
+      ->save();
+  }
 }
 
 /**
@@ -90,6 +100,17 @@ function acquia_migrate_uninstall($is_syncing) {
   $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
   $role->revokePermission('view the administration theme');
   $role->trustData()->save();
+
+  // Revert back to the default of showing the Acquia Connector sign-up message.
+  // @see acquia_connector_show_free_tier_promo()
+  // @see acquia_migrate_install()
+  // @see acquia_migrate_modules_installed()
+  if (\Drupal::moduleHandler()->moduleExists('acquia_connector')) {
+    \Drupal::configFactory()
+      ->getEditable('acquia_connector.settings')
+      ->set('hide_signup_messages', 0)
+      ->save();
+  }
 
   // Warn the site owner to also uninstall other modules.
   \Drupal::messenger()->addWarning(t('You probably also want to uninstall the <code>migrate</code>, <code>migrate_drupal</code>, <code>migrate_drupal_ui</code>, <code>migrate_plus</code>, <code>decoupled_pages</code>, <code>media_migration</code> and <code>webform_migrate</code> modules!'));

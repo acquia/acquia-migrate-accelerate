@@ -5,6 +5,7 @@
  * I wish we did not need this file 🙈.
  */
 
+use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use Drupal\acquia_migrate\MigrationAlterer;
 use Drupal\acquia_migrate\Recommendations;
 use Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateNodeReference;
@@ -235,12 +236,22 @@ function acquia_migrate_entity_field_access($operation, FieldDefinitionInterface
 /**
  * Implements hook_modules_installed().
  */
-function acquia_migrate_modules_installed($modules) {
+function acquia_migrate_modules_installed($modules, $is_syncing) {
   $timestamp = \Drupal::time()->getRequestTime();
   foreach ($modules as $module) {
     // @see \Drupal\acquia_migrate\Commands\AcquiaMigrateCommands::auditModules()
     $key = "module_install_timestamp:$module";
     \Drupal::keyValue('acquia_migrate')->set($key, $timestamp);
+  }
+
+  // Hide the Acquia Connector sign-up message if on Acquia Cloud.
+  // @see acquia_connector_show_free_tier_promo()
+  // @see acquia_migrate_install()
+  if (!$is_syncing && AcquiaDrupalEnvironmentDetector::isAhEnv() && in_array('acquia_connector', $modules, TRUE)) {
+    \Drupal::configFactory()
+      ->getEditable('acquia_connector.settings')
+      ->set('hide_signup_messages', 1)
+      ->save();
   }
 }
 

@@ -976,9 +976,9 @@ final class MigrationAlterer {
           $level = $is_heuristic
             ? RfcLogLevel::WARNING
             : RfcLogLevel::DEBUG;
-          $this->logger->log($level, 'The high_water_property "@column-name" for the base migration plugin "@migration-plugin-id" occurred in @count tables in the query, of which @count-column contain this column. The alias "@alias" for the table "@table" was selected. (@known-or-heuristic)', [
+          $this->logger->log($level, 'The high_water_property "@column-name" for the base migration plugin "@base-migration-plugin-id" occurred in @count tables in the query, of which @count-column contain this column. The alias "@alias" for the table "@table" was selected. (@known-or-heuristic)', [
             '@column-name' => $source_field,
-            '@migration-plugin-id' => $migration_id,
+            '@base-migration-plugin-id' => $base_migration_plugin_id,
             '@count' => count($tables),
             '@count-column' => count($candidate_table_aliases),
             '@alias' => $selected_table_alias,

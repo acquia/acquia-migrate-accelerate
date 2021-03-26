@@ -12,7 +12,6 @@ use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Url;
-use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Plugin\MigrationInterface;
 
@@ -859,25 +858,18 @@ final class Migration {
    *   all internal migration plugins to be met plus all (external) migration
    *   plugins this migration depends on (in other migrations) must have been
    *   run.
+   *
+   * @see \Drupal\migrate\Plugin\Migration::checkRequirements()
+   * @see \Drupal\acquia_migrate\MigrationClusterer::getAvailableMigrations()
    */
   private function isImportable() {
-    $is_importable = TRUE;
-    foreach ($this->migrationPlugins as $migration_plugin) {
-      try {
-        $migration_plugin->checkRequirements();
-      }
-      catch (RequirementsException $e) {
-        $dependencies_outside_this_cluster = array_diff($e->getRequirements()['requirements'], array_keys($this->migrationPlugins));
-        if (!empty($dependencies_outside_this_cluster)) {
-          $is_importable = FALSE;
-          break;
-        }
-      }
-    }
-
-    $is_importable = $is_importable && $this->allDependencyRowsProcessed();
-
-    return $is_importable;
+    // The simplest possible implementation here would be to call
+    // \Drupal\migrate\Plugin\Migration::checkRequirements(). But that would
+    // repeat source & destination requirements checks that
+    // \Drupal\acquia_migrate\MigrationClusterer::getAvailableMigrations()
+    // already performed, at this point we only need to check if the required
+    // migrationdependencies have finished running!
+    return $this->allDependencyRowsProcessed();
   }
 
   /**
@@ -938,6 +930,7 @@ final class Migration {
    */
   public static function toResourceObject(Migration $migration, RefinableCacheableDependencyInterface $cacheability) : array {
     Timer::start(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION);
+    Timer::start(__CLASS__ . __METHOD__ . $migration->id());
 
     // This may be called repeatedly within a request, but the service will not
     // change. Hence this is safe to statically cache.
@@ -1218,7 +1211,8 @@ final class Migration {
       }
     }
 
-    $duration = Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION)['time'];
+    Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION);
+    $duration = Timer::stop(__CLASS__ . __METHOD__ . $migration->id())['time'];
     if ($duration > 500) {
       \Drupal::service('logger.channel.acquia_migrate_profiling_statistics')
         ->info(
