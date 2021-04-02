@@ -5,7 +5,6 @@ namespace Drupal\acquia_migrate;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -214,6 +213,13 @@ final class MigrationAlterer {
   protected $container;
 
   /**
+   * The migration plugin interpreter.
+   *
+   * @var \Drupal\acquia_migrate\MigrationPluginInterpreter
+   */
+  protected $migrationPluginInterpreter;
+
+  /**
    * Constructs a MigrationAlterer.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -228,14 +234,17 @@ final class MigrationAlterer {
    *   The logger to use.
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
+   * @param \Drupal\acquia_migrate\MigrationPluginInterpreter $migration_plugin_interpreter
+   *   The migration plugin interpreter.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager, LoggerChannelInterface $logger, ContainerInterface $container) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $destination_plugin_manager, LoggerChannelInterface $logger, ContainerInterface $container, MigrationPluginInterpreter $migration_plugin_interpreter) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->sourcePluginManager = $source_plugin_manager;
     $this->destinationPluginManager = $destination_plugin_manager;
     $this->logger = $logger;
     $this->container = $container;
+    $this->migrationPluginInterpreter = $migration_plugin_interpreter;
   }
 
   /**
@@ -1279,50 +1288,6 @@ final class MigrationAlterer {
   }
 
   /**
-   * Gets all migrations for derived config entity bundle types.
-   *
-   * @param array[] $migrations
-   *   An associative array of migrations keyed by migration ID, the same that
-   *   is passed to hook_migration_plugins_alter() hooks.
-   *
-   * @see \Drupal\Core\Config\Entity\ConfigEntityBundleBase
-   */
-  private function getDerivedConfigEntityBundleMigrations(array $migrations) {
-    $derived_config_entity_bundle_migrations = [];
-    foreach ($migrations as $id => $definition) {
-      $destination_plugin_id = $definition['destination']['plugin'] ?? NULL;
-      if (
-        !$destination_plugin_id ||
-        strpos($destination_plugin_id, PluginBase::DERIVATIVE_SEPARATOR) === FALSE
-      ) {
-        continue;
-      }
-      if (count(explode(PluginBase::DERIVATIVE_SEPARATOR, $id)) !== 2) {
-        continue;
-      }
-      $destination_entity_type = explode(PluginBase::DERIVATIVE_SEPARATOR, $destination_plugin_id)[0] === 'entity'
-        ? explode(PluginBase::DERIVATIVE_SEPARATOR, $destination_plugin_id)[1]
-        : NULL;
-      if (!$destination_entity_type) {
-        continue;
-      }
-      // Only consider migrations that have a config entity type as their
-      // destination.
-      $destination_entity_type_definition = $this->entityTypeManager->getDefinition($destination_entity_type, FALSE);
-      if (!($destination_entity_type_definition instanceof ConfigEntityTypeInterface)) {
-        continue;
-      }
-
-      $bundle_of = $destination_entity_type_definition->getBundleOf();
-      if (!empty($bundle_of)) {
-        $derived_config_entity_bundle_migrations[$id] = $definition;
-      }
-    }
-
-    return $derived_config_entity_bundle_migrations;
-  }
-
-  /**
    * Maps entity bundle migration dependencies to the more specific derivative.
    *
    * Examples:
@@ -1338,7 +1303,7 @@ final class MigrationAlterer {
   public function refineEntityBundleMigrationDependencies(array &$migrations) {
     $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
 
-    $d7_derived_config_entity_bundle_migration_ids = array_keys($this->getDerivedConfigEntityBundleMigrations($d7_migrations));
+    $d7_derived_config_entity_bundle_migration_ids = array_keys($this->migrationPluginInterpreter->getDerivedConfigEntityBundleMigrationPluginDefinitions($d7_migrations));
     // Collect the corresponding base migration plugin IDs, because they are the
     // migration dependencies we want to refine.
     $d7_derived_config_entity_bundle_migration_base_ids = array_reduce($d7_derived_config_entity_bundle_migration_ids, function (array $carry, string $plugin_id) {

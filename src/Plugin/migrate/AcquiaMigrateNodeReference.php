@@ -2,15 +2,25 @@
 
 namespace Drupal\acquia_migrate\Plugin\migrate;
 
-use Drupal\field\Plugin\migrate\field\d7\NodeReference;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate_drupal\Plugin\migrate\field\d7\NodeReference;
+
+// @codingStandardsIgnoreStart
+if (class_exists(NodeReference::class)) {
+  // @todo Remove this complexity when 9.2.0 is released and we depend on it.
+  abstract class AcquiaMigrateNodeReferenceBase extends NodeReference {}
+}
+else {
+  abstract class AcquiaMigrateNodeReferenceBase extends \Drupal\field\Plugin\migrate\field\d7\NodeReference {}
+}
+// @codingStandardsIgnoreEnd
 
 /**
  * Plugin replacement for node_reference migrate field plugin.
  *
  * @see acquia_migrate_migrate_field_info_alter()
  */
-class AcquiaMigrateNodeReference extends NodeReference {
+class AcquiaMigrateNodeReference extends AcquiaMigrateNodeReferenceBase {
 
   /**
    * {@inheritdoc}

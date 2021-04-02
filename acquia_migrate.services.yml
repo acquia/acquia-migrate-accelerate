@@ -110,6 +110,7 @@ services:
       - '@acquia_migrate.clusterer'
       - '@database'
       - '@cache.migrate'
+      - '@acquia_migrate.migration_plugin_interpreter'
 
   paramconverter.acquia_migrate.migration:
     class: Drupal\acquia_migrate\ParamConverter\MigrationConverter
@@ -184,7 +185,11 @@ services:
     tags:
       - { name: event_subscriber }
 
-  # Migration Alterer
+  # Interpreting and altering migration plugins.
+  acquia_migrate.migration_plugin_interpreter:
+    class: Drupal\acquia_migrate\MigrationPluginInterpreter
+    arguments:
+      - '@entity_type.manager'
   acquia_migrate.migration_alterer:
     class: Drupal\acquia_migrate\MigrationAlterer
     arguments:
@@ -194,6 +199,7 @@ services:
       - '@plugin.manager.migrate.destination'
       - '@logger.channel.acquia_migrate'
       - '@service_container'
+      - '@acquia_migrate.migration_plugin_interpreter'
 
   # Service decorator
   acquia_migrate.cache_tags.invalidator:

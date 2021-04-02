@@ -149,10 +149,13 @@ final class MigrationBatchManager {
 
     // Determine which migrations would effectively be completely imported
     // because of this initial import.
-    $completely_imported = [];
+    $completely_imported_first_plugin = [];
+    $completely_imported_last_plugin = [];
     foreach ($migrations as $migration) {
-      if (empty(array_diff($migration->getMigrationPluginIds(), $ordered_initial_migration_plugin_ids))) {
-        $completely_imported[] = $migration->id();
+      $all_plugin_ids_for_migration = $migration->getMigrationPluginIds();
+      if (empty(array_diff($all_plugin_ids_for_migration, $ordered_initial_migration_plugin_ids))) {
+        $completely_imported_first_plugin[reset($all_plugin_ids_for_migration)] = $migration->id();
+        $completely_imported_last_plugin[end($all_plugin_ids_for_migration)] = $migration->id();
       }
     }
 
@@ -162,37 +165,29 @@ final class MigrationBatchManager {
       [$virtual_initial_migration->id()],
     ];
     $operations[] = [[__CLASS__, 'overrideErrorHandler'], []];
-    // Import all completely imported migrations first. Ensure their import
-    // duration is recorded. (They are already ordered in migration order, which
-    // already ensures that if they depend on each other, that they'll be listed
-    // in the correct order.)
-    foreach ($completely_imported as $migration_id) {
-      $migration_plugin_ids_for_this_migration = $migrations[$migration_id]->getMigrationPluginIds();
-      $operations[] = [[__CLASS__, 'recordImportStart'], [$migration_id]];
+    // Import in the specified order, but ensure the import duration is recorded
+    // of all migrations that are completely imported.
+    foreach ($ordered_initial_migration_plugin_ids as $plugin_id) {
+      // Track start of a migration that will be completely imported.
+      if (isset($completely_imported_first_plugin[$plugin_id])) {
+        $migration_id = $completely_imported_first_plugin[$plugin_id];
+        $operations[] = [[__CLASS__, 'recordImportStart'], [$migration_id]];
+      }
+      // Import a single migration plugin of a particular migration.
       $operations[] = [
         static::$actionCallable[static::ACTION_IMPORT],
         [
-          $migration_plugin_ids_for_this_migration,
+          [$plugin_id],
           $config,
         ],
       ];
-
-      $operations[] = [[__CLASS__, 'recordImportDuration'], [$migration_id]];
-      $operations[] = [[__CLASS__, 'calculateCompleteness'], [$migration_id]];
-
-      // Update the list of remaining initial migration plugin IDs.
-      $ordered_initial_migration_plugin_ids = array_diff($ordered_initial_migration_plugin_ids, $migration_plugin_ids_for_this_migration);
+      // Track duration of a migration that has been completely imported.
+      if (isset($completely_imported_last_plugin[$plugin_id])) {
+        $migration_id = $completely_imported_last_plugin[$plugin_id];
+        $operations[] = [[__CLASS__, 'recordImportDuration'], [$migration_id]];
+        $operations[] = [[__CLASS__, 'calculateCompleteness'], [$migration_id]];
+      }
     }
-    // Import remaining initial migration plugins. We cannot record their import
-    // duration, since they only cover the configuration of these migrations
-    // (otherwise they'd be completely imported too).
-    $operations[] = [
-      static::$actionCallable[static::ACTION_IMPORT],
-      [
-        $ordered_initial_migration_plugin_ids,
-        $config,
-      ],
-    ];
     $operations[] = [[__CLASS__, 'recordInitialImportSuccessfulness'], []];
     $operations[] = [[__CLASS__, 'restoreErrorHandler'], []];
 

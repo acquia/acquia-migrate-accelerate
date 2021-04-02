@@ -3,6 +3,7 @@
 namespace Drupal\acquia_migrate;
 
 use Drupal\acquia_migrate\Clusterer\Heuristics\SharedEntityData;
+use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
 use Drupal\acquia_migrate\Clusterer\MigrationClusterer;
 use Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber;
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
@@ -22,6 +23,9 @@ use Drupal\Core\Database\Database;
  * "migrations" as Drupal defines them are individual migration plugin
  * instances. Here they are annotated with cluster metadata so we can transform
  * them to "migrations" as this module defines them.
+ *
+ * The only place in MigrationRepository where we deal with migration plugins
+ * instead of migrations, is ::computeVirtualInitialMigration().
  *
  * @internal
  */
@@ -49,6 +53,15 @@ class MigrationRepository {
   protected $cache;
 
   /**
+   * The migration plugin interpreter.
+   *
+   * @var \Drupal\acquia_migrate\MigrationPluginInterpreter
+   *
+   * @see ::computeVirtualInitialMigration()
+   */
+  protected $migrationPluginInterpreter;
+
+  /**
    * Whether any migration pre-selections were ever made.
    *
    * @var bool
@@ -67,11 +80,14 @@ class MigrationRepository {
    *   A Database connection to use for reading migration messages.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The migrate cache bin.
+   * @param \Drupal\acquia_migrate\MigrationPluginInterpreter $migration_plugin_interpreter
+   *   The migration plugin interpreter.
    */
-  public function __construct(MigrationClusterer $clusterer, Connection $connection, CacheBackendInterface $cache) {
+  public function __construct(MigrationClusterer $clusterer, Connection $connection, CacheBackendInterface $cache, MigrationPluginInterpreter $migration_plugin_interpreter) {
     $this->clusterer = $clusterer;
     $this->connection = $connection;
     $this->cache = $cache;
+    $this->migrationPluginInterpreter = $migration_plugin_interpreter;
   }
 
   /**
@@ -368,7 +384,27 @@ class MigrationRepository {
     // the correct dependency order, because MigrationRepository does not
     // reorder the migration plugins it receives from the clusterer.
     $initial_migrations = array_intersect_key($all_instances, array_combine($inital_migration_plugin_ids, $inital_migration_plugin_ids));
-    $ordered_initial_migration_plugin_ids = array_keys($initial_migrations);
+    // … with the sole exception of migration plugins migrating entity bundles
+    // into configuration entities: those need to be migrated before anything
+    // else (at least if they do not have any dependencies). AMA assigned them
+    // to clusters, and for the initial migration we essentially need to
+    // "uncluster" them.
+    $all_definitions = array_map(function ($migration_plugin_instance) {
+      return $migration_plugin_instance->getPluginDefinition();
+    }, $all_instances);
+    $bundle_config_entity_migration_plugins = array_filter(
+      $this->migrationPluginInterpreter->getDerivedConfigEntityBundleMigrationPluginDefinitions($all_definitions),
+      function (array $migration_plugin_definition) : bool {
+        return empty(NestedArray::mergeDeepArray($migration_plugin_definition['migration_dependencies'] ?? []));
+      }
+    );
+    // Config that gets imported must get imported in the default site language.
+    // @todo Remove after https://www.drupal.org/project/drupal/issues/3196873
+    $language_migration_plugins = [];
+    if (reset($migrations)->label() === SharedLanguageConfig::cluster()) {
+      $language_migration_plugins = reset($migrations)->getMigrationPluginInstances();
+    }
+    $ordered_initial_migration_plugin_ids = array_keys($language_migration_plugins + $bundle_config_entity_migration_plugins + $initial_migrations);
 
     $virtual_migration_label = '_INITIAL_';
     $flags = $this->getMigrationFlags();

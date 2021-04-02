@@ -150,6 +150,11 @@ final class AcquiaMigrateCommands extends DrushCommands {
 
       // This assumes the recommended version of the vetted module is used.
       $is_vetted = in_array($module->getName(), $vetted);
+      if (!$is_vetted) {
+        // Perhaps this is a dependency of a vetted dependent. For that
+        // dependent to have been vetted, this must have been vetted too.
+        $is_vetted = !empty(array_intersect(array_keys($module->required_by), $vetted));
+      }
       $has_migrations = $this->recommendations::moduleHasMigrations($module);
       $alters_migrations = $this->recommendations::moduleAltersMigrations($module);
       $is_stable = $this->recommendations::moduleIsStable($module);
@@ -207,7 +212,6 @@ final class AcquiaMigrateCommands extends DrushCommands {
    * @field-labels
    *   migration: Migration
    *   tab: UI tab
-   *   migration_plugin_id: Migration Plugin ID
    *   processed_count: Proc #
    *   imported_count: Imp #
    *   total_count: Tot #
@@ -325,6 +329,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
           'imported_pct' => $processed_count > 0
             ? sprintf("%3d%%", static::getPercentage($imported_count, $total_count))
             : NULL,
+          'activity' => $migration->getActivity() === Migration::ACTIVITY_IDLE
+            ? NULL
+            : strtolower($migration_plugin->getStatusLabel()),
         ];
         // @codingStandardsIgnoreEnd
       }

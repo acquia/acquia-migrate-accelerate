@@ -10,6 +10,7 @@ use DateTime;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -233,6 +234,17 @@ final class MigrationFingerprinter {
         }, $data_migration_plugin_instances
       ), 'array_merge', [])
     );
+
+    // It might happen that none of the underlying migrations have a SQL source
+    // plugin.
+    if (empty($tables)) {
+      $this->logger->log(RfcLogLevel::NOTICE, "The migration '@migration-label' has no tables to fingerprint. Underlying migration plugins classified as data migration: @migration-plugin-ids.", [
+        '@migration-label' => $migration->label(),
+        '@migration-plugin-ids' => implode(', ', array_keys($data_migration_plugin_instances)),
+      ]);
+      return static::FINGERPRINT_NOT_SUPPORTED;
+    }
+
     return $this->getTablesFingerprint($tables);
   }
 
@@ -286,11 +298,20 @@ final class MigrationFingerprinter {
       // is able to prefix them, if necessary.
       return '{' . $database->escapeTable($table) . '}';
     }, $tables);
+
     $query_string = sprintf('CHECKSUM TABLE %s', implode(', ', $escaped_tables));
-    if ($statement = $database->query($query_string, [], ['return' => Database::RETURN_STATEMENT])) {
+    try {
+      $statement = $database->query($query_string, [], ['return' => Database::RETURN_STATEMENT]);
+    }
+    catch (\Throwable $e) {
+      $statement = NULL;
+    }
+
+    if ($statement instanceof StatementInterface) {
       $result = $statement->fetchAll(\PDO::FETCH_COLUMN, 1);
       return hash('sha256', implode('.', $result));
     }
+
     return static::FINGERPRINT_FAILED;
   }
 
