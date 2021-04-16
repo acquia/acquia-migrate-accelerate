@@ -47,7 +47,8 @@ abstract class ContentEntityIndependentButRelated implements DependentHeuristicW
       return FALSE;
     }
 
-    $candidates = static::getCandidateTargetMigrationPluginIds($entity_type_param, $bundle_param);
+    $candidate_bundle_param = !empty($bundle_param) ? (string) $bundle_param : NULL;
+    $candidates = static::getCandidateTargetMigrationPluginIds($entity_type_param, $candidate_bundle_param);
     $matches = array_intersect($candidates, $dependent_heuristic_matches[ContentEntityBundles::id()]);
     return !empty($matches);
   }
@@ -67,7 +68,8 @@ abstract class ContentEntityIndependentButRelated implements DependentHeuristicW
       $entity_type_param = self::getDestinationEntityTypeId($migration_plugin);
     }
 
-    $candidates = static::getCandidateTargetMigrationPluginIds($entity_type_param, $bundle_param);
+    $candidate_bundle_param = !empty($bundle_param) ? (string) $bundle_param : NULL;
+    $candidates = static::getCandidateTargetMigrationPluginIds($entity_type_param, $candidate_bundle_param);
     $matches = array_intersect($candidates, $dependent_heuristic_matches[ContentEntityBundles::id()]);
 
     // Lift into the first matching migration plugin's cluster.

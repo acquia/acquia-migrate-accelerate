@@ -149,6 +149,15 @@ final class Migration {
   private $supportsRollback;
 
   /**
+   * Whether all rows have been processed.
+   *
+   * @var bool
+   *
+   * @see ::allRowsProcessed()
+   */
+  private $allRowsProcessed;
+
+  /**
    * Constructs a new Migration.
    *
    * @param string $id
@@ -237,6 +246,9 @@ final class Migration {
       $this->_dependencies[$key] = array_combine($dependency_migration_plugin_ids, $dependency_migration_plugin_ids);
     }
     unset($vars['dependencies']);
+
+    // @todo In the future, consider caching this and manually invalidating this.
+    unset($vars['allRowsProcessed']);
 
     return array_keys($vars);
   }
@@ -754,15 +766,18 @@ final class Migration {
    *   Whether all migration plugins in this migration have been processed.
    */
   public function allRowsProcessed() {
-    $all_rows_processed = TRUE;
-    foreach ($this->migrationPlugins as $migration_plugin) {
-      $all_rows_processed = $all_rows_processed && $migration_plugin->allRowsProcessed();
-      if (!$all_rows_processed) {
-        break;
+    if (!isset($this->allRowsProcessed)) {
+      $all_rows_processed = TRUE;
+      foreach ($this->migrationPlugins as $migration_plugin) {
+        $all_rows_processed = $all_rows_processed && $migration_plugin->allRowsProcessed();
+        if (!$all_rows_processed) {
+          break;
+        }
       }
+      $this->allRowsProcessed = $all_rows_processed;
     }
 
-    return $all_rows_processed;
+    return $this->allRowsProcessed;
   }
 
   /**

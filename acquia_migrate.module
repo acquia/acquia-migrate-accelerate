@@ -121,6 +121,13 @@ function acquia_migrate_toolbar() {
  */
 function acquia_migrate_migrate_id_map_info_alter(array &$definitions) {
   $definitions['sql']['class'] = SqlWithCentralizedMessageStorage::class;
+  // @see https://drupal.org/project/smart_sql_idmap
+  // @todo Remove when Media Migration does not depend on smart_sql_idmap
+  //   anymore (on a Drupal core version that includes
+  //   https://drupal.org/i/2845340).
+  if (!empty($definitions['smart_sql']['class'])) {
+    $definitions['smart_sql']['class'] = SqlWithCentralizedMessageStorage::class;
+  }
 }
 
 /**
@@ -332,32 +339,60 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
     // @see _acquia_migrate_entity_form_submit()
     $form['actions']['submit']['#value'] = t('Validate');
     $form['actions']['submit']['#submit'] = ['_acquia_migrate_entity_form_submit'];
+    $form['actions']['submit']['#access'] = TRUE;
 
     // If the source site base URL is known, generate an "edit on source site"
     // button. Also generate a message informing the user of this.
     $base_url = \Drupal::keyValue('acquia_migrate')->get(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL);
-    if ($base_url !== NULL) {
-      $path = \Drupal::request()->getPathInfo();
-      $url = Url::fromUri($base_url . $path);
-      $form['actions']['edit_on_source_site'] = [
-        '#type' => 'link',
-        '#title' => t('Edit on source site'),
-        '#access' => TRUE,
-        '#attributes' => [
-          'class' => ['button', 'button--danger'],
-          'target' => '_blank',
-        ],
-        '#url' => $url,
-        '#weight' => 100,
-      ];
+    if (!$affected_entity->isNew()) {
+      if ($base_url !== NULL) {
+        $path = \Drupal::request()->getPathInfo();
+        $url = Url::fromUri($base_url . $path);
+        $form['actions']['edit_on_source_site'] = [
+          '#type' => 'link',
+          '#title' => t('Edit on source site'),
+          '#access' => TRUE,
+          '#attributes' => [
+            'class' => ['button', 'button--danger'],
+            'target' => '_blank',
+          ],
+          '#url' => $url,
+          '#weight' => 100,
+        ];
 
-      \Drupal::messenger()->addWarning(t('Changes can be validated but will not be saved while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Change this @entity-type-label on the source site instead.</a>', [
-        '@entity-type-label' => $affected_entity->getEntityType()->getSingularLabel(),
-        ':url' => $url->toString(TRUE)->getGeneratedUrl(),
-      ]));
+        \Drupal::messenger()->addWarning(t('Changes can be validated but will not be saved while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Change this @entity-type-label on the source site instead.</a>', [
+          '@entity-type-label' => $affected_entity->getEntityType()
+            ->getSingularLabel(),
+          ':url' => $url->toString(TRUE)->getGeneratedUrl(),
+        ]));
+      }
+      else {
+        \Drupal::messenger()->addWarning(t('Changes you make will not be saved. Please make the changes on the source site directly.'));
+      }
     }
     else {
-      \Drupal::messenger()->addWarning(t('Changes you make will not be saved. Please make the changes on the source site directly.'));
+      // Only show a message on routes where the affected entity can be created.
+      // This avoids showing the message for e.g. the "add comment" form that
+      // may be rendered adjacent to a viewed entity.
+      // @see \Drupal\Core\Entity\Enhancer\EntityRouteEnhancer
+      $entity_form = \Drupal::routeMatch()->getRouteObject()->getDefault('_entity_form');
+      if ($entity_form !== NULL && ([$entity_type_id, ] = explode('.', $entity_form)) && $entity_type_id == $affected_entity->getEntityTypeId()) {
+        if ($base_url !== NULL) {
+          $path = \Drupal::request()->getPathInfo();
+          $url = Url::fromUri($base_url . $path);
+          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Create them on the source site instead.</a>', [
+            '@entity-type-labels' => $affected_entity->getEntityType()
+              ->getPluralLabel(),
+            ':url' => $url->toString(TRUE)->getGeneratedUrl(),
+          ]));
+        }
+        else {
+          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate: Accelerate</em> is installed. Create them on the source site instead.', [
+            '@entity-type-labels' => $affected_entity->getEntityType()
+              ->getPluralLabel(),
+          ]));
+        }
+      }
     }
   }
 }
@@ -373,7 +408,16 @@ function _acquia_migrate_entity_form_submit(array $form, FormStateInterface $for
   assert($entity instanceof \Drupal\Core\Entity\EntityInterface);
   $form_state->setRebuild(TRUE);
 
-  \Drupal::messenger()->addStatus(t('Validated @entity-type-label: no validation errors. Your changes were not saved.', [
-    '@entity-type-label' => $entity->getEntityType()->getSingularLabel(),
-  ]));
+  if ($entity->isNew()) {
+    \Drupal::messenger()
+      ->addStatus(t('Validated new @entity-type-label: no validation errors. It was not saved.', [
+        '@entity-type-label' => $entity->getEntityType()->getSingularLabel(),
+      ]));
+  }
+  else {
+    \Drupal::messenger()
+      ->addStatus(t('Validated @entity-type-label: no validation errors. Your changes were not saved.', [
+        '@entity-type-label' => $entity->getEntityType()->getSingularLabel(),
+      ]));
+  }
 }
