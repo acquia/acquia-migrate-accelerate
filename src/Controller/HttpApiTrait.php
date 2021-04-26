@@ -40,9 +40,16 @@ trait HttpApiTrait {
    *   Thrown if the request's content does not use the JSON:API media type.
    */
   protected function validateRequestHeaders(Request $request, array $valid_extensions = NULL) {
-    $valid_extensions = NestedArray::mergeDeep([
+    $default_valid_extensions = [
       'required' => [],
-    ], ['required' => $valid_extensions['required'] ?: []]);
+    ];
+    if (is_array($valid_extensions)) {
+      $valid_extensions = NestedArray::mergeDeep($default_valid_extensions, $valid_extensions);
+    }
+    else {
+      $valid_extensions = $default_valid_extensions;
+    }
+
     $supported_extensions = $valid_extensions['required'];
     $accept_header_value = $request->headers->get('Accept');
     if ($accept_header_value) {
