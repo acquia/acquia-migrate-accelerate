@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class GetStarted extends ControllerBase {
 
   /**
-   * The Acquia Migrate: Accelerate migration repository.
+   * The Acquia Migrate Accelerate migration repository.
    *
    * @var \Drupal\acquia_migrate\MigrationRepository
    */
@@ -46,7 +46,7 @@ final class GetStarted extends ControllerBase {
   }
 
   /**
-   * Acquia Migrate: Accelerate's dynamic start page: dynamically redirects.
+   * Acquia Migrate Accelerate's dynamic start page: dynamically redirects.
    *
    * @return \Drupal\Core\Routing\LocalRedirectResponse
    *   A redirect to the appropriate step, or to the list of steps if none could
@@ -176,7 +176,9 @@ final class GetStarted extends ControllerBase {
           ],
         ],
         'description' => [
-          '#markup' => $this->t("Follow the link above for instructions on how to configure your source site's database in this site's <code>settings.php</code> file."),
+          '#markup' => AcquiaDrupalEnvironmentDetector::isAhEnv()
+          ? $this->t("It looks like your Drupal 7 application uses a table prefix. Acquia Migrate Accelerate cannot automatically copy this from your Drupal 7 site's <code>settings.php</code>. You'll need to copy that manually, commit and push the result. See <a href='https://support.acquia.com/hc/en-us/articles/1500007166222-Adding-a-table-prefix-for-the-Acquia-Migrate-Accelerator-Environment-\'>Acquia Support Knowledgebase article</a>. If you need help, contact Acquia Support.")
+          : $this->t("Follow the link above for instructions on how to configure your source site's database in this site's <code>settings.php</code> file."),
         ],
       ],
     ];
@@ -237,7 +239,7 @@ final class GetStarted extends ControllerBase {
           ],
         ],
         'description' => [
-          '#markup' => '<em>Acquia Migrate: Accelerate</em> will automatically import all of your sources site\'s content types and fields. On this page, you\'ll be able to choose which parts of your source site that you want to migrate into your new Drupal 9 site. Don\'t worry, you can still choose to bring over anything later that you skip now.',
+          '#markup' => '<em>Acquia Migrate Accelerate</em> will automatically import all of your sources site\'s content types and fields. On this page, you\'ll be able to choose which parts of your source site that you want to migrate into your new Drupal 9 site. Don\'t worry, you can still choose to bring over anything later that you skip now.',
         ],
       ],
     ];
@@ -275,7 +277,7 @@ final class GetStarted extends ControllerBase {
     ];
     $build = [
       '#template' => 'page',
-      '#title' => $this->t('Welcome to <em>Acquia Migrate: Accelerate</em>'),
+      '#title' => $this->t('Welcome to <em>Acquia Migrate Accelerate</em>'),
       'content' => [
         '#type' => 'inline_template',
         '#template' => '{{checklist}}',

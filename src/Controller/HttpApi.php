@@ -1333,7 +1333,7 @@ final class HttpApi {
           [
             'code' => (string) 400,
             'status' => Response::$statusTexts[400],
-            'detail' => 'Another Acquia Migrate: Accelerate operation is already running. Please coordinate with your colleagues because to guarantee data consistency concurrent migration operations are not supported.',
+            'detail' => 'Another Acquia Migrate Accelerate operation is already running. Please coordinate with your colleagues because to guarantee data consistency concurrent migration operations are not supported.',
           ],
         ],
       ], 400, static::$defaultResponseHeaders);

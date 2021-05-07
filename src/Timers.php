@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\acquia_migrate;
 
 /**
- * The timers that Acquia Migrate: Accelerate uses to instrument.
+ * The timers that Acquia Migrate Accelerate uses to instrument.
  *
  * Note that the timer names are used both for the Server-Timing metric name as
  * well as the PHP runtime timer.

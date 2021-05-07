@@ -23,7 +23,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Clusters Drupal's "migration (plugin)s" into this module's "migrations".
  *
- * This is the very heart of Acquia Migrate: Accelerate, because it "clusters"
+ * This is the very heart of Acquia Migrate Accelerate, because it "clusters"
  * the numerous migration plugins that exist into "Drupal Site Builder" concepts
  * that make it significantly easier for non-experts to perform migrations from
  * Drupal 7 to Drupal 9.
@@ -54,7 +54,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  *
  * Each \Drupal\acquia_migrate\Migration has a label and a list of migration
  * plugins, i.e. \Drupal\migrate\Plugin\Migration instances. In other words:
- * there is a one-to-many relationship between "Acquia Migrate: Accelerate
+ * there is a one-to-many relationship between "Acquia Migrate Accelerate
  * migrations" and "Drupal core migrations". All of the "Drupal core migrations"
  * combined result in a single site builder concept getting migrated.
  *

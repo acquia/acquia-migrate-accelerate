@@ -59,6 +59,9 @@ final class MigrationPurger {
     // migrate-import Drush command.
     if (TRUE) {
       $id_map = $migration->getIdMap();
+      // Force 'needs update' state for every imported record. This is needed
+      // for finding those source ID values which were deleted from the source
+      // since the last import.
       $id_map->prepareUpdate();
       // Clone so that any generators aren't initialized prematurely.
       $source = clone $migration->getSourcePlugin();
@@ -72,6 +75,9 @@ final class MigrationPurger {
       $destination = $migration->getDestinationPlugin();
       while ($id_map->valid()) {
         $map_source_id = $id_map->currentSource();
+        // If the destination found in ID map does not have a cooresponding
+        // entry in the source (so it is missing), then it means it was deleted
+        // from the source.
         if (!in_array($map_source_id, $source_id_values, TRUE)) {
           $destination_ids = $id_map->currentDestination();
           $this->dispatchRowDeleteEvent(MigrateEvents::PRE_ROW_DELETE, $migration, $destination_ids);

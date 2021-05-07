@@ -48,7 +48,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
   protected $moduleExtensionList;
 
   /**
-   * The Acquia Migrate: Accelerate recommendations.
+   * The Acquia Migrate Accelerate recommendations.
    *
    * @var \Drupal\acquia_migrate\Recommendations
    */
@@ -71,7 +71,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The module extension list.
    * @param \Drupal\acquia_migrate\Recommendations $recommendations
-   *   The Acquia Migrate: Accelerate recommendations.
+   *   The Acquia Migrate Accelerate recommendations.
    * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $source_plugin_manager
    *   The migration source plugin manager.
    */

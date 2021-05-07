@@ -1,4 +1,4 @@
-# Acquia Migrate: Accelerate
+# Acquia Migrate Accelerate
 
 ## What's this then?
 
@@ -55,4 +55,4 @@ Please file a Zendesk ticket against the 'Beta Programs' ticket type.
 
 ## License
 
-Use of _Acquia Migrate: Accelerate_ is subject to the terms in the included `LICENSE.txt` and the included beta agreement.
+Use of _Acquia Migrate Accelerate_ is subject to the terms in the included `LICENSE.txt` and the included beta agreement.

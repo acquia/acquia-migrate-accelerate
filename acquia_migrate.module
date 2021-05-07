@@ -289,7 +289,7 @@ function acquia_migrate_module_implements_alter(&$implementations, $hook) {
       $skipped_crons_implementations = array_diff(array_keys($implementations), $allowed_crons);
       if (!empty($skipped_crons_implementations)) {
         $implementations = array_intersect_key($implementations, array_flip($allowed_crons));
-        \Drupal::logger('acquia_migrate')->log(RfcLogLevel::DEBUG, 'hook_cron() implementations were skipped because Acquia Migrate: Accelerate is enabled. The affected modules are: @module-list.', [
+        \Drupal::logger('acquia_migrate')->log(RfcLogLevel::DEBUG, 'hook_cron() implementations were skipped because Acquia Migrate Accelerate is enabled. The affected modules are: @module-list.', [
           '@module-list' => implode(',', $skipped_crons_implementations),
         ]);
       }
@@ -360,7 +360,7 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
           '#weight' => 100,
         ];
 
-        \Drupal::messenger()->addWarning(t('Changes can be validated but will not be saved while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Change this @entity-type-label on the source site instead.</a>', [
+        \Drupal::messenger()->addWarning(t('Changes can be validated but will not be saved while <em>Acquia Migrate Accelerate</em> is installed. <a href=":url" target="_blank">Change this @entity-type-label on the source site instead.</a>', [
           '@entity-type-label' => $affected_entity->getEntityType()
             ->getSingularLabel(),
           ':url' => $url->toString(TRUE)->getGeneratedUrl(),
@@ -380,14 +380,14 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
         if ($base_url !== NULL) {
           $path = \Drupal::request()->getPathInfo();
           $url = Url::fromUri($base_url . $path);
-          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate: Accelerate</em> is installed. <a href=":url" target="_blank">Create them on the source site instead.</a>', [
+          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate Accelerate</em> is installed. <a href=":url" target="_blank">Create them on the source site instead.</a>', [
             '@entity-type-labels' => $affected_entity->getEntityType()
               ->getPluralLabel(),
             ':url' => $url->toString(TRUE)->getGeneratedUrl(),
           ]));
         }
         else {
-          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate: Accelerate</em> is installed. Create them on the source site instead.', [
+          \Drupal::messenger()->addWarning(t('Creating new @entity-type-labels is not allowed while <em>Acquia Migrate Accelerate</em> is installed. Create them on the source site instead.', [
             '@entity-type-labels' => $affected_entity->getEntityType()
               ->getPluralLabel(),
           ]));

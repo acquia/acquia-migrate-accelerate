@@ -30,6 +30,19 @@ final class Migration {
   const ID_PATTERN = '/^[a-f0-9]{32}-[^\/]{1,192}$/';
 
   /**
+   * The minimum import ratio that all dependencies are required to reach.
+   *
+   * Note: we consider intentionally skipped rows also as imported. Put
+   * differently: what matters is that a max ratio has errors.
+   *
+   * @see ::isImportable()
+   * @see ::allDependencyRowsProcessed()
+   *
+   * @var int
+   */
+  const MINIMUM_IMPORT_RATIO = 0.70;
+
+  /**
    * Nothing is happening for this migration.
    *
    * @var string
@@ -72,9 +85,9 @@ final class Migration {
   protected $label;
 
   /**
-   * IDs of migrations that must be executed before this migration.
+   * Migration plugins instances that cause dependencies, keyed by migration ID.
    *
-   * @var string[]
+   * @var array
    */
   protected $dependencies;
 
@@ -164,7 +177,7 @@ final class Migration {
    *   The migration ID.
    * @param string $label
    *   The migration label.
-   * @param string[] $dependencies
+   * @param array $dependencies
    *   The IDs of the migrations this migration depends on. Migration IDs as
    *   keys, with an array of migration plugin instances that cause this
    *   dependency as the value for each key.
@@ -795,7 +808,22 @@ final class Migration {
     $all_dependency_rows_processed = TRUE;
     foreach ($this->dependencies as $migration_plugin_dependencies) {
       foreach ($migration_plugin_dependencies as $migration_plugin) {
-        $all_dependency_rows_processed = $all_dependency_rows_processed && $migration_plugin->allRowsProcessed();
+        /** @var \Drupal\migrate\Plugin\Migration $migration_plugin */
+        // This is a partial reimplementation of
+        // \Drupal\migrate\Plugin\Migration::allRowsProcessed() to avoid
+        // retrieving the source count twice. We have an extra requirement that
+        // not only all rows have been processed, but that a minimum ratio has
+        // been imported (or explicitly skipped).
+        $id_map = $migration_plugin->getIdMap();
+        $source_count = $migration_plugin->getSourcePlugin()->count();
+        $processed_count = $id_map->processedCount();
+        // TRICKY: "imported or skipped" = "total" - "error".
+        // @see \Drupal\migrate\Plugin\MigrateIdMapInterface::STATUS_*
+        $imported_or_skipped_count = $source_count - $id_map->errorCount();
+        $all_dependency_rows_processed = $all_dependency_rows_processed && (
+          $source_count <= 0
+          || ($source_count <= $processed_count && $imported_or_skipped_count / $source_count >= self::MINIMUM_IMPORT_RATIO)
+        );
         if (!$all_dependency_rows_processed) {
           break;
         }
@@ -883,7 +911,7 @@ final class Migration {
     // repeat source & destination requirements checks that
     // \Drupal\acquia_migrate\MigrationClusterer::getAvailableMigrations()
     // already performed, at this point we only need to check if the required
-    // migrationdependencies have finished running!
+    // migration dependencies have finished running!
     return $this->allDependencyRowsProcessed();
   }
 

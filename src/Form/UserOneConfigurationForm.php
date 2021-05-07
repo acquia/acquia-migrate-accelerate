@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\AccountForm;
 
 /**
- * Form controller for configuring user 1 within Acquia Migrate: Accelerate.
+ * Form controller for configuring user 1 within Acquia Migrate Accelerate.
  *
  * Allows configuring user name, password and e-mail.
  *
@@ -170,7 +170,7 @@ final class UserOneConfigurationForm extends AccountForm {
     $form['source_site_info']['base_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Base URL'),
-      '#description' => $this->t('Knowing the base URL of the source site will allow Acquia Migrate: Accelerate to point back to the domain when relevant, for example when it finds data consistency issues.'),
+      '#description' => $this->t('Knowing the base URL of the source site will allow Acquia Migrate Accelerate to point back to the domain when relevant, for example when it finds data consistency issues.'),
       '#required' => TRUE,
       '#placeholder' => 'https://example.com',
       '#pattern' => 'https?://.*\..*',

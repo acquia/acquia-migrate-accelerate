@@ -19,6 +19,6 @@ class UserOnePetrifiedConstraint extends Constraint {
    *
    * @var string
    */
-  public $petrifiedMessage = 'User 1 name & e-mail cannot be changed while using Acquia Migrate: Accelerate.';
+  public $petrifiedMessage = 'User 1 name & e-mail cannot be changed while using Acquia Migrate Accelerate.';
 
 }

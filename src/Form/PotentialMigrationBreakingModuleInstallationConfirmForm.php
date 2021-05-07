@@ -81,7 +81,7 @@ final class PotentialMigrationBreakingModuleInstallationConfirmForm extends Modu
    * {@inheritdoc}
    */
   protected function buildMessageList() {
-    $this->messenger()->addWarning($this->t('Modules with unvetted migration paths may break <em>Acquia Migrate: Accelerate</em>. Use at your own risk.'));
+    $this->messenger()->addWarning($this->t('Modules with unvetted migration paths may break <em>Acquia Migrate Accelerate</em>. Use at your own risk.'));
 
     $items = parent::buildMessageList();
 
@@ -95,7 +95,7 @@ final class PotentialMigrationBreakingModuleInstallationConfirmForm extends Modu
     if (!empty($vetted_modules_to_be_installed)) {
       $human_module_names = array_intersect_key($this->modules['install'], $vetted_modules_to_be_installed);
       $args = ['@modules' => Markup::create(implode('</li><li>', $human_module_names))];
-      $items[] = $this->t('✅ The following modules <strong>have been vetted</strong> in combination with <em>Acquia Migrate: Accelerate</em>: <ul><li>@modules</li></ul>', $args);
+      $items[] = $this->t('✅ The following modules <strong>have been vetted</strong> in combination with <em>Acquia Migrate Accelerate</em>: <ul><li>@modules</li></ul>', $args);
     }
 
     // Analyze the risk of each of the unvetted modules.
@@ -128,19 +128,19 @@ final class PotentialMigrationBreakingModuleInstallationConfirmForm extends Modu
       $args = ['@modules' => Markup::create(implode('</li><li>', $human_module_names))];
       switch ($risk) {
         case 'high':
-          $items[] = $this->t('⚠️⚠️⚠️ The following modules have not yet been vetted and have a <strong>high risk</strong> to break <em>Acquia Migrate: Accelerate</em> because they alter migrations: <ul><li>@modules</li></ul>', $args);
+          $items[] = $this->t('⚠️⚠️⚠️ The following modules have not yet been vetted and have a <strong>high risk</strong> to break <em>Acquia Migrate Accelerate</em> because they alter migrations: <ul><li>@modules</li></ul>', $args);
           break;
 
         case 'medium':
-          $items[] = $this->t('⚠️⚠️ The following modules have not yet been vetted and have a <strong>medium risk</strong> to break <em>Acquia Migrate: Accelerate</em> because they have migrations: <ul><li>@modules</li></ul>', $args);
+          $items[] = $this->t('⚠️⚠️ The following modules have not yet been vetted and have a <strong>medium risk</strong> to break <em>Acquia Migrate Accelerate</em> because they have migrations: <ul><li>@modules</li></ul>', $args);
           break;
 
         case 'low':
-          $items[] = $this->t('⚠️ The following modules have not yet been vetted, but have only a <strong>low risk</strong> to break <em>Acquia Migrate: Accelerate</em> because they do not have or alter migrations, but they are <strong>unstable</strong>: <ul><li>@modules</li></ul>', $args);
+          $items[] = $this->t('⚠️ The following modules have not yet been vetted, but have only a <strong>low risk</strong> to break <em>Acquia Migrate Accelerate</em> because they do not have or alter migrations, but they are <strong>unstable</strong>: <ul><li>@modules</li></ul>', $args);
           break;
 
         default:
-          $items[] = $this->t('✅ The following modules have not yet been vetted but are <strong>very unlikely to break</strong> <em>Acquia Migrate: Accelerate</em>: <ul><li>@modules</li></ul>.', $args);
+          $items[] = $this->t('✅ The following modules have not yet been vetted but are <strong>very unlikely to break</strong> <em>Acquia Migrate Accelerate</em>: <ul><li>@modules</li></ul>.', $args);
           break;
       }
     }

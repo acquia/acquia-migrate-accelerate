@@ -2,7 +2,7 @@
 
 <ruleset name="AcquiaMigrate">
 
-  <description>PHP CodeSniffer configuration for the Acquia Migrate: Accelerate module.</description>
+  <description>PHP CodeSniffer configuration for the Acquia Migrate Accelerate module.</description>
 
   <arg name="colors"/>
 

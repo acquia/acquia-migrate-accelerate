@@ -22,7 +22,7 @@ class UninstallValidator implements ModuleUninstallValidatorInterface {
     $reasons = [];
     if ($module === 'acquia_migrate') {
       if (AcquiaDrupalEnvironmentDetector::isAhEnv() && !AcquiaDrupalEnvironmentDetector::isAhStageEnv() && !AcquiaDrupalEnvironmentDetector::isAhDevEnv() && !AcquiaDrupalEnvironmentDetector::isAhProdEnv()) {
-        $reasons[] = $this->t('To uninstall the Acquia Migrate: Accelerate module, you must first promote it from the Migrate environment to the Stage or Dev environment.');
+        $reasons[] = $this->t('To uninstall the Acquia Migrate Accelerate module, you must first promote it from the Migrate environment to the Stage or Dev environment.');
       }
     }
     return $reasons;

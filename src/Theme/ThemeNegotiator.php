@@ -6,7 +6,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
 
 /**
- * Ensures the Claro theme is used for all Acquia Migrate: Accelerate routes.
+ * Ensures the Claro theme is used for all Acquia Migrate Accelerate routes.
  */
 final class ThemeNegotiator implements ThemeNegotiatorInterface {
 

@@ -1142,7 +1142,7 @@ final class MigrationAlterer {
    * e.g. the user migration, this only happens right before the user migration
    * gets executed.
    *
-   * Since Acquia Migrate: Accelerate's MigrationClusterer requires finalized
+   * Since Acquia Migrate Accelerate's MigrationClusterer requires finalized
    * migration dependencies, this callback adds the migration dependencies by
    * calling ::getProcesses() on the stub migration.
    *

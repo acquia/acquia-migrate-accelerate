@@ -45,7 +45,7 @@ final class SourceDatabase {
     catch (DatabaseExceptionWrapper $e) {
       // If even the migration fingerprinter's canary table is not present, then
       // the database cannot contain Drupal 7 data. Merely a valid database
-      // connection is insufficient for Acquia Migrate: Accelerate to function.
+      // connection is insufficient for Acquia Migrate Accelerate to function.
       return FALSE;
     }
     catch (\Exception $e) {
