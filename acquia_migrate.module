@@ -421,3 +421,21 @@ function _acquia_migrate_entity_form_submit(array $form, FormStateInterface $for
       ]));
   }
 }
+
+/**
+ * Implements hook_migrate_process_info_alter().
+ */
+function acquia_migrate_migrate_process_info_alter(&$definitions) {
+  // If the 'file_copy_or_generate' migrate process plugin is available (so:
+  // Migrate Devel FileCopy is installed), then we replace the 'file_copy'
+  // definition with 'file_copy_or_generate' – because we're probably debugging
+  // a (propery sanitized) customer DB without having the files backup.
+  // @see https://drupal.org/project/migrate_devel_file_copy
+  if (
+    !empty($definitions['file_copy_or_generate']) &&
+    !empty($definitions['file_copy'])
+  ) {
+    $definitions['file_copy'] = $definitions['file_copy_or_generate'];
+    unset($definitions['file_copy_or_generate']);
+  }
+}

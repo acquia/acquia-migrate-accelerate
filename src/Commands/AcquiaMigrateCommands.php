@@ -6,6 +6,7 @@ namespace Drupal\acquia_migrate\Commands;
 
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Drupal\acquia_migrate\Controller\HttpApi;
+use Drupal\acquia_migrate\MacGyver;
 use Drupal\acquia_migrate\Migration;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\Recommendations;
@@ -82,6 +83,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
     $this->moduleExtensionList = $module_extension_list;
     $this->recommendations = $recommendations;
     $this->sourcePluginManager = $source_plugin_manager;
+    if (MacGyver::isArmed()) {
+      MacGyver::getSourceination();
+    }
   }
 
   /**

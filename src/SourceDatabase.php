@@ -64,7 +64,13 @@ final class SourceDatabase {
    *   The connection.
    */
   public static function getConnection(): Connection {
-    $source_connection_details = \Drupal::state()->get('acquia_migrate_test_database', static::$defaultConnectionDetails);
+    if (MacGyver::isArmed()) {
+      $default_connection_details = \Drupal::state()->get('acquia_migrate_copied_database', static::$defaultConnectionDetails);
+    }
+    else {
+      $default_connection_details = static::$defaultConnectionDetails;
+    }
+    $source_connection_details = \Drupal::state()->get('acquia_migrate_test_database', $default_connection_details);
     return Database::getConnection($source_connection_details['target'], $source_connection_details['key']);
   }
 

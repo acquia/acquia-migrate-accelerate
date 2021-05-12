@@ -13,6 +13,7 @@ use Drupal\acquia_migrate\Exception\InvalidFilterParameterException;
 use Drupal\acquia_migrate\Exception\MissingQueryParameterException;
 use Drupal\acquia_migrate\Exception\MultipleClientErrorsException;
 use Drupal\acquia_migrate\Exception\QueryParameterNotAllowedException;
+use Drupal\acquia_migrate\MacGyver;
 use Drupal\acquia_migrate\MessageAnalyzer;
 use Drupal\acquia_migrate\Migration;
 use Drupal\acquia_migrate\MigrationFingerprinter;
@@ -412,19 +413,34 @@ final class HttpApi {
           "rel" => UriDefinitions::LINK_REL_STALE_DATA,
         ];
       }
-      if ($this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH) && ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess())) {
-        $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
-          ->setAbsolute()
-          ->toString(TRUE);
-        $cacheability->addCacheableDependency($initial_import_url);
-        $title = $total_import_count === 0
-          ? "Initial import"
-          : sprintf("Re-importing supporting configuration (%d) after a rollback…", count($todo));
-        $document['links']['initial-import'] = [
-          "href" => $initial_import_url->getGeneratedUrl(),
-          "title" => $title,
-          "rel" => "https://github.com/acquia/acquia_migrate#link-rel-start-batch-process",
-        ];
+      if ($this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH)) {
+        // First: ensure that we're always working on an optimized database.
+        if (MacGyver::detectWhetherActionIsNeeded()) {
+          $database_copy_url = Url::fromRoute('acquia_migrate.api.migration.database.copy')
+            ->setAbsolute()
+            ->toString(TRUE);
+          $cacheability->addCacheableDependency($database_copy_url);
+          $document['links']['initial-import'] = [
+            "href" => $database_copy_url->getGeneratedUrl(),
+            "title" => 'Optimizing database for migration…',
+            "rel" => "https://github.com/acquia/acquia_migrate#link-rel-start-batch-process",
+          ];
+        }
+        // Second: ensure the supporting configuration has been imported.
+        elseif ($total_import_count === 0 || $todo = $this->repository->getInitialMigrationPluginIdsWithRowsToProcess()) {
+          $initial_import_url = Url::fromRoute('acquia_migrate.api.migration.import.initial')
+            ->setAbsolute()
+            ->toString(TRUE);
+          $cacheability->addCacheableDependency($initial_import_url);
+          $title = $total_import_count === 0
+            ? "Initial import"
+            : sprintf("Re-importing supporting configuration (%d) after a rollback…", count($todo));
+          $document['links']['initial-import'] = [
+            "href" => $initial_import_url->getGeneratedUrl(),
+            "title" => $title,
+            "rel" => "https://github.com/acquia/acquia_migrate#link-rel-start-batch-process",
+          ];
+        }
       }
     }
     $total_message_count = $this->getTotalMigrationMessageCount();
@@ -1309,6 +1325,31 @@ final class HttpApi {
   }
 
   /**
+   * Checks if an active batch is running; if so: return error response.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse|null
+   *   NULL when no batch is running, an error response otherwise.
+   */
+  private function abortIfAnotherBatchIsRunning() : ?JsonResponse {
+    // This lock will extended for the duration of this batch process.
+    // @see \Drupal\acquia_migrate\Controller\HttpApi::migrationProcess()
+    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
+    if (!$lock_acquired) {
+      return JsonResponse::create([
+        'errors' => [
+          [
+            'code' => (string) 400,
+            'status' => Response::$statusTexts[400],
+            'detail' => 'Another Acquia Migrate Accelerate operation is already running. Please coordinate with your colleagues because to guarantee data consistency concurrent migration operations are not supported.',
+          ],
+        ],
+      ], 400, static::$defaultResponseHeaders);
+    }
+
+    return NULL;
+  }
+
+  /**
    * Creates a batch and provides a link to follow to process that batch.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -1326,17 +1367,8 @@ final class HttpApi {
       'required' => ['migrationId'],
     ]);
 
-    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
-    if (!$lock_acquired) {
-      return JsonResponse::create([
-        'errors' => [
-          [
-            'code' => (string) 400,
-            'status' => Response::$statusTexts[400],
-            'detail' => 'Another Acquia Migrate Accelerate operation is already running. Please coordinate with your colleagues because to guarantee data consistency concurrent migration operations are not supported.',
-          ],
-        ],
-      ], 400, static::$defaultResponseHeaders);
+    if ($abort_response = $this->abortIfAnotherBatchIsRunning()) {
+      return $abort_response;
     }
 
     $migration_id = $request->get('migrationId');
@@ -1366,6 +1398,10 @@ final class HttpApi {
    * @todo Remove or rewrite this once the "Content structure" screen is built.
    */
   public function migrationImportInitial() : JsonResponse {
+    if ($abort_response = $this->abortIfAnotherBatchIsRunning()) {
+      return $abort_response;
+    }
+
     $batch_status = $this->migrationBatchManager->createInitialMigrationBatch();
     $batch_url = Url::fromRoute('acquia_migrate.api.migration.process', [
       'process_id' => $batch_status->getId(),
@@ -1373,6 +1409,35 @@ final class HttpApi {
     return JsonResponse::create([
       'meta' => [
         'note' => 'The migration process has been started, follow the `next` link to continue processing it.',
+      ],
+      'links' => [
+        'next' => [
+          'href' => $batch_url->toString(),
+        ],
+      ],
+    ], 303, array_merge(static::$defaultResponseHeaders, [
+      'Location' => $batch_url->toString(),
+    ]));
+  }
+
+  /**
+   * Creates an "copy database" batch.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
+   */
+  public function migrationDatabaseCopy() : JsonResponse {
+    if ($abort_response = $this->abortIfAnotherBatchIsRunning()) {
+      return $abort_response;
+    }
+
+    $batch_status = MacGyver::createDatabaseCopyBatch();
+    $batch_url = Url::fromRoute('acquia_migrate.api.migration.process', [
+      'process_id' => $batch_status->getId(),
+    ])->setAbsolute();
+    return JsonResponse::create([
+      'meta' => [
+        'note' => 'The database optimization process has been started, follow the `next` link to continue processing it.',
       ],
       'links' => [
         'next' => [
@@ -1399,6 +1464,9 @@ final class HttpApi {
    */
   public function migrationProcess(Request $request, int $process_id): JsonResponse {
     $this->validateRequest($request);
+    // Extend the lock that was already acquired.
+    // @see \Drupal\acquia_migrate\Controller\HttpApi::abortIfAnotherBatchIsRunning()
+    $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
     $batch_status = $this->migrationBatchManager->isMigrationBatchOngoing($process_id);
     if ($batch_status instanceof BatchUnknown) {
       // @todo: should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.

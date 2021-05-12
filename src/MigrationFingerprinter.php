@@ -422,24 +422,41 @@ final class MigrationFingerprinter {
 
     // On Acquia hosting environments, only perform a refresh if and only if
     // the current recent info was generated after the last fingerprint compute
-    // time. This avoids performing fingerprinting of tables mid-refresh.
+    // time. This avoids performing fingerprinting of tables mid-refresh. Also
+    // only compute fingerprints after we've invoked MacGyver, otherwise we risk
+    // computing different fingerprints.
     if (AcquiaDrupalEnvironmentDetector::isAhEnv()) {
-      // Ensure it is computed initially, regardless of whether recent_info is
-      // populated.
-      $last_fingerprint_compute_time = $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME);
-      if ($last_fingerprint_compute_time === NULL) {
-        return TRUE;
-      }
       // Do not recompute it until the recent info has been populated.
       $recent_info = $this->state->get(Recommendations::KEY_RECENT_INFO);
       if ($recent_info === NULL) {
         return FALSE;
       }
+      $recent_info_time = DateTime::createFromFormat(DATE_RFC3339, $recent_info['generated']);
+      // First: ensure MacGyver copies the database whenever the recent info is
+      // newer than the previous copy.
+      $last_episode = $this->state->get(MacGyver::LAST_MACGYVER_EPISODE);
+      if ($last_episode === NULL) {
+        // Wait for the first copy to be created.
+        return FALSE;
+      }
+      $last_episode_time = DateTime::createFromFormat(DATE_RFC3339, $last_episode);
+      if ($recent_info_time > $last_episode_time && FALSE !== \Drupal::keyValue('acquia_migrate')->get(MacGyver::CAMOUFLAGE_REALISTIC, FALSE)) {
+        // Force a new copy to be created if it was not for the most recent
+        // version of the database.
+        \Drupal::keyValue('acquia_migrate')->set(MacGyver::CAMOUFLAGE_REALISTIC, FALSE);
+        return FALSE;
+      }
+      // Second: after MacGyver is done, compute the fingerprints.
+      // Ensure it is computed initially.
+      $last_fingerprint_compute_time = $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME);
+      if ($last_fingerprint_compute_time === NULL) {
+        return TRUE;
+      }
       // Recompute whenever the recent info was updated after the fingerprint
       // was computed.
-      $recent_info_time = DateTime::createFromFormat(DATE_RFC3339, $recent_info['generated']);
       $last_compute_time = DateTime::createFromFormat(DATE_RFC3339, $last_fingerprint_compute_time);
-      return $recent_info_time > $last_compute_time;
+      $recompute_is_recommended = $last_episode_time > $last_compute_time;
+      return $recompute_is_recommended;
     }
 
     $compute_max_age = new DateInterval(static::COMPUTE_MAX_AGE);

@@ -283,3 +283,12 @@ function acquia_migrate_update_9100() {
  */
 function acquia_migrate_update_9101() {
 }
+
+/**
+ * MacGyver support added a new route.
+ *
+ * @see \Drupal\acquia_migrate\Controller\HttpApi::migrationDatabaseCopy()
+ */
+function acquia_migrate_update_9201() {
+  \Drupal::service('router.builder')->rebuild();
+}

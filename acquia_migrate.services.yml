@@ -140,6 +140,11 @@ services:
     arguments: ['@plugin.manager.migration']
 
   # Event subscribers.
+  acquia_migrate.sourcination.registerer:
+    class: \Drupal\acquia_migrate\EventSubscriber\SourcinationRegisterer
+    arguments: []
+    tags:
+      - { name: event_subscriber }
   controller.acquia_migrate.http_api.response_validator:
     class: \Drupal\acquia_migrate\EventSubscriber\HttpApiResponseValidator
     arguments:
