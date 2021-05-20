@@ -33,6 +33,11 @@ class ProfiledContainerDerivativeDiscoveryDecorator extends ContainerDerivativeD
    * {@inheritdoc}
    */
   protected function getDerivatives(array $base_plugin_definitions) {
+    // Computing all derivatives is very resource-intensive. For complex source
+    // sites, the number of derivatives to generate can be very high. Increase
+    // the memory limit for the remainder of this request.
+    ini_set('memory_limit', '512M');
+
     Timer::start(Timers::COMPUTE_MIGRATION_PLUGINS_DERIVED);
 
     $plugin_definitions = [];

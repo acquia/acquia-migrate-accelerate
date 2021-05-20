@@ -13,6 +13,9 @@
         "league/uri": "^6.3",
         "league/uri-components": "^2.2.1"
     },
+    "conflict": {
+        "drupal/migrate_tools": "1.x-dev || 2.x-dev || 3.x-dev || 4.x-dev || 5.x-dev || 6.x-dev"
+    },
     "require-dev": {
         "acquia/coding-standards": "dev-master",
         "dealerdirect/phpcodesniffer-composer-installer": "dev-master",

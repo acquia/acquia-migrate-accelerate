@@ -273,6 +273,12 @@ final class MigrationClusterer {
    *   `cluster` metadata property assigned.
    */
   public function getClusteredMigrationPlugins() : array {
+    // Computing all clusters is very resource-intensive. For complex source
+    // sites, the number of dependencies between migration plugins to analyze to
+    // compute the appropriate clusters can be very high. Increase the memory
+    // limit for the remainder of this request.
+    ini_set('memory_limit', '512M');
+
     $all_migration_plugins = $this->getAvailableMigrationPlugins();
 
     $matched_migration_plugins_per_heuristic = [];
