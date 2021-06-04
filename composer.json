@@ -31,6 +31,8 @@
         },
         "patches": {
             "drupal/core": {
+                "#3204073: \\Drupal\\Core\\Lock\\PersistentDatabaseLockBackend::acquire() does not allow extending after the first request.": "https://www.drupal.org/files/issues/2021-05-31/persistent_lock_extend-3204073-5.patch",
+                "#3217355: Set skip_testcases_on_fail:false in nightwatch.conf.js": "https://www.drupal.org/files/issues/2021-06-04/3217355-4.patch",
                 "Avoid https://www.drupal.org/project/drupal/issues/2796755 breaking this module": "https://gist.githubusercontent.com/wimleers/4c8742d5efb74ea5dad1475b4478bd40/raw/99e35617a292b730fdbb36be4f3ce48d5c9863a1/migration-metadata.patch",
                 "track_changes should not prevent efficient imports": "https://gist.githubusercontent.com/wimleers/47b888f3abbddbeae66a915fd690691e/raw/c96e2265aae3d496b8a47f1898a5c5b5bde210dd/track_changes_should_not_prevent_efficient_imports.patch"
             }

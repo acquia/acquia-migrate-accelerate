@@ -1333,7 +1333,7 @@ final class HttpApi {
   private function abortIfAnotherBatchIsRunning() : ?JsonResponse {
     // This lock will extended for the duration of this batch process.
     // @see \Drupal\acquia_migrate\Controller\HttpApi::migrationProcess()
-    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
+    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time'));
     if (!$lock_acquired) {
       return JsonResponse::create([
         'errors' => [
@@ -1464,9 +1464,12 @@ final class HttpApi {
    */
   public function migrationProcess(Request $request, int $process_id): JsonResponse {
     $this->validateRequest($request);
-    // Extend the lock that was already acquired.
+    // Extend the lock that was already acquired. Extend it to the max execution
+    // time of this batch processing request.
     // @see \Drupal\acquia_migrate\Controller\HttpApi::abortIfAnotherBatchIsRunning()
-    $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time') * 2);
+    if (!$this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time'))) {
+      \Drupal::logger('acquia_migrate')->warning('Failed to extend AMA active batch lock at the start of the batch request.');
+    }
     $batch_status = $this->migrationBatchManager->isMigrationBatchOngoing($process_id);
     if ($batch_status instanceof BatchUnknown) {
       // @todo: should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.
@@ -1489,6 +1492,15 @@ final class HttpApi {
       // released in this case, we cannot do it here.
       // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor::interruptMigrateExecutable
       $links['next'] = ['href' => $self_url->toString()];
+      // Extend the lock that was already acquired. But do not extend it overly
+      // excessively far: require the client to make the next request within the
+      // next 5 seconds.
+      // Note: if we did not consume the entire max_execution_time during this
+      // batch processing request, the this may effectively *shorten* the lock
+      // duration: this is intentional.
+      if (!$this->persistentLock->acquire(static::ACTIVE_BATCH, 5)) {
+        \Drupal::logger('acquia_migrate')->warning('Failed to extend AMA active batch lock at the end of the batch request.');
+      }
     }
     else {
       $this->persistentLock->release(static::ACTIVE_BATCH);
