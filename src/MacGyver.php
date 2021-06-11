@@ -72,6 +72,10 @@ final class MacGyver {
     'search_index',
     'search_node_links',
     'search_total',
+    // simplesaml tables -- no need to migrate
+    'simplesaml_kvstore',
+    'simplesaml_saml_LogoutStore',
+    'simplesaml_tableVersion',
     // D7 watchdog is irrelevant in D9.
     'watchdog',
   ];
