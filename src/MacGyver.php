@@ -72,6 +72,10 @@ final class MacGyver {
     'search_index',
     'search_node_links',
     'search_total',
+     // Session metadata for the simplesamlphp_auth module is not migrated.
+    'simplesaml_kvstore',
+    'simplesaml_saml_LogoutStore',
+    'simplesaml_tableVersion',
     // D7 watchdog is irrelevant in D9.
     'watchdog',
   ];
@@ -651,6 +655,9 @@ final class MacGyver {
         // TRICKY: THIS IS A CHANGE.
         // @see https://www.drupal.org/project/drupal/issues/3210913
         $definition['fields'][$name]['mysql_type'] = 'date';
+      }
+      elseif ($type === 'timestamp') {
+        $definition['fields'][$name]['mysql_type'] = 'timestamp';
       }
       elseif ($type === 'datetime') {
         // Adjust for other database types.

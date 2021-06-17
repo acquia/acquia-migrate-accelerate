@@ -67,7 +67,10 @@ final class LocalhostToAcquiaSumologic extends SysLog {
     if (!isset($must_send)) {
       $env = (AcquiaDrupalEnvironmentDetector::isLocalEnv() || AcquiaDrupalEnvironmentDetector::isAhIdeEnv()) ? 'local' : 'cloud';
       $must_send = $env === 'local' && !file_exists(__DIR__ . '/../../.git');
-      ['uuid' => $site_uuid, 'name' => $site_name] = $this->systemSiteConfig->get();
+      $site_config = $this->systemSiteConfig->get();
+      if (empty($site_config)) {
+        $site_config['uuid'] = $site_config['name'] = 'testing';
+      }
     }
 
     // Prefix the syslog entry with the site UUID, site name and environment.

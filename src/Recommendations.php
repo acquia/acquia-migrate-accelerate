@@ -114,6 +114,70 @@ final class Recommendations {
   }
 
   /**
+   * Gets unvetted recommendations only.
+   *
+   * @return array
+   *   A list of unvetted recommendations.
+   */
+  private function getUnvetted() : array {
+    return array_values(array_filter($this->getRaw(), function (array $recommendation) {
+      return $recommendation['type'] === 'packageRecommendation'
+        && $recommendation['attributes']['vetted'] === FALSE;
+    }));
+  }
+
+  /**
+   * Gets abandonment recommendations only.
+   *
+   * @return array
+   *   A list of abandonment recommendations.
+   */
+  private function getAbandoned() : array {
+    return array_values(array_filter($this->getRaw(), function (array $recommendation) {
+      return $recommendation['type'] === 'abandonmentRecommendation';
+    }));
+  }
+
+  /**
+   * Gets source modules that the vetted recommendations install.
+   *
+   * @return string[]
+   *   A list of source (Drupal 7) module names.
+   */
+  private function getVettedSourceModules() : array {
+    $recommendations = $this->getVetted();
+    return array_unique(array_reduce($recommendations, function (array $result, array $recommendation) {
+      return array_merge($result, array_column($recommendation['relationships']['recommendedFor']['data'] ?? [], 'id'));
+    }, []));
+  }
+
+  /**
+   * Gets source modules that the unvetted recommendations preinstall.
+   *
+   * @return string[]
+   *   A list of source (Drupal 7) module names.
+   */
+  private function getUnvettedSourceModules() : array {
+    $recommendations = $this->getUnvetted();
+    return array_unique(array_reduce($recommendations, function (array $result, array $recommendation) {
+      return array_merge($result, array_column($recommendation['relationships']['recommendedFor']['data'] ?? [], 'id'));
+    }, []));
+  }
+
+  /**
+   * Gets source modules that the recommendations say are abandoned.
+   *
+   * @return string[]
+   *   A list of source (Drupal 7) module names.
+   */
+  private function getAbandonedSourceModules() : array {
+    $recommendations = $this->getAbandoned();
+    return array_unique(array_reduce($recommendations, function (array $result, array $recommendation) {
+      return array_merge($result, array_column($recommendation['relationships']['recommendedFor']['data'] ?? [], 'id'));
+    }, []));
+  }
+
+  /**
    * Gets destination modules that the vetted recommendations install.
    *
    * @return string[]
@@ -237,6 +301,38 @@ final class Recommendations {
             : 'medium'
           )
         );
+  }
+
+  /**
+   * Assesses the recommendation type for a source (Drupal 7) module.
+   *
+   * @param string $module_name
+   *   A Drupal 7 module name.
+   *
+   * @return string
+   *   The recommendation type: 'vetted', 'unvetted', 'abandoned', or 'none'.
+   */
+  public function getSourceModuleRecommendationType(string $module_name) : string {
+    static $all, $vetted, $unvetted, $abandoned;
+
+    if (!isset($all)) {
+      $all = array_column($this->getSourceModules(), 'name');
+      $vetted = array_intersect($all, $this->getVettedSourceModules());
+      $unvetted = array_intersect($all, $this->getUnvettedSourceModules());
+      $abandoned = array_intersect($all, $this->getAbandonedSourceModules());
+    }
+
+    $recommendation_type = in_array($module_name, $vetted, TRUE)
+      ? 'vetted'
+      : (in_array($module_name, $abandoned, TRUE)
+        ? 'abandoned'
+        : (in_array($module_name, $unvetted, TRUE)
+          ? 'unvetted'
+          : 'none'
+        )
+      );
+
+    return $recommendation_type;
   }
 
 }

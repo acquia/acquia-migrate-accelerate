@@ -1402,6 +1402,20 @@ final class HttpApi {
       return $abort_response;
     }
 
+    // Log which recommendation type is found for each source module.
+    // TRICKY: only here because the recommendations are not guaranteed to be
+    // available during hook_install().
+    $source_modules = $this->recommendations->getSourceModules();
+    foreach ($source_modules as $module) {
+      \Drupal::service('logger.channel.acquia_migrate_statistics')->info(
+        sprintf("source_module=%s|version=%s|recommendation_type=%s|",
+          $module['name'],
+          $module['version'],
+          $this->recommendations->getSourceModuleRecommendationType($module['name'])
+        )
+      );
+    }
+
     $batch_status = $this->migrationBatchManager->createInitialMigrationBatch();
     $batch_url = Url::fromRoute('acquia_migrate.api.migration.process', [
       'process_id' => $batch_status->getId(),
