@@ -138,6 +138,7 @@ final class MigrationAlterer {
     // @see \Drupal\paragraphs\MigrationPluginsAlterer::PARAGRAPHS_ENTITY_TYPE_ID_MAP
     'field_collection_item' => 'paragraph',
     'paragraphs_item' => 'paragraph',
+    'multifield' => 'paragraph',
     // Media migration.
     'file' => 'media',
     // @see \Drupal\bean_migrate\MigrationRowPreparer::mapBeanToBlockContent

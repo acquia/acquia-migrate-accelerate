@@ -14,6 +14,18 @@ use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 trait EntityRelatedHeuristicTrait {
 
   /**
+   * IDs of known config destination plugins which aren't "entity" derivatives.
+   *
+   * @var string[]
+   */
+  protected static $knownConfigDestinationPlugins = [
+    'component_entity_display',
+    'component_entity_form_display',
+    'rollbackable_component_entity_display',
+    'rollbackable_component_entity_form_display',
+  ];
+
+  /**
    * Checks whether the given migration's destination is a config entity.
    *
    * @param \Drupal\migrate\Plugin\Migration $migration_plugin
@@ -24,7 +36,11 @@ trait EntityRelatedHeuristicTrait {
    */
   protected static function isConfigEntityDestination(MigrationPlugin $migration_plugin) : bool {
     $destination_plugin_id = $migration_plugin->getDestinationPlugin()->getPluginId();
-    return in_array('Configuration', $migration_plugin->getMigrationTags(), TRUE) && (strpos($destination_plugin_id, 'entity:') === 0 || in_array($destination_plugin_id, ['component_entity_display', 'component_entity_form_display'], TRUE));
+    return in_array('Configuration', $migration_plugin->getMigrationTags(), TRUE) &&
+      (
+        strpos($destination_plugin_id, 'entity:') === 0 ||
+        in_array($destination_plugin_id, self::$knownConfigDestinationPlugins, TRUE)
+      );
   }
 
   /**
@@ -53,6 +69,11 @@ trait EntityRelatedHeuristicTrait {
       case 'd7_metatag_field_instance_widget_settings':
         $entity_type = $source_config['entity_type_id'] ?? NULL;
         $bundle = $source_config['bundle'] ?? NULL;
+        break;
+
+      case 'multifield_type':
+      case 'multifield_translation_settings':
+        $entity_type = 'multifield';
         break;
 
       default:
@@ -152,6 +173,17 @@ trait EntityRelatedHeuristicTrait {
     // that contains the 'every other' redirects.
     // @see https://www.drupal.org/project/redirect/issues/3082364
     if ($destination_entity_type === 'redirect' && $source_has_entity_type_parameter) {
+      return FALSE;
+    }
+
+    // We do not want to treat paragraph, field collection and multifield
+    // migrations as stand-alone content entities, because they always belong to
+    // a 'real' content entity, and we are able to migrate them per content
+    // entity bundle. Paragraph and field collection migrations are using the
+    // 'entity_reference_revisions' destination plugin, but multifield uses
+    // 'entity_complete' (usually used for stand-alone content entities), hence
+    // the need for this additional check.
+    if ($migration->getBaseId() === 'multifield') {
       return FALSE;
     }
 

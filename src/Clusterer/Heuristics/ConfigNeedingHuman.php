@@ -22,7 +22,13 @@ final class ConfigNeedingHuman implements IndependentHeuristicInterface, Heurist
    * {@inheritdoc}
    */
   public function matches(MigrationPlugin $migration_plugin) : bool {
-    return $migration_plugin->id() === 'd7_filter_format';
+    return in_array(
+      $migration_plugin->id(), [
+        'd7_filter_format',
+        'd7_forum_settings',
+      ],
+      TRUE
+    );
   }
 
   /**
