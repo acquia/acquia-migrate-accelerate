@@ -232,7 +232,7 @@ final class Migration {
    *   Whether this migration supports rollbacks.
    */
   private function computeSupportsRollback() : bool {
-    // @todo: should there be a special case here when *some*, but not *all*, plugins support rollback?
+    // @todo should there be a special case here when *some*, but not *all*, plugins support rollback?.
     $rollback_capable_plugins = array_reduce($this->migrationPlugins, function (array $rollback_capable_plugins, MigrationInterface $migration_plugin) {
       return $migration_plugin->getDestinationPlugin()->supportsRollback()
         ? array_merge($rollback_capable_plugins, [$migration_plugin])
@@ -1091,167 +1091,7 @@ final class Migration {
     Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION_LINKS);
 
     foreach ($available_urls as $key => $url) {
-      assert($url instanceof Url);
-      $link_params = [];
-      switch ($key) {
-        case 'import':
-          $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
-          $link_title = t('Import');
-          break;
-
-        case 'rollback':
-          $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
-          $link_title = t('Rollback');
-          break;
-
-        case 'rollback-and-import':
-          $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
-          $link_title = t('Rollback and import');
-          break;
-
-        case 'refresh':
-          $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
-          $link_title = t('Refresh');
-          break;
-
-        case 'stop':
-          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
-          $link_title = t('Stop operation');
-          $link_params = [
-            'data' => [
-              'type' => 'migration',
-              'id' => $migration->id(),
-              'attributes' => [
-                'activity' => 'idle',
-              ],
-            ],
-          ];
-          break;
-
-        case 'complete':
-          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
-          $link_title = t('Mark as completed');
-          $link_params = [
-            'confirm' => t("I'm sure, I'm ready with this migration, at least for now."),
-            'data' => [
-              'type' => 'migration',
-              'id' => $migration->id(),
-              'attributes' => [
-                'completed' => TRUE,
-              ],
-            ],
-          ];
-          break;
-
-        case 'uncomplete':
-          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
-          $link_title = t('Unmark as completed');
-          $link_params = [
-            'confirm' => FALSE,
-            'data' => [
-              'type' => 'migration',
-              'id' => $migration->id(),
-              'attributes' => [
-                'completed' => FALSE,
-              ],
-            ],
-          ];
-          break;
-
-        case 'skip':
-          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
-          $link_title = t('Skip');
-          $link_params = [
-            'confirm' => t("I'm sure, this does not need to be migrated, at least not for now."),
-            'data' => [
-              'type' => 'migration',
-              'id' => $migration->id(),
-              'attributes' => [
-                'skipped' => TRUE,
-              ],
-            ],
-          ];
-          break;
-
-        case 'unskip':
-          $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
-          $link_title = t('Unskip');
-          $link_params = [
-            'confirm' => FALSE,
-            'data' => [
-              'type' => 'migration',
-              'id' => $migration->id(),
-              'attributes' => [
-                'skipped' => FALSE,
-              ],
-            ],
-          ];
-          break;
-
-        case 'preview-by-offset':
-          $link_rel = UriDefinitions::LINK_REL_PREVIEW;
-          $link_title = t('Preview first row');
-          $url->setOption('query', ['byOffset' => 0]);
-          break;
-
-        case 'preview-by-url':
-          $link_rel = UriDefinitions::LINK_REL_PREVIEW;
-          $link_title = t('Preview by URL');
-          $link_template = [
-            'uri-template:href' => $url->setAbsolute()->toString(TRUE)->getGeneratedUrl() . '{?byUrl}',
-            'uri-template:suggestions' => [
-              [
-                'label' => t('By source site URL'),
-                'variable' => urlencode('byUrl'),
-                'cardinality' => 1,
-              ],
-            ],
-            'rel' => UriDefinitions::LINK_REL_PREVIEW,
-          ];
-          break;
-
-        case 'preview-unmet-requirement:0':
-        case 'preview-unmet-requirement:1':
-          $link_rel = UriDefinitions::LINK_REL_UNMET_REQUIREMENT;
-          if ($url->getUri() === 'https://github.com/acquia/acquia_migrate#application-concept-no-unprocessed-supporting-configuration') {
-            $exception = $previewer->isReadyForPreview($migration);
-            // This is guaranteed to return an exception.
-            // @see \Drupal\acquia_migrate\Migration::getAvailableLinkUrls()
-            if (!($exception instanceof RowPreviewException)) {
-              throw new \LogicException();
-            };
-            $link_title = $exception->getMessage();
-          }
-          else {
-            throw new \InvalidArgumentException();
-          }
-          break;
-
-        case 'field-mapping':
-          $link_rel = UriDefinitions::LINK_REL_MAPPING;
-          $link_title = t('View mapping');
-          $link_template = [];
-          break;
-
-        default:
-          assert(FALSE, 'Unrecognized migration action: ' . $key);
-          $link_rel = $key;
-          $link_title = $key;
-      }
-      $link = $url->setAbsolute()->toString(TRUE);
-      assert($link instanceof GeneratedUrl);
-      $cacheability->addCacheableDependency($link);
-      $resource_object['links'][$key] = [
-        'href' => $link->getGeneratedUrl(),
-        'title' => $link_title,
-        'rel' => $link_rel,
-      ];
-      if (!empty($link_params)) {
-        $resource_object['links'][$key]['params'] = $link_params;
-      }
-      if (!empty($link_template)) {
-        $resource_object['links'][$key] += $link_template;
-      }
+      $resource_object['links'][$key] = self::computeResourceObjectLink($migration, $key, $url, $cacheability, $previewer);
     }
 
     Timer::stop(Timers::JSONAPI_RESOURCE_OBJECT_MIGRATION);
@@ -1268,6 +1108,189 @@ final class Migration {
     }
 
     return $resource_object;
+  }
+
+  /**
+   * Helper for computing resource object links for ::toResourceObject().
+   *
+   * @param \Drupal\acquia_migrate\Migration $migration
+   *   A migration to map.
+   * @param string $key
+   *   A key returned by ::getAvailableLinkUrls().
+   * @param \Drupal\Core\Url $url
+   *   A value returned by ::getAvailableLinkUrls().
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   *   An object capable of capturing any cacheability metadata generated by the
+   *   normalization of the given migration into a resource object.
+   * @param \Drupal\acquia_migrate\MigrationPreviewer $previewer
+   *   The migration previewer.
+   *
+   * @return array
+   *   A JSON:API resource object link array.
+   */
+  private static function computeResourceObjectLink(Migration $migration, string $key, Url $url, RefinableCacheableDependencyInterface $cacheability, MigrationPreviewer $previewer) {
+    $link_params = [];
+    switch ($key) {
+      case 'import':
+        $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
+        $link_title = t('Import');
+        break;
+
+      case 'rollback':
+        $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
+        $link_title = t('Rollback');
+        break;
+
+      case 'rollback-and-import':
+        $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
+        $link_title = t('Rollback and import');
+        break;
+
+      case 'refresh':
+        $link_rel = UriDefinitions::LINK_REL_START_BATCH_PROCESS;
+        $link_title = t('Refresh');
+        break;
+
+      case 'stop':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Stop operation');
+        $link_params = [
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'activity' => 'idle',
+            ],
+          ],
+        ];
+        break;
+
+      case 'complete':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Mark as completed');
+        $link_params = [
+          'confirm' => t("I'm sure, I'm ready with this migration, at least for now."),
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'completed' => TRUE,
+            ],
+          ],
+        ];
+        break;
+
+      case 'uncomplete':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Unmark as completed');
+        $link_params = [
+          'confirm' => FALSE,
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'completed' => FALSE,
+            ],
+          ],
+        ];
+        break;
+
+      case 'skip':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Skip');
+        $link_params = [
+          'confirm' => t("I'm sure, this does not need to be migrated, at least not for now."),
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'skipped' => TRUE,
+            ],
+          ],
+        ];
+        break;
+
+      case 'unskip':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Unskip');
+        $link_params = [
+          'confirm' => FALSE,
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'skipped' => FALSE,
+            ],
+          ],
+        ];
+        break;
+
+      case 'preview-by-offset':
+        $link_rel = UriDefinitions::LINK_REL_PREVIEW;
+        $link_title = t('Preview first row');
+        $url->setOption('query', ['byOffset' => 0]);
+        break;
+
+      case 'preview-by-url':
+        $link_rel = UriDefinitions::LINK_REL_PREVIEW;
+        $link_title = t('Preview by URL');
+        $link_template = [
+          'uri-template:href' => $url->setAbsolute()->toString(TRUE)->getGeneratedUrl() . '{?byUrl}',
+          'uri-template:suggestions' => [
+            [
+              'label' => t('By source site URL'),
+              'variable' => urlencode('byUrl'),
+              'cardinality' => 1,
+            ],
+          ],
+          'rel' => UriDefinitions::LINK_REL_PREVIEW,
+        ];
+        break;
+
+      case 'preview-unmet-requirement:0':
+      case 'preview-unmet-requirement:1':
+        $link_rel = UriDefinitions::LINK_REL_UNMET_REQUIREMENT;
+        if ($url->getUri() === 'https://github.com/acquia/acquia_migrate#application-concept-no-unprocessed-supporting-configuration') {
+          $exception = $previewer->isReadyForPreview($migration);
+          // This is guaranteed to return an exception.
+          // @see \Drupal\acquia_migrate\Migration::getAvailableLinkUrls()
+          if (!($exception instanceof RowPreviewException)) {
+            throw new \LogicException();
+          };
+          $link_title = $exception->getMessage();
+        }
+        else {
+          throw new \InvalidArgumentException();
+        }
+        break;
+
+      case 'field-mapping':
+        $link_rel = UriDefinitions::LINK_REL_MAPPING;
+        $link_title = t('View mapping');
+        $link_template = [];
+        break;
+
+      default:
+        assert(FALSE, 'Unrecognized migration action: ' . $key);
+        $link_rel = $key;
+        $link_title = $key;
+    }
+    $link = $url->setAbsolute()->toString(TRUE);
+    assert($link instanceof GeneratedUrl);
+    $cacheability->addCacheableDependency($link);
+
+    $resource_object_link = [
+      'href' => $link->getGeneratedUrl(),
+      'title' => $link_title,
+      'rel' => $link_rel,
+    ];
+    if (!empty($link_params)) {
+      $resource_object_link['params'] = $link_params;
+    }
+    if (!empty($link_template)) {
+      $resource_object_link += $link_template;
+    }
+    return $resource_object_link;
   }
 
 }

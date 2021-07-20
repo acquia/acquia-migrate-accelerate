@@ -255,7 +255,11 @@ final class MigrationMappingViewer {
     assert(Inspector::assertAllObjects($field_definitions, FieldDefinitionInterface::class));
 
     try {
-      $unmapped_destination_columns = array_diff_key($field_definitions, $data_migration_plugin->getProcessPlugins(), ['uuid' => TRUE, $entity_type->getKey('bundle') => TRUE]);
+      $unmapped_destination_columns = array_diff_key(
+        $field_definitions,
+        $data_migration_plugin->getProcessPlugins(),
+        ['uuid' => TRUE, $entity_type->getKey('bundle') => TRUE]
+      );
     }
     catch (MigrateException $e) {
       throw new \InvalidArgumentException($e->getMessage(), 500);
@@ -352,8 +356,17 @@ final class MigrationMappingViewer {
    *   a main property.
    */
   private static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $sample_field_value = call_user_func_array([$field_definition->getItemDefinition()->getClass(), 'generateSampleValue'], [$field_definition]);
-    $main_property_name = call_user_func_array([$field_definition->getItemDefinition()->getClass(), 'mainPropertyName'], []);
+    $sample_field_value = call_user_func_array(
+      [
+        $field_definition->getItemDefinition()->getClass(),
+        'generateSampleValue',
+      ],
+      [$field_definition]
+    );
+    $main_property_name = call_user_func_array(
+      [$field_definition->getItemDefinition()->getClass(), 'mainPropertyName'],
+      []
+    );
     if (is_array($sample_field_value) && array_keys($sample_field_value) === [$main_property_name]) {
       $sample_field_value = $sample_field_value[$main_property_name];
     }

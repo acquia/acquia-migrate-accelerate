@@ -21,8 +21,6 @@ trait EntityRelatedHeuristicTrait {
   protected static $knownConfigDestinationPlugins = [
     'component_entity_display',
     'component_entity_form_display',
-    'rollbackable_component_entity_display',
-    'rollbackable_component_entity_form_display',
   ];
 
   /**

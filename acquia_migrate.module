@@ -142,8 +142,7 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   // @codingStandardsIgnoreEnd
   $migration_alterer->addDependenciesFromFieldPlugins($migrations);
   $migration_alterer->refineMigrationsLabels($migrations);
-  $migration_alterer->convertToRollbackableConfig($migrations);
-  $migration_alterer->convertToRollbackableEntityDisplay($migrations);
+  $migration_alterer->persistFieldStorageConfigs($migrations);
   $migration_alterer->refineMediaEntityMigrations($migrations);
   $migration_alterer->addDiscoveredTaxonomyDependencies($migrations);
   $migration_alterer->addFieldTypePluginChecker($migrations);
@@ -169,6 +168,7 @@ function acquia_migrate_entity_base_field_info_alter(&$fields, EntityTypeInterfa
     $fields['mail']->addConstraint('UserOnePetrified');
     $fields['init']->addConstraint('UserOnePetrified');
     $fields['pass']->addConstraint('UserOnePetrified');
+    $fields['status']->addConstraint('UserOnePetrified');
   }
   return $fields;
 }

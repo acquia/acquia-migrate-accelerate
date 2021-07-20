@@ -328,7 +328,10 @@ final class MigrationClusterer {
     $heuristic_id = $heuristic::id();
 
     if ($heuristic instanceof IndependentHeuristicInterface) {
-      $matched_migration_plugins_per_heuristic[$heuristic_id] = array_filter($all_migration_plugins, [$heuristic, 'matches']);
+      $matched_migration_plugins_per_heuristic[$heuristic_id] = array_filter($all_migration_plugins, [
+        $heuristic,
+        'matches',
+      ]);
     }
     elseif ($heuristic instanceof DependentHeuristicInterface) {
       if (!empty(array_diff($heuristic->getDependencies(), array_keys($matched_migration_plugins_per_heuristic)))) {

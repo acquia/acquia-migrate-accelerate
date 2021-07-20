@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\acquia_migrate;
 
 use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
-use DateInterval;
-use DateTime;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -357,7 +355,7 @@ final class MigrationFingerprinter {
     ]));
     $db_options['database'] = $db_copy;
     Database::addConnectionInfo('fingerprint', 'default', $db_options);
-    /* @var \Drupal\Core\Database\Driver\sqlite\Connection $fingerprint_db */
+    /** @var \Drupal\Core\Database\Driver\sqlite\Connection $fingerprint_db */
     $fingerprint_db = Database::getConnection('default', 'fingerprint');
 
     // Iterate over all tables not supposed to be fingerprinted and DROP them.
@@ -431,7 +429,7 @@ final class MigrationFingerprinter {
       if ($recent_info === NULL) {
         return FALSE;
       }
-      $recent_info_time = DateTime::createFromFormat(DATE_RFC3339, $recent_info['generated']);
+      $recent_info_time = \DateTime::createFromFormat(DATE_RFC3339, $recent_info['generated']);
       // First: ensure MacGyver copies the database whenever the recent info is
       // newer than the previous copy.
       $last_episode = $this->state->get(MacGyver::LAST_MACGYVER_EPISODE);
@@ -439,7 +437,7 @@ final class MigrationFingerprinter {
         // Wait for the first copy to be created.
         return FALSE;
       }
-      $last_episode_time = DateTime::createFromFormat(DATE_RFC3339, $last_episode);
+      $last_episode_time = \DateTime::createFromFormat(DATE_RFC3339, $last_episode);
       if ($recent_info_time > $last_episode_time && FALSE !== \Drupal::keyValue('acquia_migrate')->get(MacGyver::CAMOUFLAGE_REALISTIC, FALSE)) {
         // Force a new copy to be created if it was not for the most recent
         // version of the database.
@@ -454,13 +452,13 @@ final class MigrationFingerprinter {
       }
       // Recompute whenever the recent info was updated after the fingerprint
       // was computed.
-      $last_compute_time = DateTime::createFromFormat(DATE_RFC3339, $last_fingerprint_compute_time);
+      $last_compute_time = \DateTime::createFromFormat(DATE_RFC3339, $last_fingerprint_compute_time);
       $recompute_is_recommended = $last_episode_time > $last_compute_time;
       return $recompute_is_recommended;
     }
 
-    $compute_max_age = new DateInterval(static::COMPUTE_MAX_AGE);
-    $last_compute = DateTime::createFromFormat(DATE_RFC3339, $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME, '2019-03-09T03:01:00-06:00'));
+    $compute_max_age = new \DateInterval(static::COMPUTE_MAX_AGE);
+    $last_compute = \DateTime::createFromFormat(DATE_RFC3339, $this->state->get(self::KEY_LAST_FINGERPRINT_COMPUTE_TIME, '2019-03-09T03:01:00-06:00'));
     $expiry = $last_compute->add($compute_max_age);
     if ($expiry < date_create('now')) {
       return TRUE;
@@ -485,7 +483,10 @@ final class MigrationFingerprinter {
    *   TRUE if the database driver is mysql, FALSE otherwise.
    */
   protected static function isSourceDatabaseSupported(): bool {
-    return in_array(SourceDatabase::getConnection()->databaseType(), ['mysql', 'sqlite'], TRUE);
+    return in_array(SourceDatabase::getConnection()->databaseType(), [
+      'mysql',
+      'sqlite',
+    ], TRUE);
   }
 
   /**

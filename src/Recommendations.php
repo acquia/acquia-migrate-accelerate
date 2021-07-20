@@ -227,6 +227,11 @@ final class Recommendations {
    *   Whether the Drupal module extension is unstable.
    */
   public static function moduleIsStable(Extension $module) : bool {
+    // Always consider core modules as stable.
+    if (substr($module->getPath(), 0, 5) === 'core/') {
+      return TRUE;
+    }
+
     $version = $module->info['version'];
     return $version !== NULL && VersionParser::parseStability($version) === 'stable';
   }

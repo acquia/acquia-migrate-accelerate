@@ -350,7 +350,10 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
    *   The row to preview.
    */
   public function getRowToPreview(Migration $migration, int $selection_mode, string $selection_value) : Row {
-    assert(in_array($selection_mode, [static::ROW_SELECTION_BY_OFFSET, static::ROW_SELECTION_BY_URL], TRUE));
+    assert(in_array($selection_mode, [
+      static::ROW_SELECTION_BY_OFFSET,
+      static::ROW_SELECTION_BY_URL,
+    ], TRUE));
 
     $data_migration_plugin = $this->getDataMigrationPluginToPreview($migration);
     if ($data_migration_plugin === NULL) {

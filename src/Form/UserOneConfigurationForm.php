@@ -190,7 +190,11 @@ final class UserOneConfigurationForm extends AccountForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    if ($error_message = $this->validateSourceSiteInfoBaseUrl(rtrim($form_state->getValue(['source_site_info', 'base_url']), '/'))) {
+    $source_site_info = rtrim($form_state->getValue([
+      'source_site_info',
+      'base_url',
+    ]), '/');
+    if ($error_message = $this->validateSourceSiteInfoBaseUrl($source_site_info)) {
       $form_state->setErrorByName('source_site_info][base_url', $error_message);
     }
   }
@@ -227,7 +231,10 @@ final class UserOneConfigurationForm extends AccountForm {
     // @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::hasBeenConfigured()
     \Drupal::keyValue('acquia_migrate')->set(UserOneConfigurationForm::KEY, TRUE);
     // @see acquia_migrate_form_alter()
-    \Drupal::keyValue('acquia_migrate')->set(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL, rtrim($form_state->getValue(['source_site_info', 'base_url']), '/'));
+    \Drupal::keyValue('acquia_migrate')->set(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL, rtrim($form_state->getValue([
+      'source_site_info',
+      'base_url',
+    ]), '/'));
   }
 
 }

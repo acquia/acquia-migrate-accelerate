@@ -99,9 +99,18 @@ final class PotentialMigrationBreakingModuleInstallationConfirmForm extends Modu
     }
 
     // Analyze the risk of each of the unvetted modules.
-    $unvetted_stable = array_filter($unvetted_modules_to_be_installed, [$this->recommendations, 'moduleIsStable']);
-    $unvetted_has_migrations = array_filter($unvetted_modules_to_be_installed, [$this->recommendations, 'moduleHasMigrations']);
-    $unvetted_alters_migrations = array_filter($unvetted_modules_to_be_installed, [$this->recommendations, 'moduleAltersMigrations']);
+    $unvetted_stable = array_filter($unvetted_modules_to_be_installed, [
+      $this->recommendations,
+      'moduleIsStable',
+    ]);
+    $unvetted_has_migrations = array_filter($unvetted_modules_to_be_installed, [
+      $this->recommendations,
+      'moduleHasMigrations',
+    ]);
+    $unvetted_alters_migrations = array_filter($unvetted_modules_to_be_installed, [
+      $this->recommendations,
+      'moduleAltersMigrations',
+    ]);
     $unvetted_modules_to_be_installed_by_risk = [
       'NULL' => [],
       'low' => [],

@@ -44,6 +44,8 @@ class AcquiaMigrateUser extends EntityUser {
       $row->setDestinationProperty('name', $user_one->get('name')->value);
       $row->setDestinationProperty('mail', $user_one->get('mail')->value);
       $row->setDestinationProperty('init', $user_one->get('init')->value);
+      // User 1 must never be blocked.
+      $row->setDestinationProperty('status', 1);
     }
 
     return parent::import($row, $old_destination_id_values);

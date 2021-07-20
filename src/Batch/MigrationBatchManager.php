@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * This lets the logic live separate from the HTTP API controller.
  *
- * @todo: Update this docblock when this service if fleshed out.
+ * @todo Update this docblock when this service if fleshed out.
  *
  * @internal
  */
@@ -396,7 +396,7 @@ final class MigrationBatchManager {
    */
   public static function calculateCompleteness(string $migration_id) {
     $migration_repository = \Drupal::service('acquia_migrate.migration_repository');
-    /* @var \Drupal\acquia_migrate\MigrationFingerprinter $migration_fingerprinter */
+    /** @var \Drupal\acquia_migrate\MigrationFingerprinter $migration_fingerprinter */
     $migration_fingerprinter = \Drupal::service('acquia_migrate.migration_fingerprinter');
     assert($migration_repository instanceof MigrationRepository);
     $migration = $migration_repository->getMigration($migration_id);

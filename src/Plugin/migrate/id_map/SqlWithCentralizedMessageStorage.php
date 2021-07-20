@@ -487,6 +487,12 @@ final class SqlWithCentralizedMessageStorage extends Sql {
    * {@inheritdoc}
    */
   protected function countHelper($status = NULL, $table = NULL) {
+    // AMA itself never calls ::messageCount(). But if other code calls it, our
+    // optimizations should not cause failures.
+    if ($table === $this->messageTableName()) {
+      return parent::countHelper($status, $table);
+    }
+
     if (empty($this->memoizedCounts)) {
       if ($table !== NULL && $table !== $this->mapTableName()) {
         throw new \InvalidArgumentException('Invalid table name provided.');

@@ -71,10 +71,18 @@ class CacheableAcquiaMigrateResponseSubscriber implements EventSubscriberInterfa
     $events = [];
 
     // Run before DynamicPageCacheSubscriber::onRespond().
-    $events[KernelEvents::RESPONSE][] = ['onResponseBeforeDynamicPageCacheSubscriber', 101];
+    $events[KernelEvents::RESPONSE][] = [
+      'onResponseBeforeDynamicPageCacheSubscriber',
+      101,
+    ];
     // Run after FinishResponseSubscriber::onRespond().
-    $events[KernelEvents::RESPONSE][] = ['onResponseAfterFinishResponseSubscriber', -1];
-    $events[KernelEvents::RESPONSE][] = ['invalidateAcquiaMigrateResponsesOnMutate'];
+    $events[KernelEvents::RESPONSE][] = [
+      'onResponseAfterFinishResponseSubscriber',
+      -1,
+    ];
+    $events[KernelEvents::RESPONSE][] = [
+      'invalidateAcquiaMigrateResponsesOnMutate',
+    ];
 
     return $events;
   }

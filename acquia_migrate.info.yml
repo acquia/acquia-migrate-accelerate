@@ -12,3 +12,4 @@ dependencies:
   - drupal:migrate_plus
   - drupal:decoupled_pages
   - drupal:syslog
+  - migmag:migmag_rollbackable_replace

@@ -38,26 +38,6 @@ final class MigrationAlterer {
   use StringTranslationTrait;
 
   /**
-   * Destination plugin map.
-   *
-   * Structure:
-   * @code
-   * [
-   *   'original_destination_plugin' => 'new_rollbackable_destination_plugin'
-   * ]
-   * @endcode
-   *
-   * @var string[]
-   */
-  const DESTINATION_PLUGIN_MAP = [
-    'color' => 'rollbackable_color',
-    'config' => 'rollbackable_config',
-    'd7_theme_settings' => 'rollbackable_d7_theme_settings',
-    'shortcut_set_users' => 'rollbackable_shortcut_set_users',
-    'default_langcode' => 'rollbackable_default_langcode',
-  ];
-
-  /**
    * Migration source plugin ID map for taxonomy term migration dependencies.
    *
    * Map of the source entity type IDs and the source bundle keys per migration
@@ -401,53 +381,23 @@ final class MigrationAlterer {
   }
 
   /**
-   * Replaces config-like destination plugins with rollbackable plugins.
+   * Locks migrated field storage configs.
    *
-   * Also includes user shortcut set.
-   *
-   * @param array[] $migrations
-   *   An associative array of migrations keyed by migration ID, the same that
-   *   is passed to hook_migration_plugins_alter() hooks.
-   */
-  public function convertToRollbackableConfig(array &$migrations) {
-    foreach ($migrations as &$migration_data) {
-      $migration_tags = $migration_data['migration_tags'] ?? [];
-      if (!in_array($this->migrationTag, $migration_tags, TRUE) || !isset($migration_data['destination']['plugin']) || !in_array($migration_data['destination']['plugin'], array_keys(static::DESTINATION_PLUGIN_MAP), TRUE)) {
-        // Invalid migration without destination plugin, non-config destination,
-        // or not Drupal 7 migration – nothing to do.
-        continue;
-      }
-
-      $migration_data['destination']['plugin'] = static::DESTINATION_PLUGIN_MAP[$migration_data['destination']['plugin']];
-    }
-  }
-
-  /**
-   * Make entity_display migrations rollbackable.
-   *
-   * Replaces entity_display destination plugins with a rollbackable one, and
-   * prevents field storages from being deleted when field configs are rolled
-   * back (by setting persist_with_no_fields to true).
+   * By default, field_storage_config configuration entities are deleted when
+   * no related field_config (field instance) configuration left on the
+   * destination site. AMA wants to prevent this.
    *
    * @param array[] $migrations
    *   An associative array of migrations keyed by migration ID, the same that
    *   is passed to hook_migration_plugins_alter() hooks.
    */
-  public function convertToRollbackableEntityDisplay(array &$migrations) {
-    $map = [
-      'component_entity_display' => 'rollbackable_component_entity_display',
-      'component_entity_form_display' => 'rollbackable_component_entity_form_display',
-    ];
+  public function persistFieldStorageConfigs(array &$migrations) {
     foreach ($migrations as &$migration_data) {
       $migration_tags = $migration_data['migration_tags'] ?? [];
       if (!in_array($this->migrationTag, $migration_tags, TRUE) || !isset($migration_data['destination']['plugin'])) {
         // Invalid migration without destination plugin, non-entity display
         // destination, or not Drupal 7 migration – nothing to do.
         continue;
-      }
-
-      if (in_array($migration_data['destination']['plugin'], array_keys($map), TRUE)) {
-        $migration_data['destination']['plugin'] = $map[$migration_data['destination']['plugin']];
       }
 
       // We have to make sure that field_storage_config configurations aren't

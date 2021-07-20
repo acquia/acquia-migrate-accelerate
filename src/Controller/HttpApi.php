@@ -525,7 +525,7 @@ final class HttpApi {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The response.
    *
-   * @TODO Make sure to invalidate if cached whenever migration plugins are
+   * @todo Make sure to invalidate if cached whenever migration plugins are
    * rebuilt.
    */
   public function migrationGet(Request $request, Migration $migration) {
@@ -1156,7 +1156,11 @@ final class HttpApi {
       if (!is_string($data['id'] ?? NULL)) {
         throw new BadRequestHttpException(sprintf('An update operation\'s data must include an id member.'));
       }
-      if (count(array_intersect_key($data['attributes'] ?? [], array_flip(['skipped', 'completed']))) !== 1) {
+      $data_attributes = array_intersect_key($data['attributes'] ?? [], array_flip([
+        'skipped',
+        'completed',
+      ]));
+      if (count($data_attributes) !== 1) {
         throw new BadRequestHttpException(sprintf('This resource only supports skipping, unskipping, completing and un-completing migration resources.'));
       }
       try {
@@ -1372,7 +1376,7 @@ final class HttpApi {
     }
 
     $migration_id = $request->get('migrationId');
-    // @todo: validate that the requested migration ID exists.
+    // @todo validate that the requested migration ID exists.
     $batch_url = $this->getMigrationProcessUrl($migration_id, $migration_action)->setAbsolute();
     return JsonResponse::create([
       'meta' => [
@@ -1486,7 +1490,7 @@ final class HttpApi {
     }
     $batch_status = $this->migrationBatchManager->isMigrationBatchOngoing($process_id);
     if ($batch_status instanceof BatchUnknown) {
-      // @todo: should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.
+      // @todo should this be a cacheable response? If so, we'll need to mint and invalidate a cache tag for it.
       return JsonResponse::create(NULL, 404, static::$defaultResponseHeaders);
     }
     $data = [

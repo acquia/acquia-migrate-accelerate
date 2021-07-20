@@ -50,6 +50,13 @@ use Drupal\Core\Database\SchemaObjectExistsException;
  * drush ev "\Drupal::keyValue('acquia_migrate')->get('acquia_migrate.ah.database_copied', TRUE);"
  * @endcode
  *
+ * It is possible to completely reset MacGyver. First manually drop all tables
+ * matching the regex /ama\d+_/ (so "ama1_", "ama2_", et cetera). Then run this:
+ * @code
+ * drush ev "\Drupal::state()->deleteMultiple(['migrate.fallback_state_key', 'acquia_migrate.ah.database_copy_time', 'acquia_migrate.ah.copy_start']);"
+ * drush ev "\Drupal::keyValue('acquia_migrate')->deleteMultiple(['acquia_migrate.ah.current_copy_version', 'acquia_migrate.ah.database_copied', 'acquia_migrate.ah.database_copy_to_delete', 'acquia_migrate.ah.interrupted_database_copy_to_delete']);"
+ * @encode
+ *
  * @internal
  */
 final class MacGyver {
