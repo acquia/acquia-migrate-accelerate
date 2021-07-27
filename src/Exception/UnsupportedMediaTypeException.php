@@ -22,7 +22,7 @@ class UnsupportedMediaTypeException extends BadRequestHttpException {
   /**
    * {@inheritdoc}
    */
-  public function getStatusCode() {
+  public function getStatusCode() : int {
     return 415;
   }
 

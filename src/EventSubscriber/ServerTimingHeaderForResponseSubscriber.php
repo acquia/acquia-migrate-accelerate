@@ -145,7 +145,7 @@ class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterfac
    *   The measurements, if any.
    */
   private static function getTimerMeasurements(string $timer_name) : ?array {
-    set_error_handler(function () {}, E_NOTICE);
+    set_error_handler(function () {}, E_WARNING | E_NOTICE);
     $measurements = Timer::stop($timer_name);
     restore_error_handler();
     return $measurements;

@@ -481,7 +481,6 @@ final class MigrationAlterer {
         }
 
         $migration_data['migration_dependencies']['required'] = array_unique(array_merge(array_values($migration_data['migration_dependencies']['required']), [
-          'd7_user',
           'd7_media_view_modes',
           'd7_view_modes:file',
           'd7_field:file',

@@ -342,11 +342,8 @@ final class MigrationBatchManager {
    *   The filename that the error was raised in.
    * @param int $line
    *   The line number the error was raised at.
-   * @param array $context
-   *   An array that points to the active symbol table at the point the error
-   *   occurred.
    */
-  public static function logNonHaltingErrorsOrPassthrough($error_level, $message, $filename, $line, array $context) : void {
+  public static function logNonHaltingErrorsOrPassthrough($error_level, $message, $filename, $line) : void {
     $backtrace = debug_backtrace();
 
     $non_halting_error_levels = [
@@ -361,7 +358,7 @@ final class MigrationBatchManager {
     ];
     if (!in_array($error_level, $non_halting_error_levels, TRUE)) {
       // Pass through to the Drupal error handler.
-      _drupal_error_handler($error_level, $message, $filename, $line, $context);
+      _drupal_error_handler($error_level, $message, $filename, $line);
       return;
     }
 

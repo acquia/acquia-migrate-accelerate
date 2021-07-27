@@ -26,7 +26,7 @@ class BadRequestHttpException extends \RuntimeException implements AcquiaMigrate
   /**
    * {@inheritdoc}
    */
-  public function getStatusCode() {
+  public function getStatusCode(): int {
     return 400;
   }
 

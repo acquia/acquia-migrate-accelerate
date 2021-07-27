@@ -19,7 +19,7 @@ final class NotAcceptableException extends BadRequestHttpException {
   /**
    * {@inheritdoc}
    */
-  public function getStatusCode() {
+  public function getStatusCode() : int {
     return 406;
   }
 
