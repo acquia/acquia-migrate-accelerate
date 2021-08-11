@@ -330,3 +330,11 @@ function acquia_migrate_update_9202() {
   $schema->renameTable('acquia_migrate_config_new', 'migmag_rollbackable_new_targets');
   $schema->renameTable('acquia_migrate_config_rollback_data', 'migmag_rollbackable_data');
 }
+
+/**
+ * Migration Previewer service needs an extra argument.
+ *
+ * @see \Drupal\acquia_migrate\MigrationPreviewer::__construct()
+ */
+function acquia_migrate_update_9203() {
+}

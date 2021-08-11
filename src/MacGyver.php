@@ -67,6 +67,8 @@ final class MacGyver {
    * @var string[]
    */
   const EXCLUDED_TABLES = [
+    // D7 accesslog is irrelevant in D9.
+    'accesslog',
     // Caches are rebuilt, not migrated.
     'cache_.+',
     // Migration metadata from migrations into Drupal 7 are irrelevant when
@@ -85,6 +87,8 @@ final class MacGyver {
     'simplesaml_tableVersion',
     // D7 watchdog is irrelevant in D9.
     'watchdog',
+    // WordPress tables if any, should not be migrated.
+    'wp_.+',
   ];
 
   /**

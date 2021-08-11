@@ -74,6 +74,12 @@ trait EntityRelatedHeuristicTrait {
         $entity_type = 'multifield';
         break;
 
+      case 'statistics_node_counter':
+      case 'statistics_node_translation_counter':
+        $entity_type = 'node';
+        $bundle = $source_config['node_type'];
+        break;
+
       default:
         $entity_type = $source_config['entity_type'] ?? $source_config['constants']['entity_type'] ?? NULL;
         $bundle = $source_config['node_type'] ?? $source_config['bundle'] ?? $source_config['type'] ?? NULL;

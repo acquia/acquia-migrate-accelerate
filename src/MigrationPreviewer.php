@@ -6,6 +6,7 @@ use Drupal\acquia_migrate\Exception\ImplementationException;
 use Drupal\acquia_migrate\Exception\MissingSourceDatabaseException;
 use Drupal\acquia_migrate\Exception\RowNotFoundException;
 use Drupal\acquia_migrate\Exception\RowPreviewException;
+use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -14,6 +15,7 @@ use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
@@ -22,6 +24,8 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Row;
+use Masterminds\HTML5;
+use Masterminds\HTML5\Parser\StringInputStream;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -81,6 +85,13 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
   protected $eventDispatcher;
 
   /**
+   * The key value store to use.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   */
+  protected $keyValue;
+
+  /**
    * MigrationPreviewer constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -91,12 +102,15 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
    *   The HTTP kernel.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   *   The key value store factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, HttpKernelInterface $http_kernel, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, HttpKernelInterface $http_kernel, EventDispatcherInterface $event_dispatcher, KeyValueFactoryInterface $key_value_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->renderer = $renderer;
     $this->httpKernel = $http_kernel;
     $this->eventDispatcher = $event_dispatcher;
+    $this->keyValue = $key_value_factory->get('acquia_migrate');
   }
 
   /**
@@ -249,7 +263,7 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
       'attributes' => [
         'raw' => $raw_mapping,
         // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-srcdoc
-        'html' => $filtered_html_response->getContent(),
+        'html' => $this->alterRelativeLinksToSourceSite($filtered_html_response->getContent()),
       ],
       'relationships' => [
         'sourceMigration' => [
@@ -784,7 +798,7 @@ HTML;
       ->create(
         $row->getDestination()
       )
-      ->enforceIsNew();
+      ->enforceIsNew(FALSE);
 
     // @see \Drupal\node\NodeViewBuilder::buildComponents()
     $entity->in_preview = TRUE;
@@ -799,6 +813,41 @@ HTML;
     return [
       'postEntityPreviewBuild',
     ];
+  }
+
+  /**
+   * Changes anchor href as absolute to source site.
+   *
+   * Also sets the target="_blank" to open preview in new tab.
+   *
+   * @param string $html
+   *   HTML containing anchors with root-relative URL `href` attribute value.
+   *
+   * @return string
+   *   Updated HTML.
+   */
+  private function alterRelativeLinksToSourceSite(string $html) : string {
+    $html5 = new HTML5(['disable_html_ns' => TRUE]);
+    try {
+      $dom = $html5->parse($html);
+    }
+    catch (\TypeError $e) {
+      $text_stream = new StringInputStream($html);
+      $dom = $html5->parse($text_stream);
+    }
+    $d7_base_url = rtrim($this->keyValue->get(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL), '/');
+    foreach ($dom->getElementsByTagName('a') as $node) {
+      /** @var \DOMElement $node */
+      $src = rawurldecode($node->getAttribute('href'));
+      $url_parts = parse_url($src);
+      $scheme = $url_parts['scheme'] ?? '';
+      if (!$scheme) {
+        $src = ltrim($src, '/');
+        $node->setAttribute('href', $d7_base_url . '/' . $src);
+      }
+      $node->setAttribute('target', '_blank');
+    }
+    return $html5->saveHTML($dom);
   }
 
 }

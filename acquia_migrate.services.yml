@@ -27,6 +27,7 @@ services:
       - '@renderer'
       - '@http_kernel'
       - '@event_dispatcher'
+      - '@keyvalue'
   acquia_migrate.mapping_viewer:
     class: Drupal\acquia_migrate\MigrationMappingViewer
     arguments:
