@@ -224,6 +224,26 @@ d7_filter_format:
       php_code: >-
         Stop using the php_code filter! It was a bad practice in Drupal 7 too. Either modify your Drupal 7 site to stop
         using it, otherwise it's recommended to not migrate any content that is actively using this filter."
+      insert_block: >-
+        The "Insert Block" module has no Drupal 9 port. You can use the Drupal 9 compatibility patch and help get it
+        committed at https://www.drupal.org/project/insert_block/issues/3151591. Warning: this module is not maintained!
+      ds_code: >-
+        Stop using the ds_code filter! It is equivalent to the php_code filter, which already was a bad practice in
+        Drupal too too.Either modify your Drupal 7 site to stop using it, otherwise it's recommended to not migrate any
+        content that is actively using this filter."
+      easychart: >-
+        The "Easychart" module has no Drupal 9 port. You can use the Drupal 9 compatibility patch and help get it
+        committed at https://www.drupal.org/project/easychart/issues/3214283. This filter was even removed from the
+        7.x-3.x version, the last version it shipped with was 7.x-2.x, which got its last release in 2015! Warning: this
+        module is not maintained!
+      tabs: >-
+        The "jQuery UI filter" module has no Drupal 9 port. This filter is available in the Drupal 8 version of this
+        module. You can use the Drupal 9 compatibility patch and help get it committed at
+        https://www.drupal.org/project/jquery_ui_filter/issues/3158053. Warning: this module is not maintained!
+      accordion: >-
+        The "jQuery UI filter" module has no Drupal 9 port. This filter is available in the Drupal 8 version of this
+        module. You can use the Drupal 9 compatibility patch and help get it committed at
+        https://www.drupal.org/project/jquery_ui_filter/issues/3158053. Warning: this module is not maintained!
   -
     message:
       regexp: >-

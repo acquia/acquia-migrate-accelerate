@@ -30,13 +30,41 @@ class ProfiledContainerDerivativeDiscoveryDecorator extends ContainerDerivativeD
   ];
 
   /**
+   * Converts shorthand memory notation value to bytes.
+   *
+   * @param string $val
+   *   Memory size shorthand notation string. E.g., 128M.
+   *
+   * @see http://php.net/manual/en/function.ini-get.php
+   */
+  private static function getBytes(string $val) : int {
+    $val = trim($val);
+    $last = strtolower($val[strlen($val) - 1]);
+    $val = substr($val, 0, -1);
+    switch ($last) {
+      // Fall through (absence of break statements) is intentional.
+      case 'g':
+        $val *= 1024;
+      case 'm':
+        $val *= 1024;
+      case 'k':
+        $val *= 1024;
+    }
+    return (int) $val;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function getDerivatives(array $base_plugin_definitions) {
-    // Computing all derivatives is very resource-intensive. For complex source
-    // sites, the number of derivatives to generate can be very high. Increase
-    // the memory limit for the remainder of this request.
-    ini_set('memory_limit', '512M');
+    $minimum_memory_limit_mb = 512;
+    $current_memory_limit = static::getBytes(ini_get('memory_limit'));
+    if ($current_memory_limit < ($minimum_memory_limit_mb * 1024 * 1024)) {
+      // Computing all derivatives is very resource-intensive. For complex
+      // source sites, the number of derivatives to generate can be very high.
+      // Increase the memory limit for the remainder of this request.
+      ini_set('memory_limit', $minimum_memory_limit_mb . 'M');
+    }
 
     Timer::start(Timers::COMPUTE_MIGRATION_PLUGINS_DERIVED);
 
