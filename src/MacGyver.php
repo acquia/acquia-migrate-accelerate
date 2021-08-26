@@ -208,7 +208,7 @@ final class MacGyver {
    *   TRUE when action is needed
    */
   public static function detectWhetherActionIsNeeded() : bool {
-    if (!AcquiaDrupalEnvironmentDetector::isAhEnv()) {
+    if (!AcquiaDrupalEnvironmentDetector::isAhEnv() && !AcquiaDrupalEnvironmentDetector::isAhIdeEnv()) {
       return FALSE;
     }
 

@@ -371,6 +371,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
    *
    * @param string $migration_label_or_id
    *   A migration label or ID.
+   * @param string|null $data_migration_plugin_id
+   *   (optional) A data migration plugin ID (of of the data migration plugins
+   *   in this migration).
    * @param array $options
    *   The options to pass.
    *
@@ -406,7 +409,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function remainingRows(string $migration_label_or_id, array $options = [
+  public function remainingRows(string $migration_label_or_id, string $data_migration_plugin_id = NULL, array $options = [
     'unprocessed-only' => self::OPT,
     'processed-only' => self::OPT,
   ]) {
@@ -421,6 +424,12 @@ final class AcquiaMigrateCommands extends DrushCommands {
     $migration = $this->migrationRepository->getMigration($migration_id);
     assert($migration instanceof Migration);
     $data_migration_plugin_ids = $migration->getDataMigrationPluginIds();
+    if ($data_migration_plugin_id !== NULL) {
+      if (!in_array($data_migration_plugin_id, $data_migration_plugin_ids)) {
+        throw new \Exception(sprintf("Specified data migration plugin '%s' is not one of the data migration plugins in this migration.", $data_migration_plugin_id));
+      }
+      $data_migration_plugin_ids = [$data_migration_plugin_id];
+    }
     $this->say(dt('Analyzing @count data migration plugins for remaining rows. Unprocessed rows require a complete scan, to cross-reference the complete set of source rows against the migrate ID mapping.', ['@count' => count($data_migration_plugin_ids)]));
 
     $table = [];

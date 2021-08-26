@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\migrate\Exception\RequirementsException;
@@ -1363,6 +1364,35 @@ final class MigrationAlterer {
           '@migration-plugin-id' => $migration_plugin_id,
         ]);
       }
+    }
+  }
+
+  /**
+   * Executable file migrations with CLI tools like Drush or Migrate Tools.
+   *
+   * @param array[] $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   *
+   * @todo https://www.drupal.org/node/2804611.
+   *
+   * @see \Drupal\migrate_drupal_ui\Batch\MigrateUpgradeImportBatch::run()
+   */
+  public function makeFileMigrationsExecutable(array &$migrations): void {
+    $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
+    $d7_file_migrations = array_filter($d7_migrations, function (array $definition) {
+      return $definition['destination']['plugin'] === 'entity:file';
+    });
+    $public_files_path = Settings::get('migrate_source_base_path') ?? '';
+    $private_files_path = Settings::get('migrate_source_private_file_path') ?? $public_files_path;
+    foreach ($d7_file_migrations as $file_migration_plugin_id => $definition) {
+      // Use the private file path if the scheme property is set in the source
+      // plugin definition and is 'private' otherwise use the public file path.
+      $scheme = $definition['source']['scheme'] ?? NULL;
+      $base_path = $scheme === 'private'
+        ? $private_files_path
+        : $public_files_path;
+      $migrations[$file_migration_plugin_id]['source']['constants']['source_base_path'] = rtrim($base_path, '/');
     }
   }
 

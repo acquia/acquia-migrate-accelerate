@@ -156,6 +156,8 @@ function acquia_migrate_migration_plugins_alter(array &$migrations) {
   $migration_alterer->addChangeTracking($migrations);
   // Enable caching on migration plugins to improve performance.
   $migration_alterer->addCachingToSqlBasedMigrationPlugins($migrations);
+  // Executable file migrations with CLI tools like Drush or Migrate Tools.
+  $migration_alterer->makeFileMigrationsExecutable($migrations);
 }
 
 /**
