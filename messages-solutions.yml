@@ -229,7 +229,7 @@ d7_filter_format:
         committed at https://www.drupal.org/project/insert_block/issues/3151591. Warning: this module is not maintained!
       ds_code: >-
         Stop using the ds_code filter! It is equivalent to the php_code filter, which already was a bad practice in
-        Drupal too too.Either modify your Drupal 7 site to stop using it, otherwise it's recommended to not migrate any
+        Drupal. Modify your Drupal 7 site to stop using it. Otherwise, it's recommended to not migrate any
         content that is actively using this filter."
       easychart: >-
         The "Easychart" module has no Drupal 9 port. You can use the Drupal 9 compatibility patch and help get it

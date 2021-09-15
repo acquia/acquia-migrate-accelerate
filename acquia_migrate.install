@@ -338,3 +338,42 @@ function acquia_migrate_update_9202() {
  */
 function acquia_migrate_update_9203() {
 }
+
+/**
+ * Adds new index to the centralized messages table to improve performance.
+ */
+function acquia_migrate_update_9204() {
+  $schema = \Drupal\Core\Database\Database::getConnection()->schema();
+  $schema->addIndex(
+    SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE,
+    'faster_migrations',
+    [
+      SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_PLUGIN_ID,
+      SqlWithCentralizedMessageStorage::SOURCE_IDS_HASH,
+    ],
+    [
+      'fields' => [
+        'msgid' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_PLUGIN_ID => [
+          'type' => 'varchar',
+          'length' => '128',
+          'not null' => TRUE,
+          'description' => 'The migration plugin ID.',
+        ],
+        SqlWithCentralizedMessageStorage::SOURCE_IDS_HASH => [
+          'type' => 'varchar',
+          'length' => '64',
+          'not null' => TRUE,
+          'description' => 'Hash of source IDs.',
+        ],
+      ],
+      'indexes' => [
+        SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_PLUGIN_ID => [SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_PLUGIN_ID],
+      ],
+    ]
+  );
+}

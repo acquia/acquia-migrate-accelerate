@@ -23,6 +23,7 @@ use Drupal\acquia_migrate\MigrationPreviewer;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\ModuleAuditor;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
+use Drupal\acquia_migrate\Query\Pagination;
 use Drupal\acquia_migrate\Recommendations;
 use Drupal\acquia_migrate\Timers;
 use Drupal\acquia_migrate\UriDefinitions;
@@ -80,6 +81,7 @@ final class HttpApi {
     'url.query_args:filter',
     'url.query_args:fields',
     'url.query_args:include',
+    'url.query_args:page',
     'headers:Accept',
   ];
 
@@ -1252,75 +1254,73 @@ final class HttpApi {
     Timer::start(Timers::RESPONSE_MESSAGES_COLLECTION);
 
     $this->validateRequest($request, [
-      'optional' => ['filter'],
+      'optional' => ['filter', 'page'],
     ]);
     $cacheability = new CacheableMetadata();
     $cacheability->addCacheContexts(static::$defaultCacheContexts);
     $query = $this->getQueryFromRequest($request);
-    $data = array_map($this->getSparseFieldsetFunction($request), $this->loadMessages($query));
+    $messages_data = $this->loadMessages($request, $query);
+    $data = array_map($this->getSparseFieldsetFunction($request), $messages_data['messages'] ?? []);
     $severity_levels = RfcLogLevel::getLevels();
     $categories = $this->getFilterCategories();
     $generated_messages_url = Url::fromRoute('acquia_migrate.api.messages.get')->setAbsolute()->toString(TRUE);
     $cacheability->addCacheableDependency($generated_messages_url);
-    $response = (new CacheableJsonResponse([
-      'data' => $data,
-      'links' => [
-        'self' => [
-          'href' => $request->getUri(),
+    $links_data['query'] = [
+      'href' => $generated_messages_url->getGeneratedUrl(),
+      'uri-template:href' => $generated_messages_url->getGeneratedUrl() . '{?filter*}',
+      'uri-template:suggestions' => [
+        [
+          'label' => $this->t('Migration'),
+          'variable' => 'filter',
+          'cardinality' => 1,
+          'field' => SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_ID,
+          'operator' => ':eq',
+          'options' => array_reduce($this->loadMigrations(), function (array $options, Migration $migration) {
+            return array_merge($options, [
+              [
+                'label' => $migration->label(),
+                'value' => $migration->id(),
+              ],
+            ]);
+          }, []),
         ],
-        'query' => [
-          'href' => $generated_messages_url->getGeneratedUrl(),
-          'uri-template:href' => $generated_messages_url->getGeneratedUrl() . '{?filter*}',
-          'uri-template:suggestions' => [
-            [
-              'label' => $this->t('Migration'),
-              'variable' => 'filter',
-              'cardinality' => 1,
-              'field' => SqlWithCentralizedMessageStorage::COLUMN_MIGRATION_ID,
-              'operator' => ':eq',
-              'options' => array_reduce($this->loadMigrations(), function (array $options, Migration $migration) {
-                return array_merge($options, [
-                  [
-                    'label' => $migration->label(),
-                    'value' => $migration->id(),
-                  ],
-                ]);
-              }, []),
-            ],
-            [
-              'label' => $this->t('Severity'),
-              'variable' => 'filter',
-              'cardinality' => 1,
-              'operator' => ':eq',
-              'field' => SqlWithCentralizedMessageStorage::COLUMN_SEVERITY,
-              'options' => array_reduce(array_keys($severity_levels), function (array $values, int $level) use ($severity_levels) {
-                return array_merge($values, [
-                  [
-                    'label' => (string) $severity_levels[$level],
-                    'value' => "{$level}",
-                  ],
-                ]);
-              }, []),
-            ],
-            [
-              'label' => $this->t('Type'),
-              'variable' => 'filter',
-              'cardinality' => 1,
-              'operator' => ':eq',
-              'field' => SqlWithCentralizedMessageStorage::COLUMN_CATEGORY,
-              'options' => array_reduce(array_keys($categories), function (array $values, string $category) use ($categories) {
-                return array_merge($values, [
-                  [
-                    'label' => $categories[$category],
-                    'value' => $category,
-                  ],
-                ]);
-              }, []),
-            ],
-          ],
-          'rel' => UriDefinitions::LINK_REL_QUERY,
+        [
+          'label' => $this->t('Severity'),
+          'variable' => 'filter',
+          'cardinality' => 1,
+          'operator' => ':eq',
+          'field' => SqlWithCentralizedMessageStorage::COLUMN_SEVERITY,
+          'options' => array_reduce(array_keys($severity_levels), function (array $values, int $level) use ($severity_levels) {
+            return array_merge($values, [
+              [
+                'label' => (string) $severity_levels[$level],
+                'value' => "{$level}",
+              ],
+            ]);
+          }, []),
+        ],
+        [
+          'label' => $this->t('Type'),
+          'variable' => 'filter',
+          'cardinality' => 1,
+          'operator' => ':eq',
+          'field' => SqlWithCentralizedMessageStorage::COLUMN_CATEGORY,
+          'options' => array_reduce(array_keys($categories), function (array $values, string $category) use ($categories) {
+            return array_merge($values, [
+              [
+                'label' => $categories[$category],
+                'value' => $category,
+              ],
+            ]);
+          }, []),
         ],
       ],
+      'rel' => UriDefinitions::LINK_REL_QUERY,
+    ];
+    $links_data += $messages_data['collection_links'] ?? [];
+    $response = (new CacheableJsonResponse([
+      'data' => $data,
+      'links' => $links_data,
     ], 200, array_merge(static::$defaultResponseHeaders, [
       'Content-Type' => 'application/vnd.api+json; ext="' . UriDefinitions::EXTENSION_URI_TEMPLATE . '"',
     ])))->addCacheableDependency($cacheability);
@@ -1571,13 +1571,15 @@ final class HttpApi {
   /**
    * Loads all messages as an array of resource objects.
    *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request to serve.
    * @param \League\Uri\Contracts\QueryInterface $query
    *   The URL query.
    *
    * @return array
    *   An array of resource objects.
    */
-  protected function loadMessages(QueryInterface $query): array {
+  protected function loadMessages(Request $request, QueryInterface $query): array {
     if (!$this->connection->schema()->tableExists(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)) {
       return [];
     }
@@ -1593,6 +1595,22 @@ final class HttpApi {
       $message_query->condition($field, $value, static::$filterOperatorMap[$operator]);
     }
 
+    // Apply any pagination options to the query.
+    if ($request->query->has('page')) {
+      $pagination = Pagination::createFromQueryParameter($request->query->get('page'));
+    }
+    else {
+      $pagination = Pagination::createFromQueryParameter([
+        'page' => [
+          'offset' => Pagination::DEFAULT_OFFSET,
+          'limit' => Pagination::SIZE_MAX,
+        ],
+      ]);
+    }
+    // Clone query to get total result count.
+    $count_query = clone $message_query;
+    // Add one extra element to the page to see if there are more pages needed.
+    $message_query->range($pagination->getOffset(), $pagination->getSize() + 1);
     $message_query
       ->fields('m', [
         SqlWithCentralizedMessageStorage::COLUMN_DATETIME,
@@ -1604,9 +1622,16 @@ final class HttpApi {
         'message',
         'msgid',
       ]);
-
-    $results = $message_query->execute();
-
+    $results = $message_query->execute()->fetchAll();
+    if ($has_next_page = $pagination->getSize() < count($results)) {
+      // Drop the last result.
+      array_pop($results);
+    }
+    $link_context = [
+      'has_next_page' => $has_next_page,
+      'total_count' => $count_query->countQuery()->execute()->fetchField(),
+    ];
+    $collection_links = Pagination::getPagerLinks($request, $pagination, $link_context);
     $messages = [];
     foreach ($results as $message) {
       $datetime = (new \DateTime())
@@ -1656,8 +1681,7 @@ final class HttpApi {
         ],
       ];
     }
-
-    return $messages;
+    return ['messages' => $messages, 'collection_links' => $collection_links];
   }
 
   /**

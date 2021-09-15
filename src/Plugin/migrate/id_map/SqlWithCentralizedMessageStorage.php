@@ -214,6 +214,10 @@ final class SqlWithCentralizedMessageStorage extends Sql {
         'primary key' => ['msgid'],
         'indexes' => [
           static::COLUMN_MIGRATION_PLUGIN_ID => [static::COLUMN_MIGRATION_PLUGIN_ID],
+          'faster_migrations' => [
+            static::COLUMN_MIGRATION_PLUGIN_ID,
+            $this::SOURCE_IDS_HASH,
+          ],
         ],
       ];
       $this->getDatabase()->schema()->createTable(static::CENTRALIZED_MESSAGE_TABLE, $schema);
