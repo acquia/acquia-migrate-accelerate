@@ -39,6 +39,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\migrate\Plugin\MigrationInterface;
 use League\Uri\Components\Query;
 use League\Uri\Contracts\QueryInterface;
 use League\Uri\Uri;
@@ -1099,7 +1100,28 @@ final class HttpApi {
 
       // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor
       // @codingStandardsIgnoreLine
-      \Drupal::state()->set(InstantaneousBatchInterruptor::KEY, TRUE);
+      if (!\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH)) {
+        \Drupal::state()->set(InstantaneousBatchInterruptor::KEY, TRUE);
+      }
+      // When no migration is currently executing (because no lock is held), yet
+      // this migration is marked as active, that means that one or more of this
+      // migration's migration plugins are incorrectly marked as active. Reset
+      // their status.
+      // This is essentially an auto-suggested self-service `drush mrs *`.
+      else {
+        $stuck_migration_plugin_ids = [];
+        foreach ($migration->getMigrationPluginInstances() as $migration_plugin_instance) {
+          if ($migration_plugin_instance->getStatus() === MigrationInterface::STATUS_IDLE) {
+            continue;
+          }
+          $migration_plugin_instance->setStatus(MigrationInterface::STATUS_IDLE);
+          $stuck_migration_plugin_ids[] = $migration_plugin_instance->id();
+        }
+        \Drupal::logger('acquia_migrate')->info('The "@migration-id" migration was unstuck, specifically the following data migration plugin IDs: @stuck-migration-plugin-ids.', [
+          '@migration-id' => $migration->label(),
+          '@stuck-migration-plugin-ids' => implode(', ', $stuck_migration_plugin_ids),
+        ]);
+      }
     }
 
     foreach ($data['attributes'] as $attribute => $value) {

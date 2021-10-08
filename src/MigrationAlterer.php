@@ -1384,7 +1384,18 @@ final class MigrationAlterer {
       return $definition['destination']['plugin'] === 'entity:file';
     });
     $public_files_path = Settings::get('migrate_source_base_path') ?? '';
-    $private_files_path = Settings::get('migrate_source_private_file_path') ?? $public_files_path;
+    // Automatically use the weird alternative location for private files on
+    // Acquia Cloud.
+    // @see https://support.acquia.com/hc/en-us/articles/360005307793-Setting-the-private-file-directory-on-Acquia-Cloud
+    $acquia_cloud_weird_alternative_files_path = dirname($public_files_path . '/files-private');
+    if (file_exists($acquia_cloud_weird_alternative_files_path)) {
+      $private_files_path = $acquia_cloud_weird_alternative_files_path;
+      \Drupal::service('logger.channel.acquia_migrate_statistics')->info('private_file_path=normal');
+    }
+    else {
+      $private_files_path = Settings::get('migrate_source_private_file_path') ?? $public_files_path;
+      \Drupal::service('logger.channel.acquia_migrate_statistics')->info('private_file_path=weird');
+    }
     foreach ($d7_file_migrations as $file_migration_plugin_id => $definition) {
       // Use the private file path if the scheme property is set in the source
       // plugin definition and is 'private' otherwise use the public file path.

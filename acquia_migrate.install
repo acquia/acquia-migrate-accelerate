@@ -12,6 +12,7 @@ use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Utility\UpdateException;
 
@@ -66,6 +67,23 @@ function acquia_migrate_install($is_syncing) {
       ->set('hide_signup_messages', 1)
       ->save();
   }
+
+  // Install "migmag_process" if paragraphs is installed.
+  $module_handler = \Drupal::moduleHandler();
+  if ($module_handler->moduleExists('paragraphs')) {
+    $module_list = \Drupal::service('extension.list.module')->getList();
+    if (!in_array('migmag_process', array_keys($module_list), TRUE)) {
+      throw new MissingDependencyException(
+        'Migrate Magician Process Plugins (migmag_process) module is required if Paragraphs is installed. Make sure the module is available and try again.'
+      );
+    }
+
+    if (!$module_handler->moduleExists('migmag_process')) {
+      $module_installer = \Drupal::service('module_installer');
+      assert($module_installer instanceof ModuleInstallerInterface);
+      $module_installer->install(['migmag_process'], TRUE);
+    }
+  }
 }
 
 /**
@@ -82,6 +100,20 @@ function acquia_migrate_uninstall($is_syncing) {
     Recommendations::KEY_INITIAL_INFO,
     MigrationFingerprinter::KEY_LAST_FINGERPRINT_CANARY_TIME,
     MigrationFingerprinter::KEY_LAST_FINGERPRINT_COMPUTE_TIME,
+  ]);
+
+  // Un-MacGyver.
+  // @see \Drupal\acquia_migrate\MacGyver
+  \Drupal::state()->deleteMultiple([
+    'migrate.fallback_state_key',
+    'acquia_migrate.ah.database_copy_time',
+    'acquia_migrate.ah.copy_start',
+  ]);
+  \Drupal::keyValue('acquia_migrate')->deleteMultiple([
+    'acquia_migrate.ah.current_copy_version',
+    'acquia_migrate.ah.database_copied',
+    'acquia_migrate.ah.database_copy_to_delete',
+    'acquia_migrate.ah.interrupted_database_copy_to_delete',
   ]);
 
   if ($is_syncing) {
@@ -376,4 +408,28 @@ function acquia_migrate_update_9204() {
       ],
     ]
   );
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Installs migmag_process for paragraphs migrations.
+ */
+function acquia_migrate_update_9205() {
+  $module_handler = \Drupal::moduleHandler();
+  // Install Migrate Magician Process Plugins if Paragraphs module is installed.
+  if ($module_handler->moduleExists('paragraphs')) {
+    $module_list = \Drupal::service('extension.list.module')->getList();
+    if (!in_array('migmag_process', array_keys($module_list), TRUE)) {
+      throw new UpdateException(
+        'Migrate Magician Process Plugins (migmag_process) module is required if Paragraphs is installed. Make sure the module is available and try again.'
+      );
+    }
+
+    if (!$module_handler->moduleExists('migmag_process')) {
+      $module_installer = \Drupal::service('module_installer');
+      assert($module_installer instanceof ModuleInstallerInterface);
+      $module_installer->install(['migmag_process'], TRUE);
+    }
+  }
 }

@@ -407,6 +407,20 @@ final class MigrationBatchManager {
       ])
       ->condition('migration_id', $migration->id())
       ->execute();
+
+    // Aggregate completion tracking.
+    $migrations = $migration_repository->getMigrations();
+    $imported_rows = 0;
+    $total_rows = 0;
+    foreach ($migrations as $migration) {
+      $imported_rows += $migration->getUiImportedCount();
+      $total_rows += $migration->getTotalCount();
+    }
+    \Drupal::service('logger.channel.acquia_migrate_statistics')->info(
+      sprintf("imported_pct_of_total_rows=%.4f",
+        $imported_rows / $total_rows
+      )
+    );
   }
 
   /**
@@ -561,9 +575,20 @@ final class MigrationBatchManager {
       ? [$this->repository->getMigration($migration_id)->getDataMigrationPluginIds()]
       : [$this->repository->getMigration($migration_id)->getMigrationPluginIds()];
     if ($action === static::ACTION_IMPORT || $action == static::ACTION_REFRESH) {
+      $public_files_path = Settings::get('migrate_source_base_path');
+      // Automatically use the weird alternative location for private files on
+      // Acquia Cloud.
+      // @see https://support.acquia.com/hc/en-us/articles/360005307793-Setting-the-private-file-directory-on-Acquia-Cloud
+      $acquia_cloud_weird_alternative_files_path = dirname($public_files_path . '/files-private');
+      if (file_exists($acquia_cloud_weird_alternative_files_path)) {
+        $private_files_path = $acquia_cloud_weird_alternative_files_path;
+      }
+      else {
+        $private_files_path = Settings::get('migrate_source_private_file_path');
+      }
       $config = [
-        'source_base_path' => Settings::get('migrate_source_base_path'),
-        'source_private_file_path' => Settings::get('migrate_source_private_file_path'),
+        'source_base_path' => $public_files_path,
+        'source_private_file_path' => $private_files_path,
       ];
       array_push($arguments, $config);
     }

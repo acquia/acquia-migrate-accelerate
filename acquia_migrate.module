@@ -14,6 +14,7 @@ use Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateEntityReference;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
 use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -261,6 +262,13 @@ function acquia_migrate_modules_installed($modules, $is_syncing) {
       ->getEditable('acquia_connector.settings')
       ->set('hide_signup_messages', 1)
       ->save();
+  }
+
+  // Install migmag_process for paragraphs migrations.
+  if (!$is_syncing && in_array('paragraphs', $modules)) {
+    $installer = \Drupal::service('module_installer');
+    assert($installer instanceof ModuleInstallerInterface);
+    $installer->install(['migmag_process'], TRUE);
   }
 }
 

@@ -71,6 +71,13 @@ final class Migration {
   const ACTIVITY_REFRESHING = 'refreshing';
 
   /**
+   * This migration is stuck.
+   *
+   * @var string
+   */
+  const ACTIVITY_STUCK = 'stuck';
+
+  /**
    * The migration ID: an opaque identifier, without meaning.
    *
    * @var string
@@ -677,9 +684,11 @@ final class Migration {
       ->setRouteParameter('migration', $this->id());
 
     // If this migration is not idle, do not allow any other activities, except
-    // stopping the current activity.
+    // stopping the current activity (or unsticking it if not actually running).
     if ($this->getActivity() !== self::ACTIVITY_IDLE) {
-      $urls['stop'] = $update_resource_url;
+      $migration_is_actually_executing = !\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH);
+      $operation = $migration_is_actually_executing ? 'stop' : 'unstick';
+      $urls[$operation] = $update_resource_url;
       return $urls;
     }
 
@@ -933,6 +942,9 @@ final class Migration {
 
     switch ($max_migration_plugin_status) {
       case MigrationInterface::STATUS_IMPORTING:
+        if (\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH)) {
+          return self::ACTIVITY_STUCK;
+        }
         // Refreshing is a special case of importing as far as the migration
         // system is concerned. Therefore we need to carefully detect this. Note
         // this is specifically not using ::getUiProcecessedCount()!
@@ -1155,6 +1167,21 @@ final class Migration {
         $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
         $link_title = t('Stop operation');
         $link_params = [
+          'data' => [
+            'type' => 'migration',
+            'id' => $migration->id(),
+            'attributes' => [
+              'activity' => 'idle',
+            ],
+          ],
+        ];
+        break;
+
+      case 'unstick':
+        $link_rel = UriDefinitions::LINK_REL_UPDATE_RESOURCE;
+        $link_title = t('Reset migration');
+        $link_params = [
+          'confirm' => t("This migration seems to have frozen and has stopped running. This typically happens due to a momentary connectivity problem. If this happens repeatedly for the same migration, please file a Support Ticket for further investigation."),
           'data' => [
             'type' => 'migration',
             'id' => $migration->id(),
