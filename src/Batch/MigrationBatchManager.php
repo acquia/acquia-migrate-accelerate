@@ -189,6 +189,7 @@ final class MigrationBatchManager {
       }
     }
     $operations[] = [[__CLASS__, 'recordInitialImportSuccessfulness'], []];
+    $operations[] = [[__CLASS__, 'recordOverallProgress'], []];
     $operations[] = [[__CLASS__, 'restoreErrorHandler'], []];
 
     $new_batch = [
@@ -256,6 +257,7 @@ final class MigrationBatchManager {
       ];
     }
     $operations[] = [[__CLASS__, 'calculateCompleteness'], [$migration_id]];
+    $operations[] = [[__CLASS__, 'recordOverallProgress'], []];
 
     // Silence non-halting errors during migrations.
     array_unshift($operations, [[__CLASS__, 'overrideErrorHandler'], []]);
@@ -407,15 +409,30 @@ final class MigrationBatchManager {
       ])
       ->condition('migration_id', $migration->id())
       ->execute();
+  }
+
+  /**
+   * Records the overall progress of this site's migration.
+   */
+  public static function recordOverallProgress(): void {
+    $migration_repository = \Drupal::service('acquia_migrate.migration_repository');
+    assert($migration_repository instanceof MigrationRepository);
+    $migrations = $migration_repository->getMigrations();
 
     // Aggregate completion tracking.
-    $migrations = $migration_repository->getMigrations();
+    $processed_rows = 0;
     $imported_rows = 0;
     $total_rows = 0;
     foreach ($migrations as $migration) {
+      $processed_rows += $migration->getUiProcessedCount();
       $imported_rows += $migration->getUiImportedCount();
       $total_rows += $migration->getTotalCount();
     }
+    \Drupal::service('logger.channel.acquia_migrate_statistics')->info(
+      sprintf("processed_pct_of_total_rows=%.4f",
+        $processed_rows / $total_rows
+      )
+    );
     \Drupal::service('logger.channel.acquia_migrate_statistics')->info(
       sprintf("imported_pct_of_total_rows=%.4f",
         $imported_rows / $total_rows
