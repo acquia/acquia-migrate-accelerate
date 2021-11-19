@@ -6,7 +6,9 @@ namespace Drupal\acquia_migrate\EventSubscriber;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\Variable;
+use Drupal\content_moderation\Plugin\Validation\Constraint\ModerationStateConstraint;
 use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
@@ -18,6 +20,7 @@ use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Exception\EntityValidationException;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Performs entity validation after the entity has been saved.
@@ -31,6 +34,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @todo verify whether we should exclude \Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint from validation — see https://www.drupal.org/project/drupal/issues/3095456#comment-13359633
  */
 class PostEntitySaveValidator implements EventSubscriberInterface {
+
+  /**
+   * Skipped violations keyed by the constraint class.
+   *
+   * If every violation should be skipped of a constraint, then the value should
+   * be TRUE. If violations should be skipped based on the message template, the
+   * value should be an array of the message templates to skip.
+   *
+   * @var array
+   */
+  protected static $skippedViolations;
 
   /**
    * The entity type manager.
@@ -179,8 +193,35 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
     // without throwing it. This allows us the entity to be saved while still
     // generating a migration message for the validation errors.
     $violations = $entity->validate();
-    if (count($violations) > 0) {
-      $exception = new EntityValidationException($violations);
+    assert($violations instanceof EntityConstraintViolationListInterface);
+
+    // We might have some false positives, let's clean up violations!
+    $violations_without_false_positives = clone $violations;
+    if ($violations->count()) {
+      $messages_to_skip_per_constraint = $this->getSkippedViolations();
+      foreach ($violations->getIterator() as $index => $violation) {
+        assert($violation instanceof ConstraintViolation);
+        $constraint_class = $violation->getConstraint()
+          ? get_class($violation->getConstraint())
+          : NULL;
+        $templates_to_skip = $messages_to_skip_per_constraint[$constraint_class] ?? NULL;
+        if (!$templates_to_skip) {
+          continue;
+        }
+
+        $violation_template = $violation->getMessageTemplate();
+
+        if (
+          $templates_to_skip === TRUE ||
+          (is_array($templates_to_skip) && in_array($violation_template, $templates_to_skip))
+        ) {
+          $violations_without_false_positives->remove($index);
+        }
+      }
+    }
+
+    if (count($violations_without_false_positives) > 0) {
+      $exception = new EntityValidationException($violations_without_false_positives);
       $migration->getIdMap()->saveMessage(
         $event->getRow()->getSourceIdValues(),
         // Flatten the results of FormattableMarkup::placeholderFormat().
@@ -228,6 +269,40 @@ class PostEntitySaveValidator implements EventSubscriberInterface {
     // or "entity:user".
     assert($destination_plugin instanceof PluginBase);
     return $destination_plugin->getDerivativeId();
+  }
+
+  /**
+   * Returns info about the entity violations which shouldn't be reported.
+   *
+   * @return array
+   *   Info about the entity violations which shouldn't be reported.
+   */
+  private function getSkippedViolations() {
+    if (!is_array(self::$skippedViolations)) {
+      self::$skippedViolations = [];
+
+      if (class_exists(ModerationStateConstraint::class)) {
+        $moderation_state_constraint = new ModerationStateConstraint();
+        self::$skippedViolations[ModerationStateConstraint::class] = [
+          // Some of the moderation state specific violations are
+          // false-positive:
+          // \Drupal\content_moderation\ModerationInformation::getOriginalState()
+          // always loads the most recent moderation state instead of the
+          // previous one, meaning that the from_state -> to_state transition
+          // validation works only if it's evaluated before the corresponding
+          // content_moderation entity is saved – and it is useless after this
+          // content_moderation state entity was updated with a new revision for
+          // the actually saved (moderated) content entity revision.
+          $moderation_state_constraint->message,
+          // Invalid transition access always checks the current user - and if
+          // we're executing migrations, that's someone else than the owner of
+          // the actual entity revision.
+          $moderation_state_constraint->invalidTransitionAccess,
+        ];
+      }
+    }
+
+    return self::$skippedViolations;
   }
 
 }

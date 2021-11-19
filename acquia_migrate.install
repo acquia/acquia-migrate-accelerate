@@ -129,6 +129,17 @@ function acquia_migrate_uninstall($is_syncing) {
     $config->save();
   }
 
+  // Check if the current default mail interface is still terrible_mail_man,
+  // and if so, revert it back to the original of php_mail.
+  $mail_config = \Drupal::configFactory()->getEditable('system.mail');
+  $mail_plugins = $mail_config->get('interface');
+  foreach ($mail_plugins as $interface_key => $interface_name) {
+    if ($interface_name === 'terrible_mail_man') {
+      $mail_plugins[$interface_key] = 'php_mail';
+    }
+  }
+  $mail_config->set('interface', $mail_plugins)->save();
+
   // Also revoke the permission for anonymous users to view the administration
   // theme.
   $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);

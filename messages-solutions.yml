@@ -379,3 +379,13 @@ FALLBACK:
       user: >-
         This entity is referencing a user that probably no longer exists. This is likely wrong in the Drupal 7 source
         database too, please fix it there, refresh the source database and rollback & import this migration.
+  -
+    message:
+      regexp: >-
+        Skipping the migration of this published revision: it is the copy of the last published revision. It was saved by Workbench Moderation as a workaround for the lack of a feature in Drupal 7, because it wasn't able to handle forward \(non-default\) revisions. In Drupal 9 this is not needed anymore.
+    generic_solution: Clones of published entity revisions saved by Workbench Moderation are unnecessary in Drupal 9.
+  -
+    message:
+      regexp: >-
+        Skipping the migration of this draft revision: it lacks its previous revision. It happens because with Drupal 7 Workbench Moderation it was possible to delete older revisions, but in Drupal 9 core it is impossible to restore the original data integrity. Hopefully it isn't a problem that a draft cannot be restored.
+    generic_solution: Draft revisions whose parent revision was deleted and which were saved before a published revision aren't migrated.

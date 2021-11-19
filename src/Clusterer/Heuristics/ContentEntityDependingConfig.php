@@ -9,7 +9,8 @@ use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 /**
  * Adds depending configuration migrations to entity clusters.
  *
- * For example: d7_rdf_mapping:node:article.
+ * For example: d7_rdf_mapping:node:article,
+ * d7_language_content_settings:article.
  *
  * @see \Drupal\acquia_migrate\Clusterer\Heuristics\ContentEntityBundles
  * @see \Drupal\acquia_migrate\Clusterer\Heuristics\ContentEntityBundlesDependencies}

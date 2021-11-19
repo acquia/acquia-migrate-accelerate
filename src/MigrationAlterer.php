@@ -1365,6 +1365,19 @@ final class MigrationAlterer {
         ]);
       }
     }
+
+    // Change node complete migration's base class back to Migration, so they
+    // won't drop cache migration plugins after being executed.
+    $node_complete_migrations = array_filter(
+      self::getMigrationsWithTag($migrations, $this->migrationTag),
+      function ($definition) {
+        return $definition['source']['plugin'] === 'd7_node_complete';
+      }
+    );
+
+    foreach (array_keys($node_complete_migrations) as $node_migration_plugin_id) {
+      $migrations[$node_migration_plugin_id]['class'] = MigrationPlugin::class;
+    }
   }
 
   /**

@@ -223,10 +223,18 @@ final class MigrationClusterer {
       Heuristics\ConfigNeedingHuman::class => 0,
       Heuristics\BlockPlacements::class => 500,
       Heuristics\BeanBlockPlacements::class => 500,
+      // ModerationFlow should be computed before ContentEntityBundles and its
+      // dependencies in ContentEntityBundlesDependencies, and it weight should
+      // be higher than Heuristics\PushedToModerationFlow's weight.
+      Heuristics\ModerationFlow::class => 50,
       Heuristics\SharedEntityStructure::class => 0,
       Heuristics\SharedEntityData::class => 0,
       Heuristics\SharedBookData::class => 500,
       Heuristics\SiteConfiguration::class => 500,
+      // Should be computed before Heuristics\ContentEntityBundlesDependencies
+      // and Heuristics\ConfigEntity, weight should be lower than
+      // ModerationFlow's weight.
+      Heuristics\PushedToModerationFlow::class => 40,
       // First the key data migration plugin for the entity type + bundle
       // cluster must be identified.
       // For example: d7_node_complete:article, d7_taxonomy_term:tags.
