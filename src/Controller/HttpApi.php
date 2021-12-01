@@ -446,8 +446,11 @@ final class HttpApi {
         }
       }
     }
-    $total_message_count = $this->getTotalMigrationMessageCount();
-    $total_entity_validation_message_count = $this->getTotalEntityValidationMigrationMessageCount();
+    [$total_message_count, $distinct_migration_count_total] = $this->getTotalMigrationMessageCount();
+    [
+      $total_entity_validation_message_count,
+      $distinct_migration_count_validation,
+    ] = $this->getTotalEntityValidationMigrationMessageCount();
     if ($total_entity_validation_message_count > 0) {
       $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
         ->setOption('query', [
@@ -467,6 +470,8 @@ final class HttpApi {
         'title' => $this->t("Validation errors: @messageCount", [
           '@messageCount' => $total_entity_validation_message_count,
         ]),
+        'data-count' => (int) $total_entity_validation_message_count,
+        'data-distinct-migrations' => (int) $distinct_migration_count_validation,
       ];
       $messages_route_url = Url::fromRoute('acquia_migrate.migrations.messages')
         ->setOption('query', [
@@ -486,6 +491,8 @@ final class HttpApi {
         'title' => $this->t("Other errors: @messageCount", [
           '@messageCount' => $total_message_count - $total_entity_validation_message_count,
         ]),
+        'data-count' => (int) ($total_message_count - $total_entity_validation_message_count),
+        'data-distinct-migrations' => (int) ($distinct_migration_count_total - $distinct_migration_count_validation),
       ];
     }
     if ($total_message_count > 0) {
@@ -500,6 +507,8 @@ final class HttpApi {
         'title' => $this->t("Total errors: @messageCount", [
           '@messageCount' => $total_message_count,
         ]),
+        'data-count' => (int) $total_message_count,
+        'data-distinct-migrations' => (int) $distinct_migration_count_total,
       ];
     }
     $response = CacheableJsonResponse::create($document, 200, static::$defaultResponseHeaders);
@@ -1862,44 +1871,57 @@ final class HttpApi {
   /**
    * Gets a total message count across all migrations and migration plugins.
    *
-   * @return int
-   *   The message count.
+   * @return int[]
+   *   An array containing:
+   *   - The total message count.
+   *   - The number of distinct migrations these messages apply to.
    */
-  protected function getTotalMigrationMessageCount() : int {
+  protected function getTotalMigrationMessageCount(): array {
     // @codingStandardsIgnoreStart
     $connection = \Drupal::database();
     // @codingStandardsIgnoreEnd
 
     if (!$connection->schema()->tableExists(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)) {
-      return 0;
+      return [0, 0];
     }
 
-    return $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    $query = $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE, 'm');
+    $query->addExpression('COUNT(m.msgid)', 'total_count');
+    $query->addExpression('COUNT(DISTINCT m.sourceMigration)', 'distinct_migration_count');
+    $results = $query->execute()->fetchAll();
+    return [
+      $results[0]->total_count,
+      $results[0]->distinct_migration_count,
+    ];
   }
 
   /**
    * Gets total entity validation message count across all migration (plugins).
    *
-   * @return int
-   *   The entity validation message count.
+   * @return int[]
+   *   An array containing:
+   *   - The total message count.
+   *   - The number of distinct migrations these messages apply to.
    */
-  protected function getTotalEntityValidationMigrationMessageCount() : int {
+  protected function getTotalEntityValidationMigrationMessageCount(): array {
     // @codingStandardsIgnoreStart
     $connection = \Drupal::database();
     // @codingStandardsIgnoreEnd
 
     if (!$connection->schema()->tableExists(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE)) {
-      return 0;
+      return [0, 0];
     }
 
-    return $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE, 'm')
-      ->condition('m.messageCategory', HttpApi::MESSAGE_CATEGORY_ENTITY_VALIDATION)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    $query = $connection->select(SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE, 'm')
+      ->condition('m.messageCategory', HttpApi::MESSAGE_CATEGORY_ENTITY_VALIDATION);
+    $query->addExpression('COUNT(m.msgid)', 'total_count');
+    $query->addExpression('COUNT(DISTINCT m.sourceMigration)', 'distinct_migration_count');
+    $results = $query->execute()->fetchAll();
+    return [
+      $results[0]->total_count,
+      $results[0]->distinct_migration_count,
+    ];
+
   }
 
   /**
