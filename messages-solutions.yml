@@ -21,9 +21,9 @@ migration_plugin_id:
   -
     message:
       regexp: >-
-        This is a regular expression that the message must match. The opening and closing delimiters are slashes. Apply
-        the corresponding necessary escaping for the regular expression. If there are identifiers that determine the
-        appropriate solution, capture them using `(<some_identifier>EXPRESSION)`.
+        This is a regular expression that the message must match\. The opening and closing delimiters are slashes\.
+        Apply the corresponding necessary escaping for the regular expression\. If there are identifiers that determine
+        the appropriate solution, capture them using `\(?<some_identifier>EXPRESSION\)`\.
       specific_solution_per: "~ (YAML's null) or a named group — in this example: `some_identifier`."
       computed_specific_solution: ~
     generic_solution: "~ (YAML's null) or a string."
@@ -40,7 +40,7 @@ migration_plugin_id:
 d7_comment:
   -
     message:
-      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: name=You have to specify a valid author."
+      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: name=You have to specify a valid author\\."
       specific_solution_per: src_comment_id
       computed_specific_solution:
         callback: 'source_db_table_row_has_empty_column'
@@ -59,7 +59,7 @@ d7_comment:
         database too, please fix it there, refresh the source database and rollback & import this migration.
   -
     message:
-      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: comment_body=This value should not be null."
+      regexp: "\\[comment: (?<src_comment_id>\\d+)\\]\\: comment_body=This value should not be null\\."
       specific_solution_per: src_comment_id
       computed_specific_solution:
         callback: 'source_db_table_row_exists'
@@ -77,18 +77,18 @@ d7_comment:
         cid=@src_comment_id or by creating a 'field_data_comment_body' table row with entity_id=@src_comment_id.
 
 d7_comment_type:
+  # This issue has no solution for a non-advanced Drupal developer (and by the way, it was addressed about a year ago).
   - message:
-      regexp: Attempt to create a bundle with an ID longer than
+      regexp: Attempt to create a bundle with an ID longer than (?<char_count>\d+)
     generic_solution: >-
-      Due to the very long bundle name on the Drupal 7 source site and the architecture of the Drupal 9 config system,
-      a shortened
+      The comment type migrations tries to save a comment bundle with an ID longer than @char_count characters. Probably you are using a very outdated Drupal 9 instance. Please recreate your migration environment and start over.
 
 d7_field:
   -
     message:
       regexp: >-
         Can't migrate the '(?<src_field_name>\w+)' field storage for '(?<src_entity_type_id>\w+)' entities\, because the
-        field's type '(?<src_field_type>\w+)' is not available on the destination site.
+        field's type '(?<src_field_type>\w+)' is not available on the destination site\.
       specific_solution_per: src_field_type
     generic_solution: ~
     specific_solution:
@@ -98,7 +98,8 @@ d7_field:
   -
     message:
       regexp: >-
-        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source
+        (?<field>\w+) field\.
     generic_solution: >-
       No further actions needed The @property property is migrated into the @field, so there is no need for a separate
       field.
@@ -107,9 +108,9 @@ d7_field_instance:
   -
     message:
       regexp: >-
-        Can't migrate the '(?<field_label>\w+)' \((?<src_field_name>\w+)\) field instance for
+        Can't migrate the '(?<field_label>[^']+)' \((?<src_field_name>\w+)\) field instance for
         '(?<src_entity_type_id>\w+)' entities of type '(?<src_entity_bundle>\w+)', because the field's type
-        '(?<src_field_type>\w+)' is not available on the destination site.
+        '(?<src_field_type>\w+)' is not available on the destination site\.
       specific_solution_per: src_field_type
     generic_solution: ~
     specific_solution:
@@ -119,7 +120,8 @@ d7_field_instance:
   -
     message:
       regexp: >-
-        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source
+        (?<field>\w+) field\.
     generic_solution: >-
       No further actions needed The @property property is migrated into the @field, so there is no need for a separate
       field.
@@ -130,20 +132,21 @@ d7_field_formatter_settings:
       regexp: >-
         The field formatter plugin ID (?<src_field_formatter_plugin_id>\w+) \(used on field type
         (?<src_field_type>\w+)\) could not be mapped to an existing formatter plugin; defaulting to
-        (?<dst_field_formatter_plugin_id>\\w+) and dropping all formatter settings. Either redo the migration with the
+        (?<dst_field_formatter_plugin_id>\w+) and dropping all formatter settings\. Either redo the migration with the
         module installed that provides an equivalent formatter plugin, or modify the entity view display after the
-        migration and manually choose the right field formatter.
+        migration and manually choose the right field formatter\.
       specific_solution_per: src_field_formatter_plugin_id
     generic_solution: ~
     specific_solution:
       hs_taxonomy_term_reference_hierarchical_text: >-
         Hierarchical Select never got a stable Drupal 7 or 8 release. No equivalent formatter exists in Drupal 7 or 8.
         The default formatter should suffice. Otherwise, install the https://www.drupal.org/project/shs module and use
-        its entity_reference_shs field formatter."
+        its entity_reference_shs field formatter.
   -
     message:
       regexp: >-
-        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source
+        (?<field>\w+) field\.
     generic_solution: >-
       No further actions needed The @property property is migrated into the @field, so there is no need for a separate
       field.
@@ -151,14 +154,15 @@ d7_field_formatter_settings:
 d7_field_instance_widget_settings:
   - message:
       regexp: >-
-        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source (?<field>\w+) field.
+        Skipping field field_file_image_(?<property>\w+)_text as it will be migrated to the \w+ media entity's source
+        (?<field>\w+) field\.
     generic_solution: >-
       No further actions needed The @property property is migrated into the @field, so there is no need for a separate
       field.
 
 d7_file:
   - message:
-      regexp: 'File ''.*(?<hardcoded_and_double_slash>sites\/[\w\._-]+\/\/).*'' does not exist'
+      regexp: 'File ''.*(?<hardcoded_and_double_slash>sites\/[\w\._\-\/]+\/\/).*'' does not exist'
     generic_solution: >-
       There is a hardcoded files directory in the file path followed by a double slash. This is wrong in the Drupal 7
       source database too, please fix it there, refresh the source database and rollback & import this migration.
@@ -176,7 +180,7 @@ d7_file:
     message:
       regexp: >-
         \[file: (?<src_file_id>\d+)\]: uid\.0\.target_id=The referenced entity \(user: (?<src_user_id>\d+)\) does not
-        exist.
+        exist\.
       specific_solution_per: src_file_id
       computed_specific_solution:
         callback: 'source_db_table_row_exists'
@@ -188,12 +192,12 @@ d7_file:
     specific_solution: ~
     computed_specific_solution:
       does_not_exist: >-
-        This file (@src_file_id) is owned by a user that no longer exists. This is wrong in the Drupal 7 source database
-        too, please fix it there, refresh the source database and rollback & import this migration.
+        This file (@src_file_id) is owned by a user that no longer exists. This is wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.
 
 d7_file_entity:
   - message:
-      regexp: 'field_media_oembed_video=The provided URL does not represent a valid oEmbed resource.'
+      regexp: 'field_media_oembed_video=The provided URL does not represent a valid oEmbed resource\.'
     generic_solution: >-
       oEmbed does not support private videos — perhaps that is the case?
 
@@ -203,6 +207,7 @@ d7_file_plain:
     generic_solution: >-
       An SVG file was migrated into the Drupal 9 media library. But Drupal has only minimal support for SVG right now —
       see https://www.drupal.org/project/drupal/issues/3060504 for more information.
+  # This is an obsolete solution (and it was wrong even when it was added)!
   - message:
       regexp: 'exceeding the maximum file size of'
     generic_solution: >-
@@ -215,7 +220,7 @@ d7_filter_format:
     message:
       regexp: >-
         Filter (?<source_filter_plugin_id>\w+) could not be mapped to an existing filter plugin; defaulting to
-        filter_null and dropping all settings. Either redo the migration with the module installed that provides an
+        filter_null and dropping all settings\. Either redo the migration with the module installed that provides an
         equivalent filter, or modify the text format after the migration to remove this filter if it is no longer
         necessary.
       specific_solution_per: source_filter_plugin_id
@@ -223,14 +228,14 @@ d7_filter_format:
     specific_solution:
       php_code: >-
         Stop using the php_code filter! It was a bad practice in Drupal 7 too. Either modify your Drupal 7 site to stop
-        using it, otherwise it's recommended to not migrate any content that is actively using this filter."
+        using it, otherwise it's recommended to not migrate any content that is actively using this filter.
       insert_block: >-
         The "Insert Block" module has no Drupal 9 port. You can use the Drupal 9 compatibility patch and help get it
         committed at https://www.drupal.org/project/insert_block/issues/3151591. Warning: this module is not maintained!
       ds_code: >-
         Stop using the ds_code filter! It is equivalent to the php_code filter, which already was a bad practice in
         Drupal. Modify your Drupal 7 site to stop using it. Otherwise, it's recommended to not migrate any
-        content that is actively using this filter."
+        content that is actively using this filter.
       easychart: >-
         The "Easychart" module has no Drupal 9 port. You can use the Drupal 9 compatibility patch and help get it
         committed at https://www.drupal.org/project/easychart/issues/3214283. This filter was even removed from the
@@ -248,7 +253,7 @@ d7_filter_format:
     message:
       regexp: >-
         Filter (?<source_filter_plugin_id>\w+) could not be mapped to an existing filter plugin; omitted since it is a
-        transformation-only filter. Install and configure a successor after the migration.
+        transformation-only filter\. Install and configure a successor after the migration\.
       specific_solution_per: source_filter_plugin_id
     generic_solution: ~
     specific_solution:
@@ -263,7 +268,7 @@ d7_filter_format:
 
 d7_image_styles:
   - message:
-      regexp: The "manualcrop_crop_and_scale" plugin does not exist.
+      regexp: The "manualcrop_crop_and_scale" plugin does not exist\.
     generic_solution: >-
       The https://www.drupal.org/project/manualcrop module for Drupal 7 is obsolete, its successor is
       https://www.drupal.org/project/image_widget_crop, but https://www.drupal.org/project/focal_point is a viable
@@ -272,13 +277,13 @@ d7_image_styles:
 d7_menu_links:
   - message:
       regexp: >-
-        The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
+        The path "internal:\/(?<src_invalid_path_source>.+)" failed validation\.
     generic_solution: This menu link points to a path that no longer exists or possibly never existed. Perhaps it
       points to a View that hasn't been manually recreated?
+  # Is this regular expression correct? I don't think so.
   - message:
       regexp: >-
         No parent link found for plid '\d+' in menu
-        The path "internal:\/(?<src_invalid_path_source>.+)" failed validation.
     generic_solution: This menu link does not have a parent link. This is wrong in the Drupal 7 source database too,
       please fix it there, refresh the source database and rollback & import this migration.
 
@@ -286,7 +291,7 @@ d7_path_redirect:
   - message:
       regexp: >-
         \[redirect: (?<src_redirect_id>\d+)\]: uid\.0\.target_id=The referenced entity \(user: (?<src_user_id>\d+)\)
-        does not exist.
+        does not exist\.
       specific_solution_per: src_redirect_id
       computed_specific_solution:
         callback: 'source_db_table_row_exists'
@@ -306,7 +311,7 @@ d7_url_alias:
     message:
       regexp: >-
         \[path_alias: (?<src_path_alias_id>\d+), revision: (?<src_path_alias_revision_id>\d+)\]: path.0.value=Either the
-        path '\/user\/(?<src_user_id>\d+)' is invalid or you do not have access to it.
+        path '\/user\/(?<src_user_id>\d+)' is invalid or you do not have access to it\.
       specific_solution_per: src_path_alias_id
       computed_specific_solution:
         callback: 'source_db_table_row_exists'
@@ -331,15 +336,14 @@ d7_url_alias:
 
 FALLBACK:
   - message:
-      regexp: >-
-        This value should not be null.
+      regexp: This value should not be null\.
     generic_solution: >-
       A new field was added to this entity type after entities had already been created. This new field was marked as
       required, but the entities that already existed were not updated with values for this new required field. This is
       wrong in the Drupal 7 source database too, please fix it there, refresh the source database and rollback & import
       this migration!
   - message:
-      regexp: The "(?<src_entity_type_id>\w+)" entity type does not exist.
+      regexp: The "(?<src_entity_type_id>\w+)" entity type does not exist\.
       specific_solution_per: src_entity_type_id
     generic_solution: ~
     specific_solution:
@@ -351,20 +355,10 @@ FALLBACK:
       menu_fields: >-
         The "Menu Item Fields" (menu_fields) module has no Drupal 9 port. The Drupal 9 successor is "Menu Item Extras"
         (menu_item_extras).
-  - message:
-      regexp: Attempt to create a field \w+ that does not exist on entity type (?<src_entity_type_id>\w+).
-      specific_solution_per: src_entity_type_id
-    generic_solution: ~
-    specific_solution:
-      biblio: >-
-        The "Bibliography" (biblio) module has no Drupal 9 port. The Drupal 9 successor is "Bibliography & Citation"
-        (bibcite). It is run by an enthusiastic team, follow them at https://twitter.com/BibCite. You can help finish
-        this migration at https://www.drupal.org/project/bibcite_migrate.
-      field_collection_item: We are working on providing a reliable migration path to Paragraphs. Stay tuned.
   -
     message:
       regexp: >-
-        \[.*\]: \w+\.\d+\.target_id=The referenced entity \((?<referenced_entity_type_id>\w+): \d+\) does not exist.
+        \[.*\]: \w+\.\d+\.target_id=The referenced entity \((?<referenced_entity_type_id>\w+): \d+\) does not exist\.
       specific_solution_per: referenced_entity_type_id
     generic_solution: >-
       Either the referenced entity does not exist anymore on the source site or the migration of the referenced entity

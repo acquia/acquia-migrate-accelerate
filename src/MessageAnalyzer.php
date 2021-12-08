@@ -2,6 +2,7 @@
 
 namespace Drupal\acquia_migrate;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Serialization\Yaml;
 
 /**
@@ -19,10 +20,34 @@ final class MessageAnalyzer {
   private $solutions;
 
   /**
-   * MessageAnalyzer constructor.
+   * The connection to the source database.
+   *
+   * @var \Drupal\Core\Database\Connection
    */
-  public function __construct() {
+  private $sourceDatabase;
+
+  /**
+   * MessageAnalyzer constructor.
+   *
+   * @param \Drupal\Core\Database\Connection|null $source_database
+   *   The connection to the source database.
+   */
+  public function __construct(Connection $source_database = NULL) {
     $this->solutions = Yaml::decode(file_get_contents(__DIR__ . '/../messages-solutions.yml'));
+    $this->sourceDatabase = $source_database;
+  }
+
+  /**
+   * Returns the connection to the source database.
+   *
+   * @return \Drupal\Core\Database\Connection
+   *   The connection to the source database.
+   */
+  private function getSourceDatabase() {
+    if (!$this->sourceDatabase instanceof Connection) {
+      $this->sourceDatabase = SourceDatabase::getConnection();
+    }
+    return $this->sourceDatabase;
   }
 
   /**
@@ -69,7 +94,7 @@ final class MessageAnalyzer {
             throw new \InvalidArgumentException('Invalid computed_specific_solution callback specified.');
           }
           if (isset($candidate_solutions[$i]['message']['computed_specific_solution']) && $candidate_solutions[$i]['message']['computed_specific_solution']['callback'] === 'source_db_table_row_exists') {
-            $exists_or_not = SourceDatabase::getConnection()->select($args[0])->condition($args[1], $args[2])->countQuery()->execute()->fetchField()
+            $exists_or_not = $this->getSourceDatabase()->select($args[0])->condition($args[1], $args[2])->countQuery()->execute()->fetchField()
               ? 'exists'
               : 'does_not_exist';
             if (isset($candidate_solutions[$i]['computed_specific_solution'][$exists_or_not])) {
@@ -77,7 +102,7 @@ final class MessageAnalyzer {
             }
           }
           elseif (isset($candidate_solutions[$i]['message']['computed_specific_solution']) && $candidate_solutions[$i]['message']['computed_specific_solution']['callback'] === 'source_db_table_row_has_null_column') {
-            $is_null_or_not = SourceDatabase::getConnection()->select($args[0])->condition($args[1], NULL, 'IS NULL')->countQuery()->execute()->fetchField()
+            $is_null_or_not = $this->getSourceDatabase()->select($args[0])->condition($args[1], NULL, 'IS NULL')->countQuery()->execute()->fetchField()
               ? 'is_null'
               : 'is_not_null';
             if (isset($candidate_solutions[$i]['computed_specific_solution'][$is_null_or_not])) {
@@ -85,7 +110,7 @@ final class MessageAnalyzer {
             }
           }
           elseif (isset($candidate_solutions[$i]['message']['computed_specific_solution']) && $candidate_solutions[$i]['message']['computed_specific_solution']['callback'] === 'source_db_table_row_has_empty_column') {
-            $is_empty_or_not = SourceDatabase::getConnection()->select($args[0])->condition($args[1], '', 'LIKE')->countQuery()->execute()->fetchField()
+            $is_empty_or_not = $this->getSourceDatabase()->select($args[0])->condition($args[1], '', 'LIKE')->countQuery()->execute()->fetchField()
               ? 'is_empty'
               : 'is_not_empty';
             if (isset($candidate_solutions[$i]['computed_specific_solution'][$is_empty_or_not])) {
@@ -101,7 +126,31 @@ final class MessageAnalyzer {
           return str_replace("@$per", $matches[$per], $candidate_solutions[$i]['generic_solution']);
         }
         else {
-          return $candidate_solutions[$i]['generic_solution'];
+          $named_matches = array_filter(
+            $matches ?? [],
+            function ($key) {
+              return is_string($key);
+            },
+            ARRAY_FILTER_USE_KEY
+          );
+          if (empty($named_matches)) {
+            return $candidate_solutions[$i]['generic_solution'];
+          }
+
+          $placeholders = array_reduce(
+            array_keys($named_matches),
+            function (array $carry, string $named): array {
+              $quoted = preg_quote("@" . $named, '/');
+              $carry[] = '/' . $quoted . '/';
+              return $carry;
+            },
+            []
+          );
+          return preg_replace(
+            $placeholders,
+            $named_matches,
+            $candidate_solutions[$i]['generic_solution']
+          );
         }
       }
     }
