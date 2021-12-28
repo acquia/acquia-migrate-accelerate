@@ -12,6 +12,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\DatabaseBackend;
+use Drupal\Core\Cache\DatabaseCacheTagsChecksum;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 
@@ -185,7 +187,27 @@ class MigrationRepository {
       $migrations = $this->doGetMigrations();
       $duration = Timer::stop(Timers::COMPUTE_MIGRATIONS)['time'];
       $dst_queries = Database::getLog(Timers::COMPUTE_MIGRATIONS . '-dst', 'default');
+      // Ignore destination DB queries to the `cachetags` table or to any cache
+      // bin (except queries to the `cache_migrate` cache bin: those are
+      // relevant).
+      foreach ($dst_queries as $index => $query) {
+        if ($query['caller']['class'] === DatabaseCacheTagsChecksum::class
+            || ($query['caller']['class'] === DatabaseBackend::class && strpos($query['query'], 'migrate') === FALSE)) {
+          unset($dst_queries[$index]);
+        }
+      }
       ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::COMPUTE_MIGRATIONS . '-dst', count($dst_queries));
+      // @codingStandardsIgnoreStart
+      /*
+      if (\Drupal::state()->get('travisci_acquiaci_debug', FALSE)) {
+        $q = [];
+        foreach ($dst_queries as $query) {
+          $q[] = strtr($query['query'], $query['args']) . ' — caller: ' . $query['caller']['class'];
+        }
+        file_put_contents('/tmp/dst-queries.txt', implode("\n", str_replace("\n", '', $q)));
+      }
+      */
+      // @codingStandardsIgnoreEnd
       $src_queries = Database::getLog(Timers::COMPUTE_MIGRATIONS . '-src', 'migrate');
       ServerTimingHeaderForResponseSubscriber::trackQueryLog(Timers::COMPUTE_MIGRATIONS . '-src', count($src_queries));
       \Drupal::service('logger.channel.acquia_migrate_profiling_statistics')->info(
