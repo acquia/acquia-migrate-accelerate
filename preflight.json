@@ -1,0 +1,8914 @@
+{
+  "abjs": {
+    "vetted": false,
+    "note": null
+  },
+  "ableplayer": {
+    "vetted": false,
+    "note": null
+  },
+  "abuseipdb": {
+    "vetted": false,
+    "note": null
+  },
+  "access_by_ref": {
+    "vetted": false,
+    "note": null
+  },
+  "access_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "access_unpublished": {
+    "vetted": false,
+    "note": null
+  },
+  "accessibility": {
+    "vetted": true,
+    "note": "The Accessibility module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "accessible_content": {
+    "vetted": true,
+    "note": "The Accessible Content module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "ace_editor": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/ace_editor and https://www.drupal.org/project/ace_editor/issues/3022330 for instructions."
+  },
+  "achievements": {
+    "vetted": false,
+    "note": null
+  },
+  "acl": {
+    "vetted": true,
+    "note": null
+  },
+  "acquia_agent": {
+    "vetted": true,
+    "note": null
+  },
+  "acquia_connector": {
+    "vetted": true,
+    "note": null
+  },
+  "acquia_geoip_vary_by_country": {
+    "vetted": true,
+    "note": null
+  },
+  "acquia_lift": {
+    "vetted": false,
+    "note": null
+  },
+  "acquia_purge": {
+    "vetted": true,
+    "note": "An automatic migration of settings does not make sense for this module. The Acquia Purge module is mostly 'zero configuration'; the only thing you have to do is add an 'Acquia Cloud' purger in the Purge module. See https://git.drupalcode.org/project/acquia_purge/raw/HEAD/INSTALL.md for detailed instructions."
+  },
+  "acquia_search": {
+    "vetted": false,
+    "note": "Acquia Search is not yet available for Drupal 9. It should be available in Q1 2021. See https://docs.acquia.com/acquia-search/release-notes/ — for more details, please contact your (Technical) Account Manager."
+  },
+  "acquia_spi": {
+    "vetted": true,
+    "note": null
+  },
+  "acsf": {
+    "vetted": false,
+    "note": null
+  },
+  "actions_permissions": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "ad_choices_link": {
+    "vetted": false,
+    "note": null
+  },
+  "add_to_head": {
+    "vetted": false,
+    "note": null
+  },
+  "addanother": {
+    "vetted": false,
+    "note": null
+  },
+  "addressfield": {
+    "vetted": true,
+    "note": null
+  },
+  "addressfield_cr": {
+    "vetted": false,
+    "note": null
+  },
+  "addtoany": {
+    "vetted": false,
+    "note": null
+  },
+  "addtocal": {
+    "vetted": false,
+    "note": null
+  },
+  "addtocalendar": {
+    "vetted": false,
+    "note": null
+  },
+  "addtocopy": {
+    "vetted": false,
+    "note": null
+  },
+  "addtohomescreen": {
+    "vetted": false,
+    "note": null
+  },
+  "admin_content_notification": {
+    "vetted": false,
+    "note": null
+  },
+  "admin_denied": {
+    "vetted": false,
+    "note": null
+  },
+  "admin_devel": {
+    "vetted": true,
+    "note": null
+  },
+  "admin_menu": {
+    "vetted": true,
+    "note": null
+  },
+  "admin_menu_toolbar": {
+    "vetted": true,
+    "note": null
+  },
+  "admin_theme": {
+    "vetted": false,
+    "note": null
+  },
+  "admin_views": {
+    "vetted": true,
+    "note": "This module overrides 'administrative listing' pages in Drupal 7 site with equivalent Views for superior usability. Drupal core now contains a superset of its functionality."
+  },
+  "admin_views_system_display": {
+    "vetted": true,
+    "note": "This module overrides 'administrative listing' pages in Drupal 7 site with equivalent Views for superior usability. Drupal core now contains a superset of its functionality."
+  },
+  "adminimal_admin_menu": {
+    "vetted": false,
+    "note": "The Adminimal Admin Toolbar module is the successor to the Adminimal Administration Menu module"
+  },
+  "adminimal_admin_toolbar": {
+    "vetted": false,
+    "note": null
+  },
+  "administerusersbyrole": {
+    "vetted": false,
+    "note": null
+  },
+  "administration_language_negotiation": {
+    "vetted": false,
+    "note": null
+  },
+  "adminrole": {
+    "vetted": true,
+    "note": "This module is a little helper to maintain an administrator role which has all available permissions for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "adminrss": {
+    "vetted": false,
+    "note": null
+  },
+  "adroll": {
+    "vetted": false,
+    "note": null
+  },
+  "adsense": {
+    "vetted": true,
+    "note": null
+  },
+  "adsense_consent": {
+    "vetted": false,
+    "note": null
+  },
+  "adstxt": {
+    "vetted": false,
+    "note": null
+  },
+  "advagg": {
+    "vetted": false,
+    "note": null
+  },
+  "advanced_help": {
+    "vetted": true,
+    "note": null
+  },
+  "advanced_help_hint": {
+    "vetted": false,
+    "note": null
+  },
+  "advanced_link": {
+    "vetted": true,
+    "note": "This module is obsolete in Drupal 9. No known equivalent module exists; please help porting this module if it's critical for your site"
+  },
+  "advanced_text_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "advancedform": {
+    "vetted": false,
+    "note": null
+  },
+  "advancedqueue": {
+    "vetted": false,
+    "note": null
+  },
+  "advpoll": {
+    "vetted": false,
+    "note": null
+  },
+  "aet": {
+    "vetted": false,
+    "note": null
+  },
+  "age_calculator": {
+    "vetted": false,
+    "note": null
+  },
+  "aggregator": {
+    "vetted": true,
+    "note": null
+  },
+  "agls": {
+    "vetted": false,
+    "note": null
+  },
+  "agreement": {
+    "vetted": true,
+    "note": null
+  },
+  "ajax_comments": {
+    "vetted": false,
+    "note": null
+  },
+  "ajax_loader": {
+    "vetted": false,
+    "note": null
+  },
+  "ajax_screen_lock": {
+    "vetted": false,
+    "note": null
+  },
+  "akamai": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/monolog module."
+  },
+  "akismet": {
+    "vetted": false,
+    "note": null
+  },
+  "alb_auth": {
+    "vetted": false,
+    "note": null
+  },
+  "alertbox": {
+    "vetted": false,
+    "note": null
+  },
+  "alexa": {
+    "vetted": false,
+    "note": null
+  },
+  "alinks": {
+    "vetted": false,
+    "note": null
+  },
+  "alpha_pagination": {
+    "vetted": false,
+    "note": null
+  },
+  "alt_login": {
+    "vetted": false,
+    "note": null
+  },
+  "alt_stream_wrappers": {
+    "vetted": false,
+    "note": null
+  },
+  "amazon_pa": {
+    "vetted": false,
+    "note": null
+  },
+  "amazon_ses": {
+    "vetted": false,
+    "note": null
+  },
+  "amp": {
+    "vetted": true,
+    "note": null
+  },
+  "amp_cts": {
+    "vetted": false,
+    "note": null
+  },
+  "amswap": {
+    "vetted": false,
+    "note": null
+  },
+  "analytics": {
+    "vetted": false,
+    "note": null
+  },
+  "animate_any": {
+    "vetted": false,
+    "note": null
+  },
+  "animate_css": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not - see similar issue with earlier release also https://www.drupal.org/project/animate_css/issues/3114653."
+  },
+  "anonymous_login": {
+    "vetted": false,
+    "note": null
+  },
+  "anonymous_publishing": {
+    "vetted": false,
+    "note": null
+  },
+  "anonymous_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "anonymous_subscriptions": {
+    "vetted": false,
+    "note": null
+  },
+  "anonymous_token": {
+    "vetted": false,
+    "note": null
+  },
+  "answers": {
+    "vetted": false,
+    "note": null
+  },
+  "antibot": {
+    "vetted": false,
+    "note": null
+  },
+  "apachesolr": {
+    "vetted": false,
+    "note": null
+  },
+  "apachesolr_search": {
+    "vetted": false,
+    "note": null
+  },
+  "ape": {
+    "vetted": false,
+    "note": null
+  },
+  "apigee_account": {
+    "vetted": true,
+    "note": "Apigee says: 'Choose an SSO module compatible with Drupal 8.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "apigee_checklist": {
+    "vetted": true,
+    "note": "Apigee says: 'Site Status monitoring included in Drupal 8 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "apigee_company": {
+    "vetted": false,
+    "note": null
+  },
+  "apigee_gtm": {
+    "vetted": false,
+    "note": null
+  },
+  "appbanners": {
+    "vetted": false,
+    "note": null
+  },
+  "appear2mee": {
+    "vetted": false,
+    "note": null
+  },
+  "append_file_info": {
+    "vetted": false,
+    "note": null
+  },
+  "applenews": {
+    "vetted": false,
+    "note": null
+  },
+  "apptiles": {
+    "vetted": false,
+    "note": null
+  },
+  "asciidoc": {
+    "vetted": false,
+    "note": null
+  },
+  "asset_injector": {
+    "vetted": false,
+    "note": null
+  },
+  "astrology": {
+    "vetted": false,
+    "note": null
+  },
+  "at_tools": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not - see https://www.drupal.org/project/at_tools/issues/3244556."
+  },
+  "atom": {
+    "vetted": false,
+    "note": null
+  },
+  "attribution": {
+    "vetted": false,
+    "note": null
+  },
+  "auctions": {
+    "vetted": false,
+    "note": null
+  },
+  "audiofield": {
+    "vetted": false,
+    "note": null
+  },
+  "audit_log": {
+    "vetted": false,
+    "note": null
+  },
+  "auditfiles": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_entitylabel": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_entityqueue": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_image_style": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_login_url": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_nodetitle": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_retina": {
+    "vetted": false,
+    "note": null
+  },
+  "autoban": {
+    "vetted": false,
+    "note": null
+  },
+  "autocomplete_deluxe": {
+    "vetted": false,
+    "note": null
+  },
+  "autofloat": {
+    "vetted": false,
+    "note": null
+  },
+  "autologout": {
+    "vetted": true,
+    "note": null
+  },
+  "automatic_updates": {
+    "vetted": false,
+    "note": null
+  },
+  "autoslave": {
+    "vetted": false,
+    "note": null
+  },
+  "aws_sqs": {
+    "vetted": false,
+    "note": null
+  },
+  "back_to_top": {
+    "vetted": false,
+    "note": null
+  },
+  "background_image_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "backup_migrate": {
+    "vetted": true,
+    "note": "This migration is not yet automated and will not be, see https://www.drupal.org/project/backup_migrate/issues/2953042. This is with good reasons: when migrating, you want to ensure Drupal 7 back-ups do not get overwritten and it is recommended to revisit the backup strategy."
+  },
+  "backup_permissions": {
+    "vetted": false,
+    "note": null
+  },
+  "baguettebox": {
+    "vetted": false,
+    "note": null
+  },
+  "banana_dashboard": {
+    "vetted": false,
+    "note": null
+  },
+  "bankvault": {
+    "vetted": false,
+    "note": null
+  },
+  "barcodes": {
+    "vetted": false,
+    "note": null
+  },
+  "bartik_admin": {
+    "vetted": false,
+    "note": null
+  },
+  "basic_cart": {
+    "vetted": false,
+    "note": null
+  },
+  "bat": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has library requirement conflict with drupal/date_recur module."
+  },
+  "bat_api": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has library requirement conflict with drupal/date_recur module."
+  },
+  "batch_jobs": {
+    "vetted": false,
+    "note": "This module is currently unmaintained. Use at your own risk. It's also seeking new maintainers."
+  },
+  "batch_resize_image": {
+    "vetted": false,
+    "note": null
+  },
+  "bazaarvoice": {
+    "vetted": true,
+    "note": "This module must be installed manually as its required dependency mikemiles86/bazaarvoice-productfeed require ssh2 extension."
+  },
+  "bbr": {
+    "vetted": false,
+    "note": null
+  },
+  "bcc": {
+    "vetted": false,
+    "note": null
+  },
+  "be_sure": {
+    "vetted": false,
+    "note": null
+  },
+  "bean": {
+    "vetted": true,
+    "note": null
+  },
+  "bean_admin_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "beautytips": {
+    "vetted": false,
+    "note": null
+  },
+  "behat_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "bestreply": {
+    "vetted": false,
+    "note": null
+  },
+  "better_exposed_filters": {
+    "vetted": false,
+    "note": null
+  },
+  "better_field_descriptions": {
+    "vetted": false,
+    "note": null
+  },
+  "better_formats": {
+    "vetted": true,
+    "note": "The Better Formats module was never stable in Drupal 7. Most of its functionality is obsolete in Drupal 9."
+  },
+  "better_module_dependencies": {
+    "vetted": false,
+    "note": null
+  },
+  "better_search": {
+    "vetted": false,
+    "note": null
+  },
+  "betterlogin": {
+    "vetted": false,
+    "note": null
+  },
+  "bg_image_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "biblio": {
+    "vetted": false,
+    "note": null
+  },
+  "bigint": {
+    "vetted": false,
+    "note": null
+  },
+  "bigmenu": {
+    "vetted": false,
+    "note": null
+  },
+  "bigvideo": {
+    "vetted": false,
+    "note": null
+  },
+  "birdseed": {
+    "vetted": false,
+    "note": null
+  },
+  "blackbaud_sky_api": {
+    "vetted": false,
+    "note": null
+  },
+  "blazy": {
+    "vetted": false,
+    "note": null
+  },
+  "blazy_photoswipe": {
+    "vetted": false,
+    "note": null
+  },
+  "blinknet": {
+    "vetted": false,
+    "note": null
+  },
+  "block": {
+    "vetted": true,
+    "note": null
+  },
+  "block_access": {
+    "vetted": false,
+    "note": null
+  },
+  "block_aria_landmark_roles": {
+    "vetted": false,
+    "note": null
+  },
+  "block_class": {
+    "vetted": true,
+    "note": null
+  },
+  "block_country": {
+    "vetted": false,
+    "note": null
+  },
+  "block_date": {
+    "vetted": false,
+    "note": null
+  },
+  "block_exclude_pages": {
+    "vetted": false,
+    "note": null
+  },
+  "block_token": {
+    "vetted": false,
+    "note": null
+  },
+  "block_upload": {
+    "vetted": false,
+    "note": null
+  },
+  "blockcache_alter": {
+    "vetted": true,
+    "note": "This module has no use in Drupal 9: every block already has optimal caching built in."
+  },
+  "blockgroup": {
+    "vetted": false,
+    "note": null
+  },
+  "blockify": {
+    "vetted": false,
+    "note": null
+  },
+  "blockreference": {
+    "vetted": true,
+    "note": null
+  },
+  "blog": {
+    "vetted": false,
+    "note": "The blog module is no longer part of Drupal core."
+  },
+  "bontact": {
+    "vetted": false,
+    "note": null
+  },
+  "book": {
+    "vetted": true,
+    "note": null
+  },
+  "book_access": {
+    "vetted": false,
+    "note": null
+  },
+  "bookkeeping": {
+    "vetted": true,
+    "note": "This module must be installed manually due to its dependency on drupal/dynamic_entity_reference development version."
+  },
+  "booktree": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_carousel_if": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_classes": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_library": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_login_authenticate": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_modal_forms": {
+    "vetted": true,
+    "note": "The Bootstrap Modal Forms module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "bootstrap_modal_messages": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_quicktabs": {
+    "vetted": false,
+    "note": null
+  },
+  "bootstrap_site_alert": {
+    "vetted": false,
+    "note": null
+  },
+  "botscout": {
+    "vetted": false,
+    "note": null
+  },
+  "brandfolder": {
+    "vetted": false,
+    "note": null
+  },
+  "brazilian_ids": {
+    "vetted": false,
+    "note": null
+  },
+  "breadcrumb_extra_field": {
+    "vetted": false,
+    "note": null
+  },
+  "breadcrumb_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "breakpoints": {
+    "vetted": true,
+    "note": "The Drupal 7 Breakpoints module was added to Drupal core. Breakpoints are no longer configurable, but are versioned along with the theme: they are defined in THEMENAME.breakpoints.yml file at the root of the theme. Therefore there is nothing to migrate."
+  },
+  "bricks": {
+    "vetted": false,
+    "note": null
+  },
+  "brightcove": {
+    "vetted": false,
+    "note": null
+  },
+  "broadstreet_ads": {
+    "vetted": false,
+    "note": null
+  },
+  "browser_refresh": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/browser_refresh/issues/3241233."
+  },
+  "browserclass": {
+    "vetted": false,
+    "note": null
+  },
+  "browsersync": {
+    "vetted": false,
+    "note": null
+  },
+  "bu": {
+    "vetted": false,
+    "note": null
+  },
+  "bueditor": {
+    "vetted": false,
+    "note": null
+  },
+  "bugherd": {
+    "vetted": false,
+    "note": null
+  },
+  "build_hooks": {
+    "vetted": false,
+    "note": null
+  },
+  "bulk_author_update": {
+    "vetted": false,
+    "note": null
+  },
+  "bulk_comment_delete": {
+    "vetted": false,
+    "note": null
+  },
+  "bulk_export": {
+    "vetted": true,
+    "note": "The Bulk Export submodule of the CTools module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "bulkdelete": {
+    "vetted": false,
+    "note": null
+  },
+  "bundle_copy": {
+    "vetted": true,
+    "note": "This module provides content type copying for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "buster": {
+    "vetted": false,
+    "note": null
+  },
+  "bxslider": {
+    "vetted": false,
+    "note": null
+  },
+  "bynder": {
+    "vetted": false,
+    "note": null
+  },
+  "cacheexclude": {
+    "vetted": true,
+    "note": "The list of paths for cache exclude needs manual re-evaluation to make sure that only the necessary paths are excluded."
+  },
+  "cacheflush": {
+    "vetted": false,
+    "note": null
+  },
+  "calendar": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "calendar_systems": {
+    "vetted": false,
+    "note": null
+  },
+  "campaignmonitor": {
+    "vetted": false,
+    "note": null
+  },
+  "canto_connector": {
+    "vetted": false,
+    "note": null
+  },
+  "canvas_api": {
+    "vetted": false,
+    "note": null
+  },
+  "captcha": {
+    "vetted": true,
+    "note": null
+  },
+  "captcha_keypad": {
+    "vetted": false,
+    "note": null
+  },
+  "captcha_questions": {
+    "vetted": false,
+    "note": null
+  },
+  "cas": {
+    "vetted": false,
+    "note": null
+  },
+  "cas_attributes": {
+    "vetted": false,
+    "note": null
+  },
+  "cbb": {
+    "vetted": false,
+    "note": null
+  },
+  "cck_select_other": {
+    "vetted": false,
+    "note": null
+  },
+  "ccl": {
+    "vetted": false,
+    "note": null
+  },
+  "cdek_api": {
+    "vetted": false,
+    "note": null
+  },
+  "cdn": {
+    "vetted": false,
+    "note": null
+  },
+  "cer": {
+    "vetted": false,
+    "note": null
+  },
+  "certificate": {
+    "vetted": false,
+    "note": null
+  },
+  "change_pwd_page": {
+    "vetted": false,
+    "note": null
+  },
+  "changed_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "charcount": {
+    "vetted": false,
+    "note": null
+  },
+  "charts": {
+    "vetted": false,
+    "note": null
+  },
+  "charts_google": {
+    "vetted": false,
+    "note": null
+  },
+  "charts_highcharts": {
+    "vetted": false,
+    "note": null
+  },
+  "check_dns": {
+    "vetted": false,
+    "note": null
+  },
+  "checklistapi": {
+    "vetted": false,
+    "note": null
+  },
+  "chosen": {
+    "vetted": false,
+    "note": null
+  },
+  "chosen_ajax": {
+    "vetted": false,
+    "note": null
+  },
+  "christmas_lights": {
+    "vetted": false,
+    "note": null
+  },
+  "christmas_snow": {
+    "vetted": false,
+    "note": null
+  },
+  "cision_block": {
+    "vetted": false,
+    "note": null
+  },
+  "civicrm_entity": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "ckeditor": {
+    "vetted": true,
+    "note": "This module provides WYSIWYG editing for rich text fields using CKEditor for a Drupal 7 site. Drupal core now contains a superset of its functionality, in the CKEditor module."
+  },
+  "ckeditor_abbreviation": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_accessibility_auditor": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_accordion": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_bootstrap_tabs": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_browser_context_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_codemirror": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_giella": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_image2": {
+    "vetted": true,
+    "note": "This module provides the Enhanced Image plugin for CKEditor. Drupal core now contains a superset of its functionality, in the CKEditor module."
+  },
+  "ckeditor_link": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_link_file": {
+    "vetted": true,
+    "note": "The actual migration is provided by the media_migration module."
+  },
+  "ckeditor_markdown": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_mentions": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_readmore": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_responsive_plugin": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_tabber": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_video": {
+    "vetted": false,
+    "note": null
+  },
+  "clamav": {
+    "vetted": false,
+    "note": null
+  },
+  "classy_paragraphs": {
+    "vetted": false,
+    "note": null
+  },
+  "cleaner": {
+    "vetted": false,
+    "note": null
+  },
+  "cleantalk": {
+    "vetted": false,
+    "note": null
+  },
+  "clear_single_page_cache": {
+    "vetted": false,
+    "note": null
+  },
+  "clever_reach": {
+    "vetted": false,
+    "note": null
+  },
+  "clientside_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "clipboardjs": {
+    "vetted": false,
+    "note": null
+  },
+  "clockpicker": {
+    "vetted": false,
+    "note": null
+  },
+  "clone": {
+    "vetted": true,
+    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+  },
+  "closeblock": {
+    "vetted": false,
+    "note": null
+  },
+  "cloud": {
+    "vetted": false,
+    "note": null
+  },
+  "cloudflare": {
+    "vetted": false,
+    "note": null
+  },
+  "cloudfront_path_invalidate": {
+    "vetted": false,
+    "note": null
+  },
+  "cloudmersiveantivirus": {
+    "vetted": false,
+    "note": null
+  },
+  "cludo_search": {
+    "vetted": false,
+    "note": null
+  },
+  "cmis": {
+    "vetted": false,
+    "note": null
+  },
+  "cocoon_media": {
+    "vetted": false,
+    "note": null
+  },
+  "codefilter": {
+    "vetted": false,
+    "note": null
+  },
+  "codes_pool": {
+    "vetted": false,
+    "note": null
+  },
+  "coffee": {
+    "vetted": false,
+    "note": null
+  },
+  "collapse_text": {
+    "vetted": false,
+    "note": null
+  },
+  "collapsiblock": {
+    "vetted": false,
+    "note": null
+  },
+  "color": {
+    "vetted": true,
+    "note": null
+  },
+  "color_field": {
+    "vetted": true,
+    "note": null
+  },
+  "colorbox": {
+    "vetted": true,
+    "note": null
+  },
+  "colorbox_field_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "colorbox_node": {
+    "vetted": true,
+    "note": "This module is obsolete in Drupal 9. Check if https://www.drupal.org/project/colorbox_simple_load or https://www.drupal.org/project/colorbox_load address your needs."
+  },
+  "colorized_gmap": {
+    "vetted": false,
+    "note": null
+  },
+  "colors": {
+    "vetted": false,
+    "note": null
+  },
+  "comment": {
+    "vetted": true,
+    "note": null
+  },
+  "comment_admin_notify": {
+    "vetted": false,
+    "note": null
+  },
+  "comment_delete": {
+    "vetted": false,
+    "note": null
+  },
+  "comment_limit": {
+    "vetted": false,
+    "note": null
+  },
+  "comment_notify": {
+    "vetted": true,
+    "note": null
+  },
+  "comment_perm": {
+    "vetted": false,
+    "note": null
+  },
+  "comment_reply_count": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_abandoned_carts": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_add_to_cart_confirmation": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_affirm": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_alipay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_amazon_lpa": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_authnet": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_autosku": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_avatax": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_balance": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_bpost": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_braintree": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_canadapost": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_cart_estimate": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_cart_to_basket": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_ccavenue": {
+    "vetted": true,
+    "note": "The Commerce CCAvenue Payment Gateway module has a stable Drupal 9 release but does not seem trustworthy. It claims to require the 'mcrypt' PHP extension. But that was dropped from PHP many years ago. Since https://www.drupal.org/project/commerce_ccavenue/issues/2998729 it no longer needs it, but it still claims it does. Install at your own risk. Please consider switching to an alternative module."
+  },
+  "commerce_chase": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_checkout_fi": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_coinpayments": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_concordpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_culqi": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_cybersource": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_datatrans": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_donate": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_dps": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_ecpay_allinone": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_email": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_epaybg": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_eurobank_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_fedex": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_feeds": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_file": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_fraud": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_funds": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_gc_client": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_gestpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_google_tag_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_heidelpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_iats": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_idpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_ingenico": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_invoice": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_itransact": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_kbcpaypage": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_klarna_checkout": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_license": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_liqpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_marketplace": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_maxipago": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/commerce_maxipago for instructions."
+  },
+  "commerce_migrate": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_mollie": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_moneris": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_multisafepay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_netbilling": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_nzpost": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_pado": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_pagseguro_transp": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_payeezy": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_payfort": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not - see https://www.drupal.org/project/commerce_payfort/issues/3229354."
+  },
+  "commerce_payme": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_payone": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_paypal": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_paystack": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_paytrail": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_payu": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_pos": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_postfinance": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_pricelist": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_printful": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_purchase_order": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_qb_webconnect": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_quick_purchase": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_realex": {
+    "vetted": true,
+    "note": "This module must be installed manually — see README.md for installation instructions."
+  },
+  "commerce_recurring": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_repeat_order": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_reports": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_saferpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_securehosting": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_sermepa": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_shipping": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_shipping_weight_tariff": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_shipstation": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_smartpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_sofortbanking": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_spgateway": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_square": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_stock": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_stock_notifications": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_stripe": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_stripe_ideal": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_taxjar": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_tpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_ups": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_usaepay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_usps": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_vantiv": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_vipps": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/acquia_search_solr's php-http/guzzle6-adapter library."
+  },
+  "commerce_webpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_winbank_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_wishlist": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_worldpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_xero": {
+    "vetted": false,
+    "note": null
+  },
+  "community_funded": {
+    "vetted": false,
+    "note": null
+  },
+  "community_tasks": {
+    "vetted": false,
+    "note": null
+  },
+  "composer_deploy": {
+    "vetted": false,
+    "note": null
+  },
+  "composer_manager": {
+    "vetted": true,
+    "note": "The Composer Manager module is obsolete in Drupal 9, it was only necessary in Drupal 7."
+  },
+  "computed_field": {
+    "vetted": false,
+    "note": null
+  },
+  "comscore_direct": {
+    "vetted": false,
+    "note": null
+  },
+  "conditional_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "conditional_message": {
+    "vetted": false,
+    "note": null
+  },
+  "confection": {
+    "vetted": false,
+    "note": null
+  },
+  "config_pages": {
+    "vetted": false,
+    "note": null
+  },
+  "config_perms": {
+    "vetted": false,
+    "note": null
+  },
+  "config_readonly": {
+    "vetted": false,
+    "note": null
+  },
+  "conflict": {
+    "vetted": false,
+    "note": null
+  },
+  "connectid": {
+    "vetted": false,
+    "note": null
+  },
+  "connectid_login": {
+    "vetted": false,
+    "note": null
+  },
+  "consent_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "contact": {
+    "vetted": true,
+    "note": null
+  },
+  "contact_permissions": {
+    "vetted": false,
+    "note": null
+  },
+  "content_access": {
+    "vetted": false,
+    "note": null
+  },
+  "content_check": {
+    "vetted": false,
+    "note": null
+  },
+  "content_language_access": {
+    "vetted": false,
+    "note": null
+  },
+  "content_lock": {
+    "vetted": false,
+    "note": null
+  },
+  "content_type_dependency": {
+    "vetted": false,
+    "note": null
+  },
+  "context": {
+    "vetted": true,
+    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port does not yet have a stable release."
+  },
+  "context_datalayer": {
+    "vetted": false,
+    "note": null
+  },
+  "context_entity_field": {
+    "vetted": false,
+    "note": null
+  },
+  "context_metadata": {
+    "vetted": false,
+    "note": null
+  },
+  "context_profile_role": {
+    "vetted": false,
+    "note": null
+  },
+  "context_ui": {
+    "vetted": true,
+    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port does not yet have a stable release."
+  },
+  "contextly": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not composer-installable — see https://www.drupal.org/project/contextly/issues/3240244."
+  },
+  "contextual": {
+    "vetted": true,
+    "note": null
+  },
+  "contextual_range_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "conversational_forms": {
+    "vetted": false,
+    "note": null
+  },
+  "cookie_content_blocker": {
+    "vetted": false,
+    "note": null
+  },
+  "cookiebot": {
+    "vetted": false,
+    "note": null
+  },
+  "cookiecuttr": {
+    "vetted": false,
+    "note": null
+  },
+  "cookieinformation": {
+    "vetted": false,
+    "note": null
+  },
+  "cookiepro": {
+    "vetted": false,
+    "note": null
+  },
+  "cookiepro_ccpa": {
+    "vetted": false,
+    "note": null
+  },
+  "cool_message": {
+    "vetted": false,
+    "note": null
+  },
+  "copyprevention": {
+    "vetted": false,
+    "note": null
+  },
+  "copyright_block": {
+    "vetted": false,
+    "note": null
+  },
+  "cors": {
+    "vetted": true,
+    "note": "This module provides CORS (Cross-Origin Resource Sharing) support for allowing cross-domain requests to Drupal. Drupal core now contains a superset of its functionality. It can be configured in your site's services.yml file, under 'cors.config'."
+  },
+  "country_path": {
+    "vetted": false,
+    "note": null
+  },
+  "county": {
+    "vetted": false,
+    "note": null
+  },
+  "course": {
+    "vetted": false,
+    "note": null
+  },
+  "crazyegg": {
+    "vetted": false,
+    "note": null
+  },
+  "create_and_translate": {
+    "vetted": false,
+    "note": null
+  },
+  "create_user_permission": {
+    "vetted": false,
+    "note": null
+  },
+  "createandcontinue": {
+    "vetted": false,
+    "note": null
+  },
+  "creditfield": {
+    "vetted": false,
+    "note": null
+  },
+  "crm_core": {
+    "vetted": false,
+    "note": null
+  },
+  "cronkeychange": {
+    "vetted": false,
+    "note": null
+  },
+  "cryptolog": {
+    "vetted": false,
+    "note": null
+  },
+  "cs_adaptive_image": {
+    "vetted": false,
+    "note": null
+  },
+  "cshs": {
+    "vetted": false,
+    "note": null
+  },
+  "css_editor": {
+    "vetted": false,
+    "note": null
+  },
+  "ctools": {
+    "vetted": true,
+    "note": "CTools should not be directly depended on by a project's composer.json since it is always a dependency of another package. However, there is no harm in enabling this module if it is depended on by another package."
+  },
+  "ctools_custom_content": {
+    "vetted": true,
+    "note": "The Custom content panes submodule of the CTools module is obsolete, because Drupal core now has a rich block system, which combined with the Drupal 9 Layout Builder can do much more."
+  },
+  "currency": {
+    "vetted": false,
+    "note": null
+  },
+  "current_year": {
+    "vetted": false,
+    "note": null
+  },
+  "curtain_raiser": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_add_another": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_add_content": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_breadcrumbs": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_formatters": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_meta": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_nid": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_pub": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_robots": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_search": {
+    "vetted": false,
+    "note": null
+  },
+  "custom_text": {
+    "vetted": false,
+    "note": null
+  },
+  "customer_identity_and_access_management": {
+    "vetted": false,
+    "note": null
+  },
+  "customerror": {
+    "vetted": false,
+    "note": null
+  },
+  "customers_canvas": {
+    "vetted": false,
+    "note": null
+  },
+  "customfilter": {
+    "vetted": false,
+    "note": null
+  },
+  "d8cache": {
+    "vetted": true,
+    "note": "The Drupal 8 Cache Backport module is obsolete in Drupal 9, it was only necessary in Drupal 7."
+  },
+  "dadata_api": {
+    "vetted": false,
+    "note": null
+  },
+  "dashboard": {
+    "vetted": true,
+    "note": "The Dashboard module was marked obsolete by its maintainers."
+  },
+  "dashboard_connector": {
+    "vetted": true,
+    "note": "The Dashboard Connector module was marked as obsolete by its maintainers. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "data": {
+    "vetted": false,
+    "note": null
+  },
+  "datacamp_light": {
+    "vetted": false,
+    "note": null
+  },
+  "datalayer": {
+    "vetted": false,
+    "note": null
+  },
+  "datatables": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you. NOTE: in order for this module's functionality to work, you need to perform additional manual steps described at https://www.drupal.org/project/datatables. Commit the JavaScript file described in those steps to your repository."
+  },
+  "date": {
+    "vetted": true,
+    "note": "This module provides a date/time field type for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_all_day": {
+    "vetted": true,
+    "note": "This module provides a date/time field type for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_ap_style": {
+    "vetted": false,
+    "note": null
+  },
+  "date_api": {
+    "vetted": true,
+    "note": "This module provides a date/time field type for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_context": {
+    "vetted": true,
+    "note": "This module provides a date/time field type for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_group": {
+    "vetted": false,
+    "note": null
+  },
+  "date_popup": {
+    "vetted": true,
+    "note": "This module provides a date/time field widget for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_popup_authored": {
+    "vetted": true,
+    "note": "This module provides a date/time field widget for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_popup_timepicker": {
+    "vetted": false,
+    "note": null
+  },
+  "date_range_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "date_repeat": {
+    "vetted": false,
+    "note": null
+  },
+  "date_repeat_field": {
+    "vetted": false,
+    "note": null
+  },
+  "date_tools": {
+    "vetted": true,
+    "note": "This module provides a date/time field type for a Drupal 7 site. Drupal core now contains most of its functionality."
+  },
+  "date_views": {
+    "vetted": true,
+    "note": "This module provides Views integration for date/time fields on a Drupal 7 site. Both the core-included date/time field and the contrib-provided repeating date module ship with Views integration."
+  },
+  "db_maintenance": {
+    "vetted": false,
+    "note": null
+  },
+  "dbee": {
+    "vetted": false,
+    "note": null
+  },
+  "dblog": {
+    "vetted": true,
+    "note": null
+  },
+  "dblog_pager": {
+    "vetted": false,
+    "note": null
+  },
+  "debug_bar": {
+    "vetted": false,
+    "note": null
+  },
+  "default_menu_link": {
+    "vetted": false,
+    "note": null
+  },
+  "delete_all": {
+    "vetted": false,
+    "note": null
+  },
+  "denormalizer": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_admin_notify": {
+    "vetted": true,
+    "note": "Apigee says: 'Set admin email notifications for new users by Configuring user account settings.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "devconnect_apiproduct_access": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_app_attributes": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_debug": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_developer_apps": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_key_value_map": {
+    "vetted": true,
+    "note": "Apigee says: 'Key-Value map calls to the Edge API are not part of the Drupal 8 Edge module. You can call the Apigee API directly or open an enhancement ticket on https://github.com/apigee/apigee-client-php if needed by your organization.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "devconnect_mint_payment": {
+    "vetted": true,
+    "note": "Apigee says: 'Custom code is required to configure a recurring Commerce payment provider.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "devconnect_mint_worldpay": {
+    "vetted": true,
+    "note": "Apigee says: 'Any Drupal Commerce 2.x payment gateway may be used.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "devconnect_monetization": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_monetization_payment": {
+    "vetted": false,
+    "note": null
+  },
+  "devconnect_status": {
+    "vetted": true,
+    "note": "Apigee says: 'Status checks are handled by the Update Manager in Drupal 8 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+  },
+  "devconnect_user": {
+    "vetted": false,
+    "note": null
+  },
+  "devel": {
+    "vetted": true,
+    "note": null
+  },
+  "devel_debug_log": {
+    "vetted": false,
+    "note": null
+  },
+  "devel_mail_logger": {
+    "vetted": false,
+    "note": null
+  },
+  "devel_snippet": {
+    "vetted": false,
+    "note": null
+  },
+  "developer_console": {
+    "vetted": false,
+    "note": null
+  },
+  "development_environment": {
+    "vetted": false,
+    "note": null
+  },
+  "dfm": {
+    "vetted": false,
+    "note": null
+  },
+  "dfp": {
+    "vetted": false,
+    "note": null
+  },
+  "dhtml_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "dialog": {
+    "vetted": true,
+    "note": "This module provides an API for opening content in an interactive overlay in Drupal 7. Drupal core now contains a superset of its functionality."
+  },
+  "did_this_help": {
+    "vetted": false,
+    "note": null
+  },
+  "diff": {
+    "vetted": true,
+    "note": null
+  },
+  "dimension": {
+    "vetted": false,
+    "note": null
+  },
+  "disable_field": {
+    "vetted": false,
+    "note": null
+  },
+  "disable_login": {
+    "vetted": false,
+    "note": null
+  },
+  "disable_messages": {
+    "vetted": false,
+    "note": null
+  },
+  "discourse_sso": {
+    "vetted": false,
+    "note": null
+  },
+  "disqus": {
+    "vetted": false,
+    "note": null
+  },
+  "docbinder": {
+    "vetted": false,
+    "note": null
+  },
+  "domain": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_entity": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_finder": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_lang": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_path": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_registration": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_traversal": {
+    "vetted": false,
+    "note": null
+  },
+  "domain_wise_aggregation": {
+    "vetted": false,
+    "note": null
+  },
+  "dopl": {
+    "vetted": false,
+    "note": null
+  },
+  "double_field": {
+    "vetted": false,
+    "note": null
+  },
+  "download_link_labeler": {
+    "vetted": false,
+    "note": null
+  },
+  "drafty": {
+    "vetted": true,
+    "note": "This module provides an API for handling drafts of revisions in Drupal 7. Drupal core now contains a superset of its functionality."
+  },
+  "draggableviews": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "drd": {
+    "vetted": false,
+    "note": null
+  },
+  "drd_agent": {
+    "vetted": false,
+    "note": null
+  },
+  "droogle": {
+    "vetted": false,
+    "note": null
+  },
+  "dropfort_update": {
+    "vetted": false,
+    "note": null
+  },
+  "drowl_trademark": {
+    "vetted": false,
+    "note": null
+  },
+  "droxy": {
+    "vetted": false,
+    "note": null
+  },
+  "druhels": {
+    "vetted": false,
+    "note": null
+  },
+  "drupal_reset": {
+    "vetted": false,
+    "note": null
+  },
+  "drupalauth4ssp": {
+    "vetted": false,
+    "note": null
+  },
+  "drupalmonitor": {
+    "vetted": false,
+    "note": null
+  },
+  "drush_entity": {
+    "vetted": false,
+    "note": null
+  },
+  "drush_help": {
+    "vetted": false,
+    "note": null
+  },
+  "drush_language": {
+    "vetted": false,
+    "note": null
+  },
+  "drush_pre_deploy": {
+    "vetted": false,
+    "note": null
+  },
+  "ds": {
+    "vetted": false,
+    "note": "There are no automatic migrations yet for Display Suite configuration, help out at https://www.drupal.org/project/ds/issues/3064554."
+  },
+  "ds_devel": {
+    "vetted": false,
+    "note": null
+  },
+  "ds_extras": {
+    "vetted": false,
+    "note": null
+  },
+  "ds_forms": {
+    "vetted": false,
+    "note": "Per the Display Suite maintainers, the Display Suite Forms submodule is obsolete in Drupal 8|9: Drupal core natively supports form modes and form displays, which combined with Drupal core's Layout Builder module allows you to do everything Display Suite Forms allowed you to do."
+  },
+  "ds_ui": {
+    "vetted": false,
+    "note": "There are no automatic migrations yet for Display Suite configuration, help out at https://www.drupal.org/project/ds/issues/3064554."
+  },
+  "dummyimage": {
+    "vetted": false,
+    "note": null
+  },
+  "duplicate_role": {
+    "vetted": false,
+    "note": null
+  },
+  "duration_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "dxpr_gridstack": {
+    "vetted": false,
+    "note": null
+  },
+  "dxpr_theme_helper": {
+    "vetted": false,
+    "note": null
+  },
+  "dynamic_banner": {
+    "vetted": false,
+    "note": null
+  },
+  "dynamic_entity_reference": {
+    "vetted": false,
+    "note": null
+  },
+  "easy_breadcrumb": {
+    "vetted": false,
+    "note": null
+  },
+  "easy_meta": {
+    "vetted": false,
+    "note": "The Easy Meta module was merged into the Metatag module. You can help finish the migration path at https://www.drupal.org/project/metatag/issues/2847536."
+  },
+  "easy_social": {
+    "vetted": false,
+    "note": null
+  },
+  "easychart_wysiwyg": {
+    "vetted": true,
+    "note": "This module is now obsolete because Drupal 8/9 port of the easychart module does not have WYSIWYG integration at all."
+  },
+  "eck": {
+    "vetted": false,
+    "note": null
+  },
+  "ecwid_shopping_cart": {
+    "vetted": false,
+    "note": null
+  },
+  "edit_own_user_account_permission": {
+    "vetted": false,
+    "note": null
+  },
+  "editablefields": {
+    "vetted": false,
+    "note": null
+  },
+  "editableviews": {
+    "vetted": false,
+    "note": null
+  },
+  "editor_note": {
+    "vetted": false,
+    "note": null
+  },
+  "editoria11y": {
+    "vetted": false,
+    "note": null
+  },
+  "edw_healthcheck": {
+    "vetted": false,
+    "note": null
+  },
+  "elastic_email": {
+    "vetted": false,
+    "note": null
+  },
+  "elasticsearch_aws_connector": {
+    "vetted": false,
+    "note": null
+  },
+  "elasticsearch_connector": {
+    "vetted": false,
+    "note": null
+  },
+  "elements": {
+    "vetted": true,
+    "note": "Drupal core now contains all of this module's functionality."
+  },
+  "elevatezoomplus": {
+    "vetted": false,
+    "note": null
+  },
+  "elf": {
+    "vetted": false,
+    "note": null
+  },
+  "elfinder": {
+    "vetted": false,
+    "note": "The elFinder module is obsolete now that Drupal core includes a feature-rich Media Library."
+  },
+  "elfinder_bueditor": {
+    "vetted": false,
+    "note": "The elFinder BUEditor integration module is obsolete now that Drupal core includes a feature-rich Media Library."
+  },
+  "elfinder_ffsel": {
+    "vetted": false,
+    "note": "The elFinder File Field Source module is obsolete now that Drupal core includes a feature-rich Media Library."
+  },
+  "elysia_cron": {
+    "vetted": false,
+    "note": null
+  },
+  "email": {
+    "vetted": true,
+    "note": "This module no longer exists because its field type has been merged into Drupal core."
+  },
+  "email_changelog": {
+    "vetted": false,
+    "note": null
+  },
+  "email_contact": {
+    "vetted": false,
+    "note": null
+  },
+  "email_nd": {
+    "vetted": false,
+    "note": null
+  },
+  "email_noreply": {
+    "vetted": false,
+    "note": null
+  },
+  "email_registration": {
+    "vetted": true,
+    "note": null
+  },
+  "empty_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "empty_page": {
+    "vetted": false,
+    "note": null
+  },
+  "emptyparagraphkiller": {
+    "vetted": false,
+    "note": null
+  },
+  "encrypt": {
+    "vetted": false,
+    "note": null
+  },
+  "entity": {
+    "vetted": true,
+    "note": "Entity API should not be directly depended on by a project's composer.json since it is always a dependency of another package. However, there is no harm in enabling this module if it is depended on by another package."
+  },
+  "entity_abuse": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_block": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_browser": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_data": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_embed": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_legal": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_modified": {
+    "vetted": true,
+    "note": "This module provides an API to access the last modified data in a coherent way. Drupal core now contains a superset of its functionality, through EntityChangedInterface."
+  },
+  "entity_notes": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_pager": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_print": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_reference": {
+    "vetted": true,
+    "note": "This module provides a field type for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "entity_reports": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_share": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_template": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_token": {
+    "vetted": true,
+    "note": "This module provides token support for entities for a Drupal 7 site. While this module does have a Drupal 9 compatible release, Drupal core now contains a superset of its functionality."
+  },
+  "entity_translation": {
+    "vetted": true,
+    "note": "This module provides translation support for entities for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "entity_translation_i18n_menu": {
+    "vetted": false,
+    "note": "This module provides translation support for menu entities for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "entity_translation_unified_form": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_translation_upgrade": {
+    "vetted": true,
+    "note": "This module provides a upgrade path from node-based to field-based translation in Drupal 7 and should've been uninstalled after having run on the Drupal 7 site."
+  },
+  "entity_view_mode": {
+    "vetted": true,
+    "note": "This module provides custom view modes support for entities for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "entity_workflow": {
+    "vetted": false,
+    "note": null
+  },
+  "entitycache": {
+    "vetted": true,
+    "note": "This module provides caching of certain Drupal 7 entities. Drupal core now contains a superset of its functionality."
+  },
+  "entityconnect": {
+    "vetted": false,
+    "note": null
+  },
+  "entityform": {
+    "vetted": false,
+    "note": null
+  },
+  "entityform_block": {
+    "vetted": false,
+    "note": null
+  },
+  "entityqueue": {
+    "vetted": false,
+    "note": null
+  },
+  "entityreference": {
+    "vetted": true,
+    "note": "This module no longer exists because its field type has been merged into Drupal core."
+  },
+  "entityreference_autocomplete": {
+    "vetted": true,
+    "note": "This module defines a new form element type that allows developers to add autocomplete fields to forms in Drupal 7. Drupal core now contains a superset of its functionality."
+  },
+  "entityreference_dragdrop": {
+    "vetted": false,
+    "note": null
+  },
+  "entityreference_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "entityreference_multiple": {
+    "vetted": false,
+    "note": null
+  },
+  "entityreference_prepopulate": {
+    "vetted": false,
+    "note": null
+  },
+  "environment_indicator": {
+    "vetted": true,
+    "note": "This module's configuration does not make sense to migrate identically, because you may have a different development strategy and are very likely to have different hostnames. We've preinstalled it for you though, so just go to /admin/config/development/environment-indicator and configure it as you please."
+  },
+  "epcgeg": {
+    "vetted": false,
+    "note": null
+  },
+  "epsilon_harmony": {
+    "vetted": false,
+    "note": null
+  },
+  "eqneditor": {
+    "vetted": false,
+    "note": null
+  },
+  "error_log": {
+    "vetted": false,
+    "note": null
+  },
+  "errorlevelpermission": {
+    "vetted": false,
+    "note": null
+  },
+  "etracker": {
+    "vetted": false,
+    "note": null
+  },
+  "eu_cookie_compliance": {
+    "vetted": false,
+    "note": null
+  },
+  "eu_cookie_compliance_gtm": {
+    "vetted": false,
+    "note": null
+  },
+  "eva": {
+    "vetted": false,
+    "note": null
+  },
+  "evercurrent": {
+    "vetted": false,
+    "note": null
+  },
+  "examples": {
+    "vetted": false,
+    "note": null
+  },
+  "exclude_node_author": {
+    "vetted": false,
+    "note": null
+  },
+  "exclude_node_title": {
+    "vetted": false,
+    "note": null
+  },
+  "exerciser": {
+    "vetted": false,
+    "note": null
+  },
+  "exif": {
+    "vetted": false,
+    "note": null
+  },
+  "exif_orientation": {
+    "vetted": false,
+    "note": null
+  },
+  "exit_modal": {
+    "vetted": false,
+    "note": null
+  },
+  "expanding_textareas": {
+    "vetted": false,
+    "note": null
+  },
+  "experience": {
+    "vetted": false,
+    "note": null
+  },
+  "expire": {
+    "vetted": true,
+    "note": "This module provides support for expiring URLs from caches. Drupal core now contains a superset of its functionality in the form of cache tags. If you need to invalidate external caches, install the https://www.drupal.org/project/purge module."
+  },
+  "exposed_filter_data": {
+    "vetted": false,
+    "note": null
+  },
+  "external_link_change": {
+    "vetted": false,
+    "note": null
+  },
+  "extlink": {
+    "vetted": true,
+    "note": null
+  },
+  "extra_css_js": {
+    "vetted": false,
+    "note": null
+  },
+  "extra_field_description": {
+    "vetted": false,
+    "note": null
+  },
+  "fac": {
+    "vetted": false,
+    "note": null
+  },
+  "facebook_comments_block": {
+    "vetted": false,
+    "note": null
+  },
+  "facebook_pixel": {
+    "vetted": false,
+    "note": null
+  },
+  "facetapi": {
+    "vetted": false,
+    "note": null
+  },
+  "facetapi_bonus": {
+    "vetted": true,
+    "note": "Most functionality is now available in Facets natively."
+  },
+  "faker": {
+    "vetted": false,
+    "note": null
+  },
+  "fallback_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "fancy_file_delete": {
+    "vetted": false,
+    "note": null
+  },
+  "fancy_login": {
+    "vetted": false,
+    "note": null
+  },
+  "faq": {
+    "vetted": false,
+    "note": null
+  },
+  "faqfield": {
+    "vetted": false,
+    "note": null
+  },
+  "farm_bee": {
+    "vetted": false,
+    "note": null
+  },
+  "farm_forest": {
+    "vetted": false,
+    "note": null
+  },
+  "farm_maple": {
+    "vetted": false,
+    "note": null
+  },
+  "fast_404": {
+    "vetted": true,
+    "note": "The Fast 404 module sped up 'Page not Found' responses in Drupal 7. Most of its functionality is obsolete in Drupal 9."
+  },
+  "fasterweb": {
+    "vetted": false,
+    "note": null
+  },
+  "fastly": {
+    "vetted": false,
+    "note": null
+  },
+  "fasttoggle": {
+    "vetted": false,
+    "note": null
+  },
+  "fb_instant_articles": {
+    "vetted": false,
+    "note": null
+  },
+  "fb_likebox": {
+    "vetted": false,
+    "note": null
+  },
+  "fe_block": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "fe_block_ui": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "fe_date": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "fe_nodequeue": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "fe_profile": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "features": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "features_extra": {
+    "vetted": true,
+    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+  },
+  "feed_block": {
+    "vetted": false,
+    "note": null
+  },
+  "feedback": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds_ex": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds_tamper": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds_youtube": {
+    "vetted": false,
+    "note": null
+  },
+  "fences": {
+    "vetted": false,
+    "note": null
+  },
+  "fft": {
+    "vetted": false,
+    "note": null
+  },
+  "field": {
+    "vetted": true,
+    "note": null
+  },
+  "field_addresstw": {
+    "vetted": false,
+    "note": null
+  },
+  "field_collection": {
+    "vetted": true,
+    "note": null
+  },
+  "field_count_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "field_css": {
+    "vetted": false,
+    "note": null
+  },
+  "field_default_token": {
+    "vetted": false,
+    "note": null
+  },
+  "field_defaults": {
+    "vetted": false,
+    "note": null
+  },
+  "field_delimiter": {
+    "vetted": false,
+    "note": null
+  },
+  "field_display_label": {
+    "vetted": false,
+    "note": null
+  },
+  "field_encrypt": {
+    "vetted": false,
+    "note": null
+  },
+  "field_formatter_class": {
+    "vetted": true,
+    "note": null
+  },
+  "field_formatter_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "field_formatter_settings": {
+    "vetted": true,
+    "note": "This module provides an additional API for configuring fields for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "field_group": {
+    "vetted": true,
+    "note": null
+  },
+  "field_group_background_image": {
+    "vetted": false,
+    "note": null
+  },
+  "field_group_easy_responsive_tabs": {
+    "vetted": false,
+    "note": null
+  },
+  "field_group_link": {
+    "vetted": false,
+    "note": null
+  },
+  "field_group_table": {
+    "vetted": false,
+    "note": null
+  },
+  "field_hidden": {
+    "vetted": false,
+    "note": null
+  },
+  "field_image_tooltips": {
+    "vetted": false,
+    "note": null
+  },
+  "field_ipaddress": {
+    "vetted": false,
+    "note": null
+  },
+  "field_name_prefix_remove": {
+    "vetted": false,
+    "note": null
+  },
+  "field_nif": {
+    "vetted": false,
+    "note": null
+  },
+  "field_orbit": {
+    "vetted": false,
+    "note": null
+  },
+  "field_permissions": {
+    "vetted": true,
+    "note": null
+  },
+  "field_redirection": {
+    "vetted": false,
+    "note": null
+  },
+  "field_slide_show_j360": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/field_slide_show_j360 for instructions."
+  },
+  "field_slideshow": {
+    "vetted": false,
+    "note": null
+  },
+  "field_sql_storage": {
+    "vetted": true,
+    "note": "This Drupal 7 core module is obsolete because field storage is handled by a different subsystem in newer versions of Drupal."
+  },
+  "field_timer": {
+    "vetted": false,
+    "note": null
+  },
+  "field_token_value": {
+    "vetted": false,
+    "note": null
+  },
+  "field_tools": {
+    "vetted": false,
+    "note": null
+  },
+  "field_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "field_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "fieldable_panels_panes": {
+    "vetted": false,
+    "note": null
+  },
+  "fieldblock": {
+    "vetted": false,
+    "note": null
+  },
+  "fieldhelptext": {
+    "vetted": false,
+    "note": null
+  },
+  "file": {
+    "vetted": true,
+    "note": null
+  },
+  "file_entity": {
+    "vetted": true,
+    "note": "The File entity module made 404 responses much faster. Drupal core now contains a superset of its functionality."
+  },
+  "file_upload_secure_validator": {
+    "vetted": false,
+    "note": null
+  },
+  "filebrowser": {
+    "vetted": false,
+    "note": null
+  },
+  "filecache": {
+    "vetted": false,
+    "note": null
+  },
+  "filefield_paths": {
+    "vetted": false,
+    "note": null
+  },
+  "filefield_sources": {
+    "vetted": false,
+    "note": "This module provides a file field widget for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "filefield_sources_view": {
+    "vetted": false,
+    "note": "This module enhances the file field widget that the filefield_sources module provides for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "filehash": {
+    "vetted": false,
+    "note": null
+  },
+  "filelist_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "filelog": {
+    "vetted": false,
+    "note": null
+  },
+  "filemime": {
+    "vetted": false,
+    "note": null
+  },
+  "fillpdf": {
+    "vetted": false,
+    "note": null
+  },
+  "filter": {
+    "vetted": true,
+    "note": null
+  },
+  "filter_harmonizer": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not composer-installable for stable Drupal core 8 or 9 — see https://www.drupal.org/project/filter_harmonizer/issues/3238584."
+  },
+  "filter_perms": {
+    "vetted": true,
+    "note": null
+  },
+  "find_content": {
+    "vetted": true,
+    "note": "This module's functionality is built into Drupal 9 core."
+  },
+  "firebase": {
+    "vetted": false,
+    "note": null
+  },
+  "first_paragraph": {
+    "vetted": false,
+    "note": null
+  },
+  "first_time_login": {
+    "vetted": false,
+    "note": null
+  },
+  "fitvids": {
+    "vetted": false,
+    "note": null
+  },
+  "fivestar": {
+    "vetted": false,
+    "note": null
+  },
+  "fivestar_smiley": {
+    "vetted": false,
+    "note": null
+  },
+  "fixteaserlinks": {
+    "vetted": false,
+    "note": null
+  },
+  "flag": {
+    "vetted": false,
+    "note": null
+  },
+  "flag_anon": {
+    "vetted": false,
+    "note": null
+  },
+  "flag_lists": {
+    "vetted": false,
+    "note": null
+  },
+  "flat_taxonomy": {
+    "vetted": false,
+    "note": null
+  },
+  "flatcomments": {
+    "vetted": false,
+    "note": null
+  },
+  "flexiform": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not composer-installable — see https://www.drupal.org/project/flexiform/issues/3223682."
+  },
+  "flexslider": {
+    "vetted": false,
+    "note": null
+  },
+  "flickr": {
+    "vetted": false,
+    "note": null
+  },
+  "flipping_book": {
+    "vetted": false,
+    "note": null
+  },
+  "flippy": {
+    "vetted": false,
+    "note": null
+  },
+  "floating_block": {
+    "vetted": false,
+    "note": null
+  },
+  "flocblock": {
+    "vetted": false,
+    "note": null
+  },
+  "flood_control": {
+    "vetted": true,
+    "note": null
+  },
+  "flood_unblock": {
+    "vetted": false,
+    "note": null
+  },
+  "floodcontrol_settings_api": {
+    "vetted": false,
+    "note": null
+  },
+  "fluidui": {
+    "vetted": false,
+    "note": null
+  },
+  "flush_facebook_cache": {
+    "vetted": false,
+    "note": null
+  },
+  "flysystem": {
+    "vetted": false,
+    "note": null
+  },
+  "focal_point": {
+    "vetted": false,
+    "note": null
+  },
+  "focal_point_focus": {
+    "vetted": false,
+    "note": null
+  },
+  "folder_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "follow_me": {
+    "vetted": false,
+    "note": null
+  },
+  "follow_unfollow": {
+    "vetted": false,
+    "note": null
+  },
+  "fontawesome": {
+    "vetted": false,
+    "note": null
+  },
+  "fontawesome_block_icons": {
+    "vetted": false,
+    "note": null
+  },
+  "fontawesome_iconpicker": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/fontawesome_iconpicker for instructions."
+  },
+  "fontyourface": {
+    "vetted": false,
+    "note": null
+  },
+  "footable": {
+    "vetted": false,
+    "note": null
+  },
+  "footermap": {
+    "vetted": false,
+    "note": null
+  },
+  "footnotes": {
+    "vetted": false,
+    "note": null
+  },
+  "force_password_change": {
+    "vetted": false,
+    "note": null
+  },
+  "forgot_username": {
+    "vetted": false,
+    "note": null
+  },
+  "form_options_attributes": {
+    "vetted": false,
+    "note": null
+  },
+  "form_panel": {
+    "vetted": false,
+    "note": null
+  },
+  "form_placeholder": {
+    "vetted": false,
+    "note": null
+  },
+  "form_protect": {
+    "vetted": false,
+    "note": null
+  },
+  "formassembly": {
+    "vetted": false,
+    "note": null
+  },
+  "formblock": {
+    "vetted": false,
+    "note": null
+  },
+  "forms_to_email": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has different composer package name."
+  },
+  "formstack": {
+    "vetted": false,
+    "note": null
+  },
+  "formtips": {
+    "vetted": false,
+    "note": null
+  },
+  "forum": {
+    "vetted": true,
+    "note": null
+  },
+  "forum_access": {
+    "vetted": false,
+    "note": null
+  },
+  "forward": {
+    "vetted": false,
+    "note": null
+  },
+  "fpa": {
+    "vetted": true,
+    "note": null
+  },
+  "fraction": {
+    "vetted": false,
+    "note": null
+  },
+  "fragments": {
+    "vetted": false,
+    "note": null
+  },
+  "freeagent": {
+    "vetted": false,
+    "note": null
+  },
+  "freelinking": {
+    "vetted": false,
+    "note": null
+  },
+  "freshdesk": {
+    "vetted": false,
+    "note": null
+  },
+  "front": {
+    "vetted": false,
+    "note": null
+  },
+  "fullcalendar": {
+    "vetted": false,
+    "note": null
+  },
+  "fullstory": {
+    "vetted": false,
+    "note": null
+  },
+  "function_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "funnelback": {
+    "vetted": false,
+    "note": null
+  },
+  "futurama": {
+    "vetted": false,
+    "note": null
+  },
+  "fz152": {
+    "vetted": false,
+    "note": null
+  },
+  "g2": {
+    "vetted": false,
+    "note": null
+  },
+  "ga_login": {
+    "vetted": false,
+    "note": null
+  },
+  "ga_node_reports": {
+    "vetted": true,
+    "note": "This module is not composer installable and also not recommended on production - see https://www.drupal.org/project/ga_node_reports and https://www.drupal.org/project/ga_node_reports/issues/3241228."
+  },
+  "ga_push": {
+    "vetted": false,
+    "note": null
+  },
+  "gareview": {
+    "vetted": false,
+    "note": null
+  },
+  "gathercontent": {
+    "vetted": false,
+    "note": null
+  },
+  "gdoc_field": {
+    "vetted": false,
+    "note": null
+  },
+  "gdpr": {
+    "vetted": false,
+    "note": null
+  },
+  "gdpr_onetrust": {
+    "vetted": false,
+    "note": null
+  },
+  "gender": {
+    "vetted": false,
+    "note": null
+  },
+  "genpass": {
+    "vetted": false,
+    "note": null
+  },
+  "geocluster": {
+    "vetted": false,
+    "note": null
+  },
+  "geocoder": {
+    "vetted": false,
+    "note": null
+  },
+  "geofield": {
+    "vetted": true,
+    "note": "The Geofield Map module's field formatter is not available; this migration falls back to the default. If you want the nicer Map-based formatter, help out at https://www.drupal.org/project/geofield_map/issues/3249091 to automate that migration. AMA has pre-installed the module for you, to configure it manually."
+  },
+  "geofield_map": {
+    "vetted": true,
+    "note": "The Geofield Map module's field formatter is not available; this migration falls back to the default. If you want the nicer Map-based formatter, help out at https://www.drupal.org/project/geofield_map/issues/3249091 to automate that migration. AMA has pre-installed the module for you, to configure it manually."
+  },
+  "geolocation": {
+    "vetted": false,
+    "note": null
+  },
+  "geophp": {
+    "vetted": true,
+    "note": null
+  },
+  "geotimezone": {
+    "vetted": false,
+    "note": null
+  },
+  "geshifilter": {
+    "vetted": false,
+    "note": null
+  },
+  "git_deploy": {
+    "vetted": false,
+    "note": null
+  },
+  "git_status": {
+    "vetted": false,
+    "note": null
+  },
+  "gitinfo": {
+    "vetted": false,
+    "note": null
+  },
+  "give": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has stripe/stripe-php library conflict with other modules."
+  },
+  "globallink": {
+    "vetted": false,
+    "note": null
+  },
+  "globalredirect": {
+    "vetted": true,
+    "note": null
+  },
+  "glossify": {
+    "vetted": false,
+    "note": null
+  },
+  "gmap": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gmap_fields": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gmap_location": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gmap_macro_builder": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gmap_static": {
+    "vetted": false,
+    "note": null
+  },
+  "gmap_style_bubbles": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gmap_taxonomy": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "gnu_terry_pratchett": {
+    "vetted": false,
+    "note": null
+  },
+  "google_analytics": {
+    "vetted": false,
+    "note": null
+  },
+  "google_analytics_reports": {
+    "vetted": false,
+    "note": null
+  },
+  "google_analytics_vimeo": {
+    "vetted": false,
+    "note": null
+  },
+  "google_appliance": {
+    "vetted": false,
+    "note": null
+  },
+  "google_chart_tools": {
+    "vetted": false,
+    "note": null
+  },
+  "google_cse": {
+    "vetted": false,
+    "note": null
+  },
+  "google_groups": {
+    "vetted": false,
+    "note": null
+  },
+  "google_image_sitemap": {
+    "vetted": false,
+    "note": null
+  },
+  "google_map_field": {
+    "vetted": false,
+    "note": null
+  },
+  "google_plus_feeds": {
+    "vetted": false,
+    "note": null
+  },
+  "google_tag": {
+    "vetted": false,
+    "note": null
+  },
+  "google_translator": {
+    "vetted": false,
+    "note": null
+  },
+  "googleanalytics": {
+    "vetted": true,
+    "note": null
+  },
+  "gov_uk": {
+    "vetted": false,
+    "note": null
+  },
+  "govcms_dlm": {
+    "vetted": false,
+    "note": null
+  },
+  "gpx_track_elevation": {
+    "vetted": false,
+    "note": null
+  },
+  "graphviz_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "gravatar": {
+    "vetted": false,
+    "note": "The Avatar Kit module is the successor to the Gravatar module, but requires an extra module to be installed. Unfortunately, https://www.drupal.org/project/avatars_gravatar is not yet compatible with Drupal 9. Help out at https://github.com/dpi/avatars_gravatar/issues/4 to help make this happen."
+  },
+  "gridheightnormalizer": {
+    "vetted": false,
+    "note": null
+  },
+  "grn": {
+    "vetted": false,
+    "note": null
+  },
+  "group": {
+    "vetted": false,
+    "note": null
+  },
+  "grouper": {
+    "vetted": false,
+    "note": null
+  },
+  "groupmenu": {
+    "vetted": false,
+    "note": null
+  },
+  "gtranslate": {
+    "vetted": false,
+    "note": null
+  },
+  "guardian": {
+    "vetted": false,
+    "note": null
+  },
+  "guardr_core": {
+    "vetted": false,
+    "note": null
+  },
+  "hacked": {
+    "vetted": true,
+    "note": "This module is not recommended on production - see https://www.drupal.org/project/hacked."
+  },
+  "hal_publications": {
+    "vetted": false,
+    "note": null
+  },
+  "hangouts": {
+    "vetted": false,
+    "note": null
+  },
+  "happy_new_year": {
+    "vetted": false,
+    "note": null
+  },
+  "hashids": {
+    "vetted": false,
+    "note": null
+  },
+  "hax": {
+    "vetted": false,
+    "note": null
+  },
+  "haystack": {
+    "vetted": false,
+    "note": null
+  },
+  "hcaptcha": {
+    "vetted": false,
+    "note": null
+  },
+  "headroomjs": {
+    "vetted": false,
+    "note": null
+  },
+  "health_check": {
+    "vetted": false,
+    "note": null
+  },
+  "heartbeat_sh": {
+    "vetted": false,
+    "note": null
+  },
+  "heisencache": {
+    "vetted": true,
+    "note": "This module needs to be installed manually due to its dependency on php 8."
+  },
+  "help": {
+    "vetted": true,
+    "note": null
+  },
+  "helper": {
+    "vetted": false,
+    "note": null
+  },
+  "helpfulness": {
+    "vetted": false,
+    "note": null
+  },
+  "hidden_captcha": {
+    "vetted": false,
+    "note": "Honeypot is recommended module instead of this module - see https://www.drupal.org/project/hidden_captcha/issues/2421919."
+  },
+  "hidden_language": {
+    "vetted": false,
+    "note": null
+  },
+  "hidden_nodes": {
+    "vetted": false,
+    "note": null
+  },
+  "hierarchical_term_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "high_contrast": {
+    "vetted": false,
+    "note": null
+  },
+  "highlight": {
+    "vetted": false,
+    "note": null
+  },
+  "hijri": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "honeypot": {
+    "vetted": true,
+    "note": null
+  },
+  "hotjar": {
+    "vetted": false,
+    "note": null
+  },
+  "hotkeys_for_save": {
+    "vetted": false,
+    "note": null
+  },
+  "hover_card": {
+    "vetted": false,
+    "note": null
+  },
+  "hover_css": {
+    "vetted": false,
+    "note": null
+  },
+  "hp": {
+    "vetted": false,
+    "note": null
+  },
+  "hreflang": {
+    "vetted": false,
+    "note": null
+  },
+  "html_title": {
+    "vetted": false,
+    "note": null
+  },
+  "htmlawed": {
+    "vetted": false,
+    "note": null
+  },
+  "htmlmail": {
+    "vetted": false,
+    "note": null
+  },
+  "htmlpurifier": {
+    "vetted": true,
+    "note": null
+  },
+  "http_response_headers": {
+    "vetted": false,
+    "note": null
+  },
+  "hubspot": {
+    "vetted": false,
+    "note": null
+  },
+  "hubspot_api": {
+    "vetted": false,
+    "note": null
+  },
+  "humanstxt": {
+    "vetted": false,
+    "note": null
+  },
+  "hypothesis": {
+    "vetted": false,
+    "note": null
+  },
+  "i18n": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_block": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_field": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_menu": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_node": {
+    "vetted": false,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_path": {
+    "vetted": false,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_redirect": {
+    "vetted": false,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_select": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_sso": {
+    "vetted": false,
+    "note": null
+  },
+  "i18n_string": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_sync": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_taxonomy": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_translation": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_user": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18n_variable": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "i18nviews": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "iban_validator": {
+    "vetted": false,
+    "note": null
+  },
+  "icecast": {
+    "vetted": false,
+    "note": null
+  },
+  "id4me": {
+    "vetted": false,
+    "note": null
+  },
+  "ief_table_view_mode": {
+    "vetted": false,
+    "note": null
+  },
+  "iek": {
+    "vetted": false,
+    "note": null
+  },
+  "iframe": {
+    "vetted": false,
+    "note": null
+  },
+  "iframe_resizer": {
+    "vetted": false,
+    "note": null
+  },
+  "iframe_title_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "iframeremove": {
+    "vetted": false,
+    "note": null
+  },
+  "image": {
+    "vetted": true,
+    "note": null
+  },
+  "image_approval": {
+    "vetted": false,
+    "note": null
+  },
+  "image_auto_alt_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "image_captcha": {
+    "vetted": true,
+    "note": null
+  },
+  "image_captcha_refresh": {
+    "vetted": true,
+    "note": null
+  },
+  "image_delta_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "image_effect": {
+    "vetted": false,
+    "note": null
+  },
+  "image_field_caption": {
+    "vetted": false,
+    "note": "Drupal core now has an image media type, to which you can add a text field that captures captions, and gets rendered as such. This migration is not yet automated, feel free to help in https://www.drupal.org/project/image_field_caption/issues/2413809."
+  },
+  "image_field_random": {
+    "vetted": false,
+    "note": null
+  },
+  "image_focus": {
+    "vetted": false,
+    "note": null
+  },
+  "image_hotspots": {
+    "vetted": false,
+    "note": null
+  },
+  "image_lazy_loader": {
+    "vetted": false,
+    "note": null
+  },
+  "image_replace": {
+    "vetted": false,
+    "note": null
+  },
+  "image_resize_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "image_style_quality": {
+    "vetted": false,
+    "note": null
+  },
+  "image_styles_admin": {
+    "vetted": false,
+    "note": null
+  },
+  "image_styles_mapping": {
+    "vetted": false,
+    "note": null
+  },
+  "image_url_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "imageapi_optimize": {
+    "vetted": false,
+    "note": null
+  },
+  "imagecache_actions": {
+    "vetted": false,
+    "note": null
+  },
+  "imagecache_canvasactions": {
+    "vetted": false,
+    "note": null
+  },
+  "imagecache_external": {
+    "vetted": false,
+    "note": null
+  },
+  "imagecache_token": {
+    "vetted": true,
+    "note": null
+  },
+  "imagefield_default_alt_and_title": {
+    "vetted": false,
+    "note": null
+  },
+  "imagefield_focus": {
+    "vetted": false,
+    "note": null
+  },
+  "imagefield_tokens": {
+    "vetted": false,
+    "note": null
+  },
+  "imagemagick": {
+    "vetted": false,
+    "note": null
+  },
+  "imagestyleflush": {
+    "vetted": true,
+    "note": "This module will flush each image style individually or flush all image styles at once from administrative interface in Drupal 7. Drupal core now contains a superset of its functionality."
+  },
+  "imagick": {
+    "vetted": false,
+    "note": null
+  },
+  "imce": {
+    "vetted": true,
+    "note": "The IMCE module is obsolete now that Drupal core includes a feature-rich Media Library. All IMCE-uploaded and IMCE-embedded files will automatically be migrated to use Media, Media Embeds and be available in the Media Library."
+  },
+  "imce_copylink": {
+    "vetted": false,
+    "note": null
+  },
+  "imce_mkdir": {
+    "vetted": true,
+    "note": "The IMCE module is obsolete now that Drupal core includes a feature-rich Media Library. All IMCE-uploaded and IMCE-embedded files will automatically be migrated to use Media, Media Embeds and be available in the Media Library."
+  },
+  "imce_wysiwyg": {
+    "vetted": true,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box."
+  },
+  "img_annotator": {
+    "vetted": false,
+    "note": null
+  },
+  "imgix": {
+    "vetted": false,
+    "note": null
+  },
+  "import_html": {
+    "vetted": false,
+    "note": null
+  },
+  "import_html_preprocess_cleanups": {
+    "vetted": false,
+    "note": null
+  },
+  "import_html_replace": {
+    "vetted": false,
+    "note": null
+  },
+  "import_html_scraping_rules": {
+    "vetted": false,
+    "note": null
+  },
+  "import_html_skip_forms": {
+    "vetted": false,
+    "note": null
+  },
+  "improved_multi_select": {
+    "vetted": false,
+    "note": null
+  },
+  "improvements": {
+    "vetted": false,
+    "note": null
+  },
+  "inline_documentation": {
+    "vetted": false,
+    "note": null
+  },
+  "inline_entity_form": {
+    "vetted": false,
+    "note": null
+  },
+  "inline_footnotes": {
+    "vetted": false,
+    "note": null
+  },
+  "inline_registration": {
+    "vetted": false,
+    "note": null
+  },
+  "inline_responsive_images": {
+    "vetted": false,
+    "note": null
+  },
+  "insert": {
+    "vetted": false,
+    "note": null
+  },
+  "insert_view": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "inspect": {
+    "vetted": false,
+    "note": null
+  },
+  "inspectlet": {
+    "vetted": false,
+    "note": null
+  },
+  "inspector": {
+    "vetted": false,
+    "note": null
+  },
+  "instagram_feeds": {
+    "vetted": false,
+    "note": null
+  },
+  "instapage": {
+    "vetted": false,
+    "note": null
+  },
+  "intense": {
+    "vetted": false,
+    "note": null
+  },
+  "interface_string_stats": {
+    "vetted": false,
+    "note": null
+  },
+  "interval": {
+    "vetted": false,
+    "note": null
+  },
+  "invite": {
+    "vetted": false,
+    "note": null
+  },
+  "ip2country": {
+    "vetted": true,
+    "note": null
+  },
+  "ip2location": {
+    "vetted": false,
+    "note": null
+  },
+  "ip_anon": {
+    "vetted": false,
+    "note": null
+  },
+  "ip_ban": {
+    "vetted": false,
+    "note": null
+  },
+  "ip_language_negotiation": {
+    "vetted": false,
+    "note": null
+  },
+  "ip_login": {
+    "vetted": false,
+    "note": null
+  },
+  "ipma_weather": {
+    "vetted": false,
+    "note": null
+  },
+  "ipstack": {
+    "vetted": false,
+    "note": null
+  },
+  "is_hacked": {
+    "vetted": false,
+    "note": null
+  },
+  "isbn": {
+    "vetted": false,
+    "note": null
+  },
+  "itchio_field": {
+    "vetted": false,
+    "note": null
+  },
+  "iubenda_integration": {
+    "vetted": false,
+    "note": null
+  },
+  "jammer": {
+    "vetted": false,
+    "note": null
+  },
+  "janrain_capture": {
+    "vetted": false,
+    "note": null
+  },
+  "jasm": {
+    "vetted": false,
+    "note": null
+  },
+  "jira_issue_collector": {
+    "vetted": false,
+    "note": null
+  },
+  "jira_rest": {
+    "vetted": false,
+    "note": null
+  },
+  "job_scheduler": {
+    "vetted": true,
+    "note": "There is no data to be migrated for this module, but the Drupal 7 modules implementing its hooks need to be ported to Drupal 9. See https://git.drupalcode.org/project/job_scheduler/-/blob/8.x-3.x/README.txt."
+  },
+  "jquery_calendar": {
+    "vetted": true,
+    "note": "This module claims to be Drupal 9-compatible but it is not composer-installable — see https://www.drupal.org/project/jquery_calendar/issues/3240251."
+  },
+  "jquery_carousel": {
+    "vetted": false,
+    "note": null
+  },
+  "jquery_colorpicker": {
+    "vetted": false,
+    "note": null
+  },
+  "jquery_countdown_timer": {
+    "vetted": false,
+    "note": null
+  },
+  "jquery_dollar": {
+    "vetted": true,
+    "note": "The jQuery Dollar module always violated best practices."
+  },
+  "jquery_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "jquery_ui_multiselect_widget": {
+    "vetted": false,
+    "note": null
+  },
+  "jquery_update": {
+    "vetted": true,
+    "note": "The latest Drupal core minor now always ships with the latest version of jQuery, this module is no longer necessary."
+  },
+  "js_offline": {
+    "vetted": false,
+    "note": null
+  },
+  "jsld": {
+    "vetted": false,
+    "note": null
+  },
+  "jsonb": {
+    "vetted": false,
+    "note": null
+  },
+  "jsonlog": {
+    "vetted": false,
+    "note": null
+  },
+  "jsonp_sparql": {
+    "vetted": false,
+    "note": null
+  },
+  "jstimer": {
+    "vetted": false,
+    "note": null
+  },
+  "jstree_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "juicebox": {
+    "vetted": false,
+    "note": null
+  },
+  "juicerio": {
+    "vetted": false,
+    "note": null
+  },
+  "jw_player": {
+    "vetted": false,
+    "note": null
+  },
+  "jwt_link": {
+    "vetted": false,
+    "note": null
+  },
+  "kalastatic": {
+    "vetted": false,
+    "note": null
+  },
+  "key": {
+    "vetted": false,
+    "note": null
+  },
+  "klaro": {
+    "vetted": false,
+    "note": null
+  },
+  "konamicode": {
+    "vetted": false,
+    "note": null
+  },
+  "kraken": {
+    "vetted": false,
+    "note": null
+  },
+  "l10n_update": {
+    "vetted": true,
+    "note": "This module provides automatic downloading and updating of interface translations for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "l10n_update_bundled": {
+    "vetted": false,
+    "note": null
+  },
+  "l2j_connect": {
+    "vetted": false,
+    "note": null
+  },
+  "lagoon_logs": {
+    "vetted": true,
+    "note": "This module must be installed manually — also see https://www.drupal.org/project/lagoon_logs/issues/3184665."
+  },
+  "lang_dropdown": {
+    "vetted": false,
+    "note": null
+  },
+  "language_access": {
+    "vetted": false,
+    "note": null
+  },
+  "language_cookie": {
+    "vetted": false,
+    "note": null
+  },
+  "language_header": {
+    "vetted": false,
+    "note": null
+  },
+  "language_hierarchy": {
+    "vetted": false,
+    "note": null
+  },
+  "language_popup": {
+    "vetted": false,
+    "note": null
+  },
+  "language_selection_page": {
+    "vetted": false,
+    "note": null
+  },
+  "languagefield": {
+    "vetted": false,
+    "note": null
+  },
+  "languageicons": {
+    "vetted": false,
+    "note": null
+  },
+  "last_login": {
+    "vetted": false,
+    "note": null
+  },
+  "layouter": {
+    "vetted": false,
+    "note": null
+  },
+  "lazy": {
+    "vetted": false,
+    "note": null
+  },
+  "lazyload": {
+    "vetted": false,
+    "note": null
+  },
+  "lazyloader": {
+    "vetted": false,
+    "note": null
+  },
+  "ldap": {
+    "vetted": false,
+    "note": null
+  },
+  "ldap_auth": {
+    "vetted": false,
+    "note": null
+  },
+  "ldap_sso": {
+    "vetted": false,
+    "note": null
+  },
+  "leadboxer": {
+    "vetted": false,
+    "note": null
+  },
+  "leaflet": {
+    "vetted": false,
+    "note": null
+  },
+  "leaflet_geojson": {
+    "vetted": false,
+    "note": null
+  },
+  "leaflet_mapbox": {
+    "vetted": false,
+    "note": null
+  },
+  "leaflet_maptiler": {
+    "vetted": false,
+    "note": null
+  },
+  "leaflet_more_maps": {
+    "vetted": false,
+    "note": null
+  },
+  "ledger": {
+    "vetted": false,
+    "note": null
+  },
+  "legal": {
+    "vetted": true,
+    "note": null
+  },
+  "letsencrypt_challenge": {
+    "vetted": false,
+    "note": null
+  },
+  "libraries": {
+    "vetted": true,
+    "note": "The Libraries API module is obsolete in Drupal 9."
+  },
+  "library": {
+    "vetted": false,
+    "note": null
+  },
+  "liftigniter": {
+    "vetted": false,
+    "note": null
+  },
+  "lightgallery": {
+    "vetted": true,
+    "note": "This module must be installed manually — see README.md for installation instructions."
+  },
+  "like_and_dislike": {
+    "vetted": false,
+    "note": null
+  },
+  "linenumbers": {
+    "vetted": false,
+    "note": null
+  },
+  "lingotek": {
+    "vetted": false,
+    "note": null
+  },
+  "link": {
+    "vetted": true,
+    "note": null
+  },
+  "link_icons": {
+    "vetted": false,
+    "note": null
+  },
+  "link_iframe_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "link_trail_by_path": {
+    "vetted": false,
+    "note": null
+  },
+  "linkchecker": {
+    "vetted": false,
+    "note": null
+  },
+  "linkchecker_summary_mail": {
+    "vetted": false,
+    "note": null
+  },
+  "linked_field": {
+    "vetted": false,
+    "note": null
+  },
+  "linkedin_insights_tag": {
+    "vetted": false,
+    "note": null
+  },
+  "linkicon": {
+    "vetted": false,
+    "note": null
+  },
+  "linkit": {
+    "vetted": true,
+    "note": null
+  },
+  "linktitle": {
+    "vetted": false,
+    "note": null
+  },
+  "list": {
+    "vetted": true,
+    "note": "This module no longer exists because its field types have been merged into Drupal core's Options module."
+  },
+  "listjs": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/listjs and https://www.drupal.org/project/listjs/issues/3241227."
+  },
+  "live_person": {
+    "vetted": false,
+    "note": null
+  },
+  "locale": {
+    "vetted": true,
+    "note": null
+  },
+  "localizejs": {
+    "vetted": false,
+    "note": null
+  },
+  "location": {
+    "vetted": true,
+    "note": null
+  },
+  "location_cck": {
+    "vetted": true,
+    "note": null
+  },
+  "location_fax": {
+    "vetted": true,
+    "note": null
+  },
+  "location_feeds": {
+    "vetted": false,
+    "note": "The patch at https://www.drupal.org/project/address/issues/2882589 adds Feeds support to the Address module."
+  },
+  "location_gmap_find_address": {
+    "vetted": false,
+    "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
+  },
+  "location_node": {
+    "vetted": true,
+    "note": null
+  },
+  "location_phone": {
+    "vetted": true,
+    "note": null
+  },
+  "location_taxonomy": {
+    "vetted": true,
+    "note": null
+  },
+  "location_user": {
+    "vetted": true,
+    "note": null
+  },
+  "location_www": {
+    "vetted": true,
+    "note": null
+  },
+  "lockr": {
+    "vetted": false,
+    "note": null
+  },
+  "log": {
+    "vetted": false,
+    "note": null
+  },
+  "log_stdout": {
+    "vetted": false,
+    "note": null
+  },
+  "logging_alerts": {
+    "vetted": false,
+    "note": null
+  },
+  "login_destination": {
+    "vetted": false,
+    "note": null
+  },
+  "login_disable": {
+    "vetted": false,
+    "note": null
+  },
+  "login_emailusername": {
+    "vetted": false,
+    "note": null
+  },
+  "login_history": {
+    "vetted": false,
+    "note": null
+  },
+  "login_onlyemail": {
+    "vetted": false,
+    "note": null
+  },
+  "login_security": {
+    "vetted": false,
+    "note": null
+  },
+  "login_tracker": {
+    "vetted": false,
+    "note": null
+  },
+  "logo_image_style": {
+    "vetted": false,
+    "note": null
+  },
+  "logouttab": {
+    "vetted": false,
+    "note": null
+  },
+  "logs_http": {
+    "vetted": false,
+    "note": null
+  },
+  "lti_tool_provider": {
+    "vetted": true,
+    "note": "This module requires OAuth PECL extension — see https://www.drupal.org/project/lti_tool_provider."
+  },
+  "m4032404": {
+    "vetted": true,
+    "note": null
+  },
+  "machine_name": {
+    "vetted": false,
+    "note": null
+  },
+  "maestro": {
+    "vetted": false,
+    "note": null
+  },
+  "magnific_popup": {
+    "vetted": false,
+    "note": null
+  },
+  "mail_debugger": {
+    "vetted": false,
+    "note": null
+  },
+  "mail_edit": {
+    "vetted": false,
+    "note": null
+  },
+  "mail_safety": {
+    "vetted": false,
+    "note": null
+  },
+  "mailchimp": {
+    "vetted": false,
+    "note": null
+  },
+  "mailcontrol": {
+    "vetted": false,
+    "note": null
+  },
+  "mailgun": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "maillog": {
+    "vetted": false,
+    "note": null
+  },
+  "mailsystem": {
+    "vetted": true,
+    "note": null
+  },
+  "maintenance200": {
+    "vetted": false,
+    "note": null
+  },
+  "maintenance_exempt": {
+    "vetted": false,
+    "note": null
+  },
+  "maintenance_mode_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "mandrill": {
+    "vetted": false,
+    "note": null
+  },
+  "manualcrop": {
+    "vetted": false,
+    "note": null
+  },
+  "mapbox": {
+    "vetted": false,
+    "note": null
+  },
+  "mark_as_read": {
+    "vetted": false,
+    "note": null
+  },
+  "markdown_exporter": {
+    "vetted": false,
+    "note": null
+  },
+  "marketo_ma": {
+    "vetted": false,
+    "note": null
+  },
+  "markup": {
+    "vetted": false,
+    "note": null
+  },
+  "mask_user_data": {
+    "vetted": false,
+    "note": null
+  },
+  "masonry": {
+    "vetted": false,
+    "note": null
+  },
+  "masonry_search": {
+    "vetted": false,
+    "note": null
+  },
+  "masonry_views": {
+    "vetted": false,
+    "note": null
+  },
+  "masquerade": {
+    "vetted": true,
+    "note": null
+  },
+  "masquerade_nominate": {
+    "vetted": false,
+    "note": null
+  },
+  "mass_password_change": {
+    "vetted": false,
+    "note": null
+  },
+  "mass_pwreset": {
+    "vetted": false,
+    "note": null
+  },
+  "match_redirect": {
+    "vetted": true,
+    "note": null
+  },
+  "mathjax": {
+    "vetted": false,
+    "note": null
+  },
+  "matomo": {
+    "vetted": false,
+    "note": null
+  },
+  "maxlength": {
+    "vetted": false,
+    "note": null
+  },
+  "measuremail": {
+    "vetted": false,
+    "note": null
+  },
+  "media": {
+    "vetted": true,
+    "note": null
+  },
+  "media_acquiadam": {
+    "vetted": false,
+    "note": null
+  },
+  "media_avportal": {
+    "vetted": false,
+    "note": null
+  },
+  "media_bulk_upload": {
+    "vetted": true,
+    "note": null
+  },
+  "media_ckeditor": {
+    "vetted": true,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box."
+  },
+  "media_colorbox": {
+    "vetted": true,
+    "note": null
+  },
+  "media_fotoweb": {
+    "vetted": false,
+    "note": null
+  },
+  "media_gallery": {
+    "vetted": false,
+    "note": null
+  },
+  "media_internet": {
+    "vetted": true,
+    "note": "Drupal core now has built-in support for oEmbed."
+  },
+  "media_pixabay": {
+    "vetted": false,
+    "note": null
+  },
+  "media_sitemap": {
+    "vetted": false,
+    "note": null
+  },
+  "media_skyfish": {
+    "vetted": false,
+    "note": null
+  },
+  "media_watermark": {
+    "vetted": false,
+    "note": null
+  },
+  "media_wysiwyg": {
+    "vetted": true,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box."
+  },
+  "media_wysiwyg_settings": {
+    "vetted": true,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box."
+  },
+  "media_wysiwyg_view_mode": {
+    "vetted": true,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box."
+  },
+  "media_youtube": {
+    "vetted": true,
+    "note": "Drupal core now has built-in support for oEmbed, including YouTube."
+  },
+  "mediaelement": {
+    "vetted": true,
+    "note": null
+  },
+  "mediafield": {
+    "vetted": true,
+    "note": null
+  },
+  "mediawiki_api": {
+    "vetted": false,
+    "note": null
+  },
+  "memcache": {
+    "vetted": true,
+    "note": null
+  },
+  "memcache_admin": {
+    "vetted": true,
+    "note": null
+  },
+  "memcache_storage": {
+    "vetted": false,
+    "note": null
+  },
+  "mentions": {
+    "vetted": false,
+    "note": null
+  },
+  "menu": {
+    "vetted": true,
+    "note": null
+  },
+  "menu_admin_per_menu": {
+    "vetted": true,
+    "note": null
+  },
+  "menu_attributes": {
+    "vetted": false,
+    "note": "The Link Attributes widget module for Drupal 9 provides a superset of functionality of the Drupal 7 Menu Attributes module. It is automatically enabled for all menu_link_content entity forms. It can also be used for any link field."
+  },
+  "menu_block": {
+    "vetted": true,
+    "note": "Most of the functionality in the Menu Block for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it: a stable Drupal 9 release is available. An automated migration is not yet available. If you want to help create that, see https://www.drupal.org/project/menu_block/issues/3114487. For now, it is recommended to recreate these (usually only a few) blocks manually."
+  },
+  "menu_block_settings_override": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_breadcrumb": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_child_item": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_firstchild": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_force": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_item_limit": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_link": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_link_sync": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_link_weight": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_node": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_pager": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_per_role": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_position": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_select": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_to_taxonomy": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_token": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_trail_by_path": {
+    "vetted": false,
+    "note": null
+  },
+  "menu_tree_compare": {
+    "vetted": false,
+    "note": null
+  },
+  "message": {
+    "vetted": false,
+    "note": null
+  },
+  "message_digest": {
+    "vetted": false,
+    "note": null
+  },
+  "message_notify": {
+    "vetted": false,
+    "note": null
+  },
+  "message_subscribe": {
+    "vetted": false,
+    "note": null
+  },
+  "message_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "metatag": {
+    "vetted": true,
+    "note": "This migration is fully working with the exception of global configuration. Help out at https://www.drupal.org/project/metatag/issues/2563651 to finish this."
+  },
+  "metatag_app_links": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_dc": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_dc_advanced": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_facebook": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_favicons": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_google_cse": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_google_plus": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_google_scholar": {
+    "vetted": false,
+    "note": null
+  },
+  "metatag_hreflang": {
+    "vetted": false,
+    "note": "Per-language hreflang metatags are not yet getting migrated, help out at https://www.drupal.org/project/metatag/issues/3077778."
+  },
+  "metatag_import_export_csv": {
+    "vetted": false,
+    "note": null
+  },
+  "metatag_mobile": {
+    "vetted": false,
+    "note": null
+  },
+  "metatag_opengraph": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_opengraph_products": {
+    "vetted": false,
+    "note": null
+  },
+  "metatag_panels": {
+    "vetted": true,
+    "note": "The Meta tags: Panels module was merged into the Metatatags module in Drupal 7 since version 7.x-1.0-beta6."
+  },
+  "metatag_pinterest": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_twitter_cards": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_verification": {
+    "vetted": true,
+    "note": null
+  },
+  "metatag_views": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "metatags_quick": {
+    "vetted": false,
+    "note": "The Meta tags quick module was merged into the Metatag module. You can help finish the migration path at https://www.drupal.org/project/metatag/issues/2618898, https://www.drupal.org/project/metatag/issues/3082398 and https://www.drupal.org/project/metatag/issues/3082401."
+  },
+  "metis": {
+    "vetted": false,
+    "note": null
+  },
+  "microspid": {
+    "vetted": false,
+    "note": null
+  },
+  "migrate": {
+    "vetted": true,
+    "note": "The Drupal 7 migrate module should probably not have been installed on your production Drupal 7 site, unless you were using it to constantly migrate data from external data sources. You will need to port your custom code."
+  },
+  "migrate_d2d": {
+    "vetted": true,
+    "note": "This module is only for migrating data from Drupal 5 or 6 into Drupal 7. It should never have been enabled on any Drupal 7 production site."
+  },
+  "migrate_extras": {
+    "vetted": true,
+    "note": "This module is only for migrating data from Drupal 5 or 6 into Drupal 7. It should never have been enabled on any Drupal 7 production site."
+  },
+  "migrate_source_yaml": {
+    "vetted": false,
+    "note": null
+  },
+  "migrate_ui": {
+    "vetted": true,
+    "note": "The Drupal 7 migrate module should probably not have been installed on your production Drupal 7 site, unless you were using it to constantly migrate data from external data sources. You will need to port your custom code."
+  },
+  "migration_tools": {
+    "vetted": false,
+    "note": null
+  },
+  "mimedetect": {
+    "vetted": false,
+    "note": null
+  },
+  "mimeinfo": {
+    "vetted": false,
+    "note": null
+  },
+  "mimemail": {
+    "vetted": false,
+    "note": null
+  },
+  "mimemail_action": {
+    "vetted": true,
+    "note": "This module's functionality is built into Drupal 9 core: use the e-mail action."
+  },
+  "minifyhtml": {
+    "vetted": false,
+    "note": null
+  },
+  "minifyjs": {
+    "vetted": false,
+    "note": null
+  },
+  "miniorange_2fa": {
+    "vetted": false,
+    "note": null
+  },
+  "miniorange_oauth_client": {
+    "vetted": false,
+    "note": null
+  },
+  "miniorange_saml": {
+    "vetted": false,
+    "note": null
+  },
+  "miniorange_saml_idp": {
+    "vetted": false,
+    "note": null
+  },
+  "minisite": {
+    "vetted": false,
+    "note": null
+  },
+  "missing_module": {
+    "vetted": true,
+    "note": "The Missing Module module for Drupal 7 is irrelevant in Drupal 9."
+  },
+  "mixitup_views": {
+    "vetted": false,
+    "note": null
+  },
+  "mob_queue": {
+    "vetted": false,
+    "note": null
+  },
+  "mobile_detect": {
+    "vetted": false,
+    "note": null
+  },
+  "mobile_number": {
+    "vetted": false,
+    "note": null
+  },
+  "mobile_switch_varnish": {
+    "vetted": false,
+    "note": null
+  },
+  "mocean_sms_broadcast": {
+    "vetted": false,
+    "note": null
+  },
+  "modal_page": {
+    "vetted": false,
+    "note": null
+  },
+  "module_builder": {
+    "vetted": false,
+    "note": null
+  },
+  "module_checkbox_clean": {
+    "vetted": false,
+    "note": null
+  },
+  "module_export": {
+    "vetted": false,
+    "note": null
+  },
+  "module_filter": {
+    "vetted": true,
+    "note": "Most of the functionality in the Module Filter for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port is not actively maintained. And no Drupal 9-compatible release is available yet. See https://www.drupal.org/project/module_filter/issues/3057277."
+  },
+  "module_missing_message_fixer": {
+    "vetted": true,
+    "note": null
+  },
+  "module_permissions": {
+    "vetted": false,
+    "note": null
+  },
+  "modules_collapse": {
+    "vetted": false,
+    "note": null
+  },
+  "modules_weight": {
+    "vetted": false,
+    "note": null
+  },
+  "mongodb": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/mongodb."
+  },
+  "monitoring": {
+    "vetted": false,
+    "note": null
+  },
+  "monolog": {
+    "vetted": false,
+    "note": null
+  },
+  "monster_menus": {
+    "vetted": false,
+    "note": null
+  },
+  "moon_phases": {
+    "vetted": false,
+    "note": null
+  },
+  "mortgage_calculator": {
+    "vetted": false,
+    "note": null
+  },
+  "mothermayi": {
+    "vetted": false,
+    "note": null
+  },
+  "msg91": {
+    "vetted": false,
+    "note": null
+  },
+  "mtcaptcha": {
+    "vetted": false,
+    "note": null
+  },
+  "multiblock": {
+    "vetted": true,
+    "note": " This module's functionality is built into Drupal 9 core."
+  },
+  "multifield": {
+    "vetted": true,
+    "note": null
+  },
+  "multiple_fields_remove_button": {
+    "vetted": true,
+    "note": null
+  },
+  "multiple_node_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "multiple_registration": {
+    "vetted": false,
+    "note": null
+  },
+  "multiple_selects": {
+    "vetted": true,
+    "note": null
+  },
+  "multiple_sitemap": {
+    "vetted": false,
+    "note": null
+  },
+  "multiselect": {
+    "vetted": false,
+    "note": null
+  },
+  "mutual_credit": {
+    "vetted": false,
+    "note": null
+  },
+  "mydropwizard": {
+    "vetted": false,
+    "note": null
+  },
+  "n1ed": {
+    "vetted": false,
+    "note": null
+  },
+  "nagios": {
+    "vetted": false,
+    "note": null
+  },
+  "name": {
+    "vetted": false,
+    "note": null
+  },
+  "nameday": {
+    "vetted": false,
+    "note": null
+  },
+  "navbar": {
+    "vetted": true,
+    "note": null
+  },
+  "neo4j": {
+    "vetted": true,
+    "note": "The neo4j module is not composer installable. Help out at https://www.drupal.org/project/neo4j/issues/3229364."
+  },
+  "netauth": {
+    "vetted": false,
+    "note": null
+  },
+  "new_relic_rpm": {
+    "vetted": false,
+    "note": null
+  },
+  "ng_lightbox": {
+    "vetted": false,
+    "note": null
+  },
+  "no_autocomplete": {
+    "vetted": false,
+    "note": null
+  },
+  "no_nbsp": {
+    "vetted": false,
+    "note": null
+  },
+  "nocurrent_pass": {
+    "vetted": false,
+    "note": null
+  },
+  "node": {
+    "vetted": true,
+    "note": null
+  },
+  "node_access_rebuild_progressive": {
+    "vetted": false,
+    "note": null
+  },
+  "node_authlink": {
+    "vetted": false,
+    "note": null
+  },
+  "node_class": {
+    "vetted": false,
+    "note": null
+  },
+  "node_clone": {
+    "vetted": true,
+    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+  },
+  "node_clone_tab": {
+    "vetted": true,
+    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+  },
+  "node_convert": {
+    "vetted": false,
+    "note": null
+  },
+  "node_delete_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "node_edit_protection": {
+    "vetted": false,
+    "note": null
+  },
+  "node_edit_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "node_expire": {
+    "vetted": true,
+    "note": "This module is marked obsolete by its maintainers."
+  },
+  "node_export": {
+    "vetted": false,
+    "note": null
+  },
+  "node_form_templates": {
+    "vetted": false,
+    "note": null
+  },
+  "node_hierarchy": {
+    "vetted": false,
+    "note": null
+  },
+  "node_hierarchy_views": {
+    "vetted": false,
+    "note": null
+  },
+  "node_hierarchy_widgets": {
+    "vetted": false,
+    "note": null
+  },
+  "node_limit": {
+    "vetted": false,
+    "note": null
+  },
+  "node_menus": {
+    "vetted": false,
+    "note": null
+  },
+  "node_reference": {
+    "vetted": true,
+    "note": "This module provides a field type for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "node_revision_delete": {
+    "vetted": false,
+    "note": null
+  },
+  "node_revision_restrict": {
+    "vetted": false,
+    "note": null
+  },
+  "node_save_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "node_title_help_text": {
+    "vetted": false,
+    "note": null
+  },
+  "node_title_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "node_type_class": {
+    "vetted": false,
+    "note": null
+  },
+  "node_view_permissions": {
+    "vetted": false,
+    "note": null
+  },
+  "nodeaccess": {
+    "vetted": false,
+    "note": null
+  },
+  "nodeblock": {
+    "vetted": false,
+    "note": null
+  },
+  "nodeownership": {
+    "vetted": false,
+    "note": null
+  },
+  "nodequeue": {
+    "vetted": true,
+    "note": null
+  },
+  "nodereference_url": {
+    "vetted": false,
+    "note": null
+  },
+  "nodetype_access": {
+    "vetted": false,
+    "note": null
+  },
+  "nodeviewcount": {
+    "vetted": false,
+    "note": null
+  },
+  "nofollowlist": {
+    "vetted": false,
+    "note": null
+  },
+  "nopremium": {
+    "vetted": false,
+    "note": null
+  },
+  "noreferrer": {
+    "vetted": false,
+    "note": null
+  },
+  "noreqnewpass": {
+    "vetted": true,
+    "note": null
+  },
+  "notes": {
+    "vetted": false,
+    "note": null
+  },
+  "notify": {
+    "vetted": false,
+    "note": null
+  },
+  "notify_log": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/notify_log/issues/3242228"
+  },
+  "npr": {
+    "vetted": false,
+    "note": null
+  },
+  "nprogress": {
+    "vetted": false,
+    "note": null
+  },
+  "nsw_feedback": {
+    "vetted": false,
+    "note": null
+  },
+  "number": {
+    "vetted": true,
+    "note": "This module no longer exists because its field types have been merged into Drupal core's Field module."
+  },
+  "number_double": {
+    "vetted": false,
+    "note": null
+  },
+  "nys_unav": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth2_client": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth2_server": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth2_token_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth_common": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth_login_oauth2": {
+    "vetted": false,
+    "note": null
+  },
+  "oauth_server_sso": {
+    "vetted": false,
+    "note": null
+  },
+  "object_log": {
+    "vetted": false,
+    "note": null
+  },
+  "ofed_switcher": {
+    "vetted": false,
+    "note": null
+  },
+  "office_hours": {
+    "vetted": false,
+    "note": null
+  },
+  "og": {
+    "vetted": false,
+    "note": null
+  },
+  "og_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "olark": {
+    "vetted": false,
+    "note": null
+  },
+  "onepass": {
+    "vetted": false,
+    "note": null
+  },
+  "onlyone": {
+    "vetted": false,
+    "note": null
+  },
+  "open_demographics": {
+    "vetted": false,
+    "note": null
+  },
+  "open_readspeaker": {
+    "vetted": false,
+    "note": null
+  },
+  "openfed_social": {
+    "vetted": false,
+    "note": null
+  },
+  "openid_connect": {
+    "vetted": false,
+    "note": null
+  },
+  "openid_connect_akamai": {
+    "vetted": false,
+    "note": null
+  },
+  "openid_connect_windows_aad": {
+    "vetted": false,
+    "note": null
+  },
+  "openinbound": {
+    "vetted": false,
+    "note": null
+  },
+  "openlayers": {
+    "vetted": true,
+    "note": "Module is not ready for use — see https://www.drupal.org/project/openlayers."
+  },
+  "openmeetings": {
+    "vetted": false,
+    "note": null
+  },
+  "opigno_tincan_api": {
+    "vetted": false,
+    "note": null
+  },
+  "optimizedb": {
+    "vetted": false,
+    "note": null
+  },
+  "options": {
+    "vetted": true,
+    "note": null
+  },
+  "options_table": {
+    "vetted": false,
+    "note": null
+  },
+  "ordered_list": {
+    "vetted": false,
+    "note": null
+  },
+  "organigrams": {
+    "vetted": false,
+    "note": null
+  },
+  "other_view_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "otp": {
+    "vetted": false,
+    "note": null
+  },
+  "otp_verification": {
+    "vetted": false,
+    "note": null
+  },
+  "ouibounce_exit_modal": {
+    "vetted": false,
+    "note": null
+  },
+  "overlay": {
+    "vetted": true,
+    "note": "The new Drupal 8 toolbar now includes a contextually aware \"back to site\" button that serves the same use-case as overlay by allowing site users to return from the admin context to the page that they were on."
+  },
+  "override_node_options": {
+    "vetted": false,
+    "note": null
+  },
+  "overseer": {
+    "vetted": false,
+    "note": null
+  },
+  "owlcarousel": {
+    "vetted": false,
+    "note": null
+  },
+  "owner_or_admin": {
+    "vetted": false,
+    "note": null
+  },
+  "pace": {
+    "vetted": false,
+    "note": null
+  },
+  "pack_upload": {
+    "vetted": false,
+    "note": null
+  },
+  "packery": {
+    "vetted": false,
+    "note": null
+  },
+  "page_load_progress": {
+    "vetted": false,
+    "note": null
+  },
+  "page_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "page_manager_search": {
+    "vetted": false,
+    "note": null
+  },
+  "page_title": {
+    "vetted": false,
+    "note": "The Page Title module was merged into the Metatag module. You can help finish the migration path at https://www.drupal.org/project/metatag/issues/3077729 and https://www.drupal.org/project/metatag/issues/3077730."
+  },
+  "pager_for_content_type": {
+    "vetted": false,
+    "note": null
+  },
+  "pagerer": {
+    "vetted": false,
+    "note": null
+  },
+  "pages_restriction": {
+    "vetted": false,
+    "note": null
+  },
+  "panelizer": {
+    "vetted": false,
+    "note": null
+  },
+  "panels": {
+    "vetted": false,
+    "note": "This migration is not yet automated, feel free to help in https://www.drupal.org/project/panels/issues/2296443."
+  },
+  "panels_everywhere": {
+    "vetted": false,
+    "note": null
+  },
+  "panels_ipe": {
+    "vetted": false,
+    "note": "This migration is not yet automated, feel free to help in https://www.drupal.org/project/panels/issues/2296443."
+  },
+  "panels_mini": {
+    "vetted": false,
+    "note": "The Mini panels submodule of the Panels module is obsolete, because Drupal core now has a rich block system, which combined with the Drupal 9 Layout Builder can do much more."
+  },
+  "panels_node": {
+    "vetted": false,
+    "note": "The Panel nodes submodule of the Panels module is obsolete, because Drupal core now has a rich block system, which combined with the Drupal 9 Layout Builder can do much more."
+  },
+  "panopoly_core": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_demo": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_images": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_magic": {
+    "vetted": false,
+    "note": null
+  },
+  "panopoly_pages": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_search": {
+    "vetted": false,
+    "note": null
+  },
+  "panopoly_test": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_theme": {
+    "vetted": false,
+    "note": null
+  },
+  "panopoly_users": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_widgets": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
+  },
+  "panopoly_wysiwyg": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/panopoly_wysiwyg for instructions."
+  },
+  "pantheon_advanced_page_cache": {
+    "vetted": false,
+    "note": null
+  },
+  "paragraphs": {
+    "vetted": true,
+    "note": null
+  },
+  "paragraphs_button": {
+    "vetted": false,
+    "note": null
+  },
+  "paragraphs_jquery_ui_accordion": {
+    "vetted": false,
+    "note": null
+  },
+  "paragraphs_previewer": {
+    "vetted": false,
+    "note": null
+  },
+  "paragraphs_summary": {
+    "vetted": false,
+    "note": null
+  },
+  "paragraphs_table": {
+    "vetted": false,
+    "note": null
+  },
+  "parameter_message": {
+    "vetted": false,
+    "note": null
+  },
+  "paranoia": {
+    "vetted": true,
+    "note": "Drupal 7's PHP module is not recommended because it poses a severe security risk without very careful configuration and trusted users. Therefore you should not need the Paranoia module either."
+  },
+  "pardot": {
+    "vetted": false,
+    "note": null
+  },
+  "partial": {
+    "vetted": false,
+    "note": null
+  },
+  "passwd_only": {
+    "vetted": false,
+    "note": null
+  },
+  "password_encrypt": {
+    "vetted": false,
+    "note": null
+  },
+  "password_field": {
+    "vetted": false,
+    "note": null
+  },
+  "password_policy": {
+    "vetted": true,
+    "note": null
+  },
+  "password_policy_password_tab": {
+    "vetted": true,
+    "note": null
+  },
+  "password_strength": {
+    "vetted": false,
+    "note": null
+  },
+  "passwordless": {
+    "vetted": false,
+    "note": null
+  },
+  "past": {
+    "vetted": false,
+    "note": null
+  },
+  "patchinfo": {
+    "vetted": false,
+    "note": null
+  },
+  "path": {
+    "vetted": true,
+    "note": null
+  },
+  "path_alias_xt": {
+    "vetted": false,
+    "note": null
+  },
+  "path_corrector": {
+    "vetted": false,
+    "note": null
+  },
+  "path_nofollow": {
+    "vetted": false,
+    "note": null
+  },
+  "path_redirect_import": {
+    "vetted": true,
+    "note": null
+  },
+  "pathauto": {
+    "vetted": true,
+    "note": null
+  },
+  "pathauto_entity": {
+    "vetted": true,
+    "note": null
+  },
+  "pathauto_menu_link": {
+    "vetted": false,
+    "note": null
+  },
+  "pathauto_persist": {
+    "vetted": true,
+    "note": null
+  },
+  "pathologic": {
+    "vetted": true,
+    "note": null
+  },
+  "patreon": {
+    "vetted": false,
+    "note": null
+  },
+  "patternkit": {
+    "vetted": false,
+    "note": null
+  },
+  "paybox": {
+    "vetted": false,
+    "note": null
+  },
+  "payment": {
+    "vetted": false,
+    "note": null
+  },
+  "paypal_payment": {
+    "vetted": false,
+    "note": null
+  },
+  "payson_checkout": {
+    "vetted": false,
+    "note": null
+  },
+  "paystack_donate": {
+    "vetted": false,
+    "note": null
+  },
+  "pbs_media_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "pc": {
+    "vetted": false,
+    "note": null
+  },
+  "pcp": {
+    "vetted": false,
+    "note": null
+  },
+  "pdf": {
+    "vetted": false,
+    "note": null
+  },
+  "pdf_html": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/pdf_html/issues/3240772"
+  },
+  "pdf_reader": {
+    "vetted": false,
+    "note": null
+  },
+  "pdf_using_mpdf": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/pdf_using_mpdf/issues/3205270"
+  },
+  "pdfpreview": {
+    "vetted": false,
+    "note": null
+  },
+  "pdftemplate": {
+    "vetted": false,
+    "note": null
+  },
+  "permalink_block": {
+    "vetted": false,
+    "note": null
+  },
+  "permissions_by_term": {
+    "vetted": false,
+    "note": null
+  },
+  "persistent_login": {
+    "vetted": false,
+    "note": null
+  },
+  "personalize": {
+    "vetted": false,
+    "note": null
+  },
+  "personalize_blocks": {
+    "vetted": false,
+    "note": null
+  },
+  "personalize_elements": {
+    "vetted": false,
+    "note": null
+  },
+  "personalize_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "personalize_taxonomy_context": {
+    "vetted": false,
+    "note": null
+  },
+  "pet": {
+    "vetted": false,
+    "note": null
+  },
+  "phone": {
+    "vetted": true,
+    "note": null
+  },
+  "phonetic": {
+    "vetted": false,
+    "note": null
+  },
+  "photos": {
+    "vetted": false,
+    "note": null
+  },
+  "photoswipe": {
+    "vetted": false,
+    "note": null
+  },
+  "php": {
+    "vetted": true,
+    "note": "Drupal 7's PHP module is not recommended because it poses a severe security risk without very careful configuration and trusted users."
+  },
+  "php_ffmpeg": {
+    "vetted": false,
+    "note": null
+  },
+  "phpword": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "physical": {
+    "vetted": false,
+    "note": null
+  },
+  "picture": {
+    "vetted": true,
+    "note": null
+  },
+  "picture_background_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "pingdom_rum": {
+    "vetted": false,
+    "note": null
+  },
+  "pirate": {
+    "vetted": false,
+    "note": null
+  },
+  "piwik_noscript": {
+    "vetted": false,
+    "note": null
+  },
+  "plupload": {
+    "vetted": false,
+    "note": null
+  },
+  "plyr": {
+    "vetted": false,
+    "note": null
+  },
+  "poll": {
+    "vetted": false,
+    "note": "The poll module is no longer part of Drupal core."
+  },
+  "poptin": {
+    "vetted": false,
+    "note": null
+  },
+  "popup": {
+    "vetted": false,
+    "note": null
+  },
+  "popup_field_group": {
+    "vetted": false,
+    "note": null
+  },
+  "popup_onload": {
+    "vetted": false,
+    "note": null
+  },
+  "porterstemmer": {
+    "vetted": false,
+    "note": null
+  },
+  "postal_code": {
+    "vetted": false,
+    "note": null
+  },
+  "postmark": {
+    "vetted": false,
+    "note": null
+  },
+  "potx": {
+    "vetted": false,
+    "note": null
+  },
+  "power_reviews": {
+    "vetted": false,
+    "note": null
+  },
+  "prepopulate": {
+    "vetted": false,
+    "note": null
+  },
+  "press_esc_to_login": {
+    "vetted": false,
+    "note": null
+  },
+  "presspatron": {
+    "vetted": false,
+    "note": null
+  },
+  "prev_next": {
+    "vetted": false,
+    "note": null
+  },
+  "prevnext": {
+    "vetted": false,
+    "note": null
+  },
+  "print": {
+    "vetted": true,
+    "note": null
+  },
+  "print_epub": {
+    "vetted": true,
+    "note": null
+  },
+  "print_mail": {
+    "vetted": true,
+    "note": null
+  },
+  "print_pdf": {
+    "vetted": true,
+    "note": null
+  },
+  "print_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "printfriendly": {
+    "vetted": true,
+    "note": "The PrintFriendly & PDF module was marked as obsolete by its maintainers. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "private_files_download_permission": {
+    "vetted": false,
+    "note": null
+  },
+  "private_taxonomy": {
+    "vetted": false,
+    "note": "This module is currently unmaintained. Use at your own risk. It's also seeking new maintainers, see https://www.drupal.org/project/private_taxonomy/issues/3244798."
+  },
+  "prlp": {
+    "vetted": false,
+    "note": null
+  },
+  "probo": {
+    "vetted": true,
+    "note": "Development of this project is moved to github. For more information see - https://www.drupal.org/project/probo."
+  },
+  "prod_check": {
+    "vetted": false,
+    "note": null
+  },
+  "profile": {
+    "vetted": false,
+    "note": "The profile module is no longer part of Drupal core. Before installing this module, you may wish to consider if you can use core modules to achieve the same functionality."
+  },
+  "profile_switcher": {
+    "vetted": false,
+    "note": null
+  },
+  "project_browser": {
+    "vetted": false,
+    "note": null
+  },
+  "promote_disable": {
+    "vetted": false,
+    "note": null
+  },
+  "propellerads": {
+    "vetted": false,
+    "note": null
+  },
+  "protected_pages": {
+    "vetted": false,
+    "note": null
+  },
+  "protected_submissions": {
+    "vetted": false,
+    "note": null
+  },
+  "public_preview": {
+    "vetted": false,
+    "note": null
+  },
+  "publication_date": {
+    "vetted": false,
+    "note": null
+  },
+  "publishcontent": {
+    "vetted": true,
+    "note": "This module provides per-content type publishing permission for a Drupal 7 site. While this module does have a Drupal 9 compatible release, Drupal core now contains a superset of its functionality since Drupal 9 is distributed with the Workflows and Content Moderation modules. These modules afford the ability to create per-content type workflows which contain \"transitions\" (e.g. from \"draft\" to \"published\") and permissions can be granted (or withheld) for those transitions."
+  },
+  "purge": {
+    "vetted": false,
+    "note": null
+  },
+  "purge_users": {
+    "vetted": false,
+    "note": null
+  },
+  "pwa": {
+    "vetted": false,
+    "note": null
+  },
+  "qbank_dam": {
+    "vetted": false,
+    "note": null
+  },
+  "qualtricsxm": {
+    "vetted": false,
+    "note": null
+  },
+  "quantcdn": {
+    "vetted": false,
+    "note": null
+  },
+  "queue_mail": {
+    "vetted": false,
+    "note": null
+  },
+  "queue_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "queue_unique": {
+    "vetted": false,
+    "note": null
+  },
+  "quick_data": {
+    "vetted": false,
+    "note": null
+  },
+  "quicker_edit": {
+    "vetted": false,
+    "note": null
+  },
+  "quicklink": {
+    "vetted": false,
+    "note": null
+  },
+  "quicktabs": {
+    "vetted": false,
+    "note": null
+  },
+  "quiz": {
+    "vetted": false,
+    "note": null
+  },
+  "quote": {
+    "vetted": false,
+    "note": null
+  },
+  "qwantsearch": {
+    "vetted": false,
+    "note": null
+  },
+  "qwebirc": {
+    "vetted": false,
+    "note": null
+  },
+  "r4032login": {
+    "vetted": true,
+    "note": null
+  },
+  "rabbit_hole": {
+    "vetted": false,
+    "note": null
+  },
+  "rabbitmq": {
+    "vetted": false,
+    "note": null
+  },
+  "radioactivity": {
+    "vetted": false,
+    "note": null
+  },
+  "radix_layouts": {
+    "vetted": false,
+    "note": null
+  },
+  "range": {
+    "vetted": true,
+    "note": null
+  },
+  "rate": {
+    "vetted": true,
+    "note": null
+  },
+  "raven": {
+    "vetted": false,
+    "note": null
+  },
+  "raw_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "rdf": {
+    "vetted": true,
+    "note": null
+  },
+  "readmore": {
+    "vetted": false,
+    "note": null
+  },
+  "readmore_extrafield": {
+    "vetted": false,
+    "note": null
+  },
+  "readonlymode": {
+    "vetted": true,
+    "note": null
+  },
+  "real_aes": {
+    "vetted": false,
+    "note": null
+  },
+  "real_estate": {
+    "vetted": false,
+    "note": null
+  },
+  "realistic_dummy_content": {
+    "vetted": false,
+    "note": null
+  },
+  "realname": {
+    "vetted": true,
+    "note": null
+  },
+  "reasonsbounce": {
+    "vetted": false,
+    "note": null
+  },
+  "recaptcha": {
+    "vetted": true,
+    "note": null
+  },
+  "recaptcha_v3": {
+    "vetted": false,
+    "note": null
+  },
+  "recently_read": {
+    "vetted": false,
+    "note": null
+  },
+  "recipe": {
+    "vetted": true,
+    "note": null
+  },
+  "recurly": {
+    "vetted": false,
+    "note": null
+  },
+  "redhen": {
+    "vetted": false,
+    "note": null
+  },
+  "redirect": {
+    "vetted": true,
+    "note": null
+  },
+  "redirect_after_logout": {
+    "vetted": false,
+    "note": null
+  },
+  "redis": {
+    "vetted": false,
+    "note": null
+  },
+  "reference_table_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "references": {
+    "vetted": true,
+    "note": "This module provides field types for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "reg_confirm_email": {
+    "vetted": false,
+    "note": null
+  },
+  "regcode": {
+    "vetted": false,
+    "note": null
+  },
+  "regcode_simple": {
+    "vetted": false,
+    "note": null
+  },
+  "registration_role": {
+    "vetted": false,
+    "note": null
+  },
+  "regon": {
+    "vetted": false,
+    "note": null
+  },
+  "rel_to_abs": {
+    "vetted": false,
+    "note": null
+  },
+  "relatedbyterms": {
+    "vetted": false,
+    "note": null
+  },
+  "reloadtina": {
+    "vetted": false,
+    "note": null
+  },
+  "remote_stream_wrapper": {
+    "vetted": false,
+    "note": null
+  },
+  "rename_admin_paths": {
+    "vetted": false,
+    "note": null
+  },
+  "repec": {
+    "vetted": false,
+    "note": null
+  },
+  "replain": {
+    "vetted": false,
+    "note": null
+  },
+  "replicate": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_bean": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_commerce": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_entityform": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_field_collection": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_helpers": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "replicate_user": {
+    "vetted": true,
+    "note": null
+  },
+  "report_field": {
+    "vetted": false,
+    "note": null
+  },
+  "representative_image": {
+    "vetted": false,
+    "note": null
+  },
+  "require_login": {
+    "vetted": false,
+    "note": null
+  },
+  "required_by_role": {
+    "vetted": false,
+    "note": null
+  },
+  "required_field_display": {
+    "vetted": false,
+    "note": null
+  },
+  "reroute_email": {
+    "vetted": false,
+    "note": null
+  },
+  "resave_all_nodes": {
+    "vetted": false,
+    "note": null
+  },
+  "reset_password_by_role": {
+    "vetted": false,
+    "note": null
+  },
+  "resource_hints": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_favicons": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_menus": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_preview": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_share_buttons": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_table_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "responsive_tables_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "responsivewrappers": {
+    "vetted": false,
+    "note": null
+  },
+  "resque": {
+    "vetted": false,
+    "note": null
+  },
+  "rest_server": {
+    "vetted": true,
+    "note": "Drupal core is now shipped with the JSON:API and REST modules. In most cases, these completely replace the functionality of the REST Server module."
+  },
+  "restrict_ip": {
+    "vetted": false,
+    "note": null
+  },
+  "restrict_password_change": {
+    "vetted": false,
+    "note": null
+  },
+  "restrict_role_login_by_ip": {
+    "vetted": false,
+    "note": null
+  },
+  "reviews": {
+    "vetted": false,
+    "note": null
+  },
+  "rfv": {
+    "vetted": false,
+    "note": null
+  },
+  "rh_file": {
+    "vetted": false,
+    "note": null
+  },
+  "rh_node": {
+    "vetted": false,
+    "note": null
+  },
+  "rh_profile2": {
+    "vetted": false,
+    "note": null
+  },
+  "rh_taxonomy": {
+    "vetted": false,
+    "note": null
+  },
+  "rh_user": {
+    "vetted": false,
+    "note": null
+  },
+  "ri": {
+    "vetted": false,
+    "note": null
+  },
+  "riddler": {
+    "vetted": false,
+    "note": null
+  },
+  "rijksvideo": {
+    "vetted": false,
+    "note": null
+  },
+  "robotstxt": {
+    "vetted": true,
+    "note": null
+  },
+  "rocket_chat": {
+    "vetted": false,
+    "note": null
+  },
+  "rokka": {
+    "vetted": false,
+    "note": null
+  },
+  "role_delegation": {
+    "vetted": true,
+    "note": null
+  },
+  "role_expire": {
+    "vetted": false,
+    "note": null
+  },
+  "role_expose": {
+    "vetted": false,
+    "note": null
+  },
+  "role_login_page": {
+    "vetted": false,
+    "note": null
+  },
+  "role_specific_user_block": {
+    "vetted": false,
+    "note": null
+  },
+  "role_theme_switcher": {
+    "vetted": false,
+    "note": null
+  },
+  "role_toggle": {
+    "vetted": false,
+    "note": null
+  },
+  "role_watchdog": {
+    "vetted": false,
+    "note": null
+  },
+  "roleassign": {
+    "vetted": true,
+    "note": null
+  },
+  "rollbar": {
+    "vetted": false,
+    "note": null
+  },
+  "rpt": {
+    "vetted": false,
+    "note": null
+  },
+  "rrssb": {
+    "vetted": false,
+    "note": null
+  },
+  "rst": {
+    "vetted": false,
+    "note": null
+  },
+  "rua": {
+    "vetted": false,
+    "note": null
+  },
+  "rules": {
+    "vetted": false,
+    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+  },
+  "rules_admin": {
+    "vetted": false,
+    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+  },
+  "rules_i18n": {
+    "vetted": false,
+    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+  },
+  "rules_scheduler": {
+    "vetted": false,
+    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+  },
+  "rules_session_vars": {
+    "vetted": false,
+    "note": null
+  },
+  "rut": {
+    "vetted": false,
+    "note": null
+  },
+  "s3fs": {
+    "vetted": true,
+    "note": null
+  },
+  "s3fs_cors": {
+    "vetted": false,
+    "note": null
+  },
+  "s3fs_file_proxy_to_s3": {
+    "vetted": false,
+    "note": null
+  },
+  "s_r_c_html5_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "safe_cache_form_clear": {
+    "vetted": true,
+    "note": "The Safe cache_form Clear module ships with Drupal 7.61 and with Drupal 8 & 9. It is obsolete on all versions of Drupal."
+  },
+  "salesforce": {
+    "vetted": false,
+    "note": null
+  },
+  "salesforce_auth": {
+    "vetted": false,
+    "note": null
+  },
+  "salesiq": {
+    "vetted": false,
+    "note": null
+  },
+  "salsa_api": {
+    "vetted": false,
+    "note": null
+  },
+  "saml_sp": {
+    "vetted": false,
+    "note": null
+  },
+  "samlauth": {
+    "vetted": false,
+    "note": null
+  },
+  "saudi_identity_field": {
+    "vetted": false,
+    "note": null
+  },
+  "save_edit": {
+    "vetted": false,
+    "note": null
+  },
+  "scanner": {
+    "vetted": false,
+    "note": null
+  },
+  "scenarios": {
+    "vetted": false,
+    "note": null
+  },
+  "scheduler": {
+    "vetted": false,
+    "note": null
+  },
+  "schema_metatag": {
+    "vetted": false,
+    "note": null
+  },
+  "schemaapp": {
+    "vetted": false,
+    "note": null
+  },
+  "scripturefilter": {
+    "vetted": false,
+    "note": null
+  },
+  "scroll_blocks": {
+    "vetted": false,
+    "note": null
+  },
+  "scroll_progress": {
+    "vetted": false,
+    "note": null
+  },
+  "scrollbar": {
+    "vetted": false,
+    "note": null
+  },
+  "scss": {
+    "vetted": false,
+    "note": null
+  },
+  "search": {
+    "vetted": true,
+    "note": null
+  },
+  "search404": {
+    "vetted": true,
+    "note": null
+  },
+  "search_365": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_algolia": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_attachments": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_autocomplete": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_exclude": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_fast": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_federated_solr": {
+    "vetted": true,
+    "note": "This module needs to be installed manually due to its version conflicts with https://www.drupal.org/project/search_api_solr"
+  },
+  "search_api_glossary": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_grouping": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_location": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_page": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_sajari": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_saved_searches": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_solr": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_sorts": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_sorts_widget": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_spellcheck": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "search_api_stats": {
+    "vetted": false,
+    "note": null
+  },
+  "search_api_views": {
+    "vetted": true,
+    "note": "This module is part of the base Search API module since https://www.drupal.org/project/search_api/issues/2044411."
+  },
+  "search_autocomplete": {
+    "vetted": false,
+    "note": null
+  },
+  "search_log": {
+    "vetted": false,
+    "note": null
+  },
+  "searchindex_wipe": {
+    "vetted": false,
+    "note": null
+  },
+  "seckit": {
+    "vetted": true,
+    "note": "The security policies for a site depend on its front end and infrastructure. Also, Drupal 7 typically requires a relatively lax CSP policy because of inline scripts. Therefore migrating the configuration from Drupal 7 does not make sense. In most cases, you should be able to configure seckit to be more strict in Drupal 9 than in Drupal 7."
+  },
+  "securelogin": {
+    "vetted": true,
+    "note": null
+  },
+  "securepages": {
+    "vetted": true,
+    "note": null
+  },
+  "securimage": {
+    "vetted": false,
+    "note": null
+  },
+  "security_review": {
+    "vetted": false,
+    "note": null
+  },
+  "securitytxt": {
+    "vetted": false,
+    "note": null
+  },
+  "segmentio": {
+    "vetted": false,
+    "note": null
+  },
+  "select2": {
+    "vetted": false,
+    "note": null
+  },
+  "select_or_other": {
+    "vetted": false,
+    "note": null
+  },
+  "selectize": {
+    "vetted": false,
+    "note": null
+  },
+  "semanticviews": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "sendgrid_integration": {
+    "vetted": false,
+    "note": null
+  },
+  "sendinblue": {
+    "vetted": false,
+    "note": null
+  },
+  "seo_checklist": {
+    "vetted": false,
+    "note": null
+  },
+  "serial": {
+    "vetted": false,
+    "note": null
+  },
+  "services": {
+    "vetted": true,
+    "note": "Drupal core is now shipped with the JSON:API and REST modules. In most cases, these completely replace the functionality of the services module."
+  },
+  "services_api_key_auth": {
+    "vetted": false,
+    "note": null
+  },
+  "services_basic_auth": {
+    "vetted": true,
+    "note": null
+  },
+  "services_documentation": {
+    "vetted": true,
+    "note": "Drupal core is now shipped with the JSON:API and REST modules. In most cases, these completely replace the functionality of the services module. To add documentation, install the https://www.drupal.org/project/openapi module."
+  },
+  "services_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "services_path": {
+    "vetted": false,
+    "note": null
+  },
+  "services_views": {
+    "vetted": true,
+    "note": "Drupal core is now shipped with the REST module, with which 'REST Export displays' can be created. In most cases, these completely replace the functionality of the Services Views module."
+  },
+  "ses_mailer": {
+    "vetted": false,
+    "note": null
+  },
+  "session_limit": {
+    "vetted": true,
+    "note": null
+  },
+  "session_node_access": {
+    "vetted": false,
+    "note": null
+  },
+  "set_front_page": {
+    "vetted": false,
+    "note": null
+  },
+  "setka_editor": {
+    "vetted": false,
+    "note": null
+  },
+  "sfweb2lead_webform": {
+    "vetted": false,
+    "note": null
+  },
+  "sharedemail": {
+    "vetted": false,
+    "note": null
+  },
+  "sharedemail_pass_reset": {
+    "vetted": false,
+    "note": null
+  },
+  "sharemessage": {
+    "vetted": false,
+    "note": null
+  },
+  "sharerich": {
+    "vetted": false,
+    "note": null
+  },
+  "sharethis": {
+    "vetted": false,
+    "note": null
+  },
+  "sharethis_block": {
+    "vetted": false,
+    "note": null
+  },
+  "shariff": {
+    "vetted": false,
+    "note": null
+  },
+  "sharpspring": {
+    "vetted": false,
+    "note": null
+  },
+  "sharpspring_webforms": {
+    "vetted": false,
+    "note": null
+  },
+  "shield": {
+    "vetted": true,
+    "note": "The list of paths for shield module needs manual re-evaluation to make sure that only the necessary paths are shielded."
+  },
+  "shopify": {
+    "vetted": false,
+    "note": null
+  },
+  "shortcode": {
+    "vetted": true,
+    "note": null
+  },
+  "shortcode_social": {
+    "vetted": false,
+    "note": null
+  },
+  "shortcut": {
+    "vetted": true,
+    "note": null
+  },
+  "shorten": {
+    "vetted": false,
+    "note": null
+  },
+  "shorthand": {
+    "vetted": false,
+    "note": null
+  },
+  "show_email": {
+    "vetted": false,
+    "note": null
+  },
+  "show_node_aliases": {
+    "vetted": false,
+    "note": null
+  },
+  "shs": {
+    "vetted": false,
+    "note": null
+  },
+  "shurly": {
+    "vetted": false,
+    "note": null
+  },
+  "shutdown": {
+    "vetted": false,
+    "note": null
+  },
+  "sign_widget": {
+    "vetted": false,
+    "note": null
+  },
+  "signaturefield": {
+    "vetted": true,
+    "note": "This module must be installed manually — see README.md for installation instructions."
+  },
+  "similarreferences": {
+    "vetted": false,
+    "note": null
+  },
+  "similarterms": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_access": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_currency_converter": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_fb_connect": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_gmap": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_gse_search": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_image_rotate": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_instagram_feed": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_ldap": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_mail": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_pass_reset": {
+    "vetted": true,
+    "note": null
+  },
+  "simple_taxonomy_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "simple_timeline": {
+    "vetted": false,
+    "note": null
+  },
+  "simplehtmldom": {
+    "vetted": true,
+    "note": "This module is abandoned and obsolete; use PHP's built-in https://www.php.net/manual/en/class.domdocument.php now!"
+  },
+  "simplei": {
+    "vetted": false,
+    "note": null
+  },
+  "simplelogin": {
+    "vetted": false,
+    "note": null
+  },
+  "simplemde": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/simplemde for instructions."
+  },
+  "simplemeta": {
+    "vetted": false,
+    "note": null
+  },
+  "simplenews": {
+    "vetted": false,
+    "note": null
+  },
+  "simplenews_content_selection": {
+    "vetted": false,
+    "note": null
+  },
+  "simplenews_scheduler": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/simplenews_scheduler/issues/3230858."
+  },
+  "simplesamlphp_auth": {
+    "vetted": false,
+    "note": null
+  },
+  "simpletest": {
+    "vetted": true,
+    "note": "SimpleTest has been deprecated and removed from Drupal core. PHPUnit is the officially supported testing library in Drupal 9."
+  },
+  "simplify": {
+    "vetted": false,
+    "note": null
+  },
+  "single_page_site": {
+    "vetted": false,
+    "note": null
+  },
+  "single_user_role": {
+    "vetted": false,
+    "note": null
+  },
+  "sirv": {
+    "vetted": false,
+    "note": null
+  },
+  "site_alert": {
+    "vetted": false,
+    "note": null
+  },
+  "site_audit": {
+    "vetted": false,
+    "note": null
+  },
+  "site_banner": {
+    "vetted": false,
+    "note": null
+  },
+  "site_map": {
+    "vetted": false,
+    "note": null
+  },
+  "site_status_message": {
+    "vetted": false,
+    "note": null
+  },
+  "site_verify": {
+    "vetted": false,
+    "note": "The Site Verify module never got any release for Drupal 8 or 9. Per https://www.drupal.org/project/site_verify/issues/2194861#comment-11511471, it is recommended to install the Metatag Verification submodule of the Metatag module. Unfortunately, no migration path for this exists yet. Help at https://www.drupal.org/project/metatag/issues/3251874."
+  },
+  "siteimprove": {
+    "vetted": false,
+    "note": null
+  },
+  "siteinfo": {
+    "vetted": false,
+    "note": null
+  },
+  "sitesearch_360": {
+    "vetted": false,
+    "note": null
+  },
+  "skillset_inview": {
+    "vetted": false,
+    "note": null
+  },
+  "skins": {
+    "vetted": false,
+    "note": null
+  },
+  "skype": {
+    "vetted": false,
+    "note": null
+  },
+  "slack": {
+    "vetted": false,
+    "note": null
+  },
+  "slack_invite": {
+    "vetted": false,
+    "note": null
+  },
+  "slack_receive": {
+    "vetted": false,
+    "note": null
+  },
+  "slick": {
+    "vetted": false,
+    "note": null
+  },
+  "slick_entityreference": {
+    "vetted": false,
+    "note": null
+  },
+  "slick_extras": {
+    "vetted": false,
+    "note": null
+  },
+  "slick_lightbox": {
+    "vetted": false,
+    "note": null
+  },
+  "slick_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "slick_views": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "slimbox2": {
+    "vetted": false,
+    "note": null
+  },
+  "smart_ip": {
+    "vetted": false,
+    "note": null
+  },
+  "smart_trim": {
+    "vetted": true,
+    "note": null
+  },
+  "smartdocs": {
+    "vetted": false,
+    "note": null
+  },
+  "smartdocs_attachment": {
+    "vetted": false,
+    "note": null
+  },
+  "smartdocs_error": {
+    "vetted": false,
+    "note": null
+  },
+  "smartdocs_parameter": {
+    "vetted": false,
+    "note": null
+  },
+  "smartlook_tracking": {
+    "vetted": false,
+    "note": null
+  },
+  "smartmenus": {
+    "vetted": false,
+    "note": null
+  },
+  "smartwaiver": {
+    "vetted": false,
+    "note": null
+  },
+  "sms_aws_sns": {
+    "vetted": false,
+    "note": null
+  },
+  "sms_fast2sms": {
+    "vetted": false,
+    "note": null
+  },
+  "sms_simplegateway": {
+    "vetted": false,
+    "note": null
+  },
+  "sms_twilio": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "sms_websms": {
+    "vetted": false,
+    "note": null
+  },
+  "smsframework": {
+    "vetted": false,
+    "note": null
+  },
+  "smtp": {
+    "vetted": true,
+    "note": null
+  },
+  "snapengage": {
+    "vetted": false,
+    "note": null
+  },
+  "social_contact_info": {
+    "vetted": false,
+    "note": null
+  },
+  "social_links": {
+    "vetted": false,
+    "note": null
+  },
+  "social_media_links": {
+    "vetted": false,
+    "note": null
+  },
+  "social_share": {
+    "vetted": false,
+    "note": null
+  },
+  "social_timeline": {
+    "vetted": false,
+    "note": null
+  },
+  "social_wall": {
+    "vetted": false,
+    "note": "It is recommended to start from scratch, both for configuring this module and even whether to use this module. Consider using https://www.drupal.org/project/socialfeed instead, which has wider adoption."
+  },
+  "socialfeed": {
+    "vetted": false,
+    "note": null
+  },
+  "socrata": {
+    "vetted": false,
+    "note": null
+  },
+  "sodium": {
+    "vetted": false,
+    "note": null
+  },
+  "soembed": {
+    "vetted": false,
+    "note": null
+  },
+  "solr_qb": {
+    "vetted": false,
+    "note": null
+  },
+  "soundcloudfield": {
+    "vetted": false,
+    "note": null
+  },
+  "sourcepoint": {
+    "vetted": false,
+    "note": null
+  },
+  "spaces_enforced": {
+    "vetted": false,
+    "note": null
+  },
+  "spambot": {
+    "vetted": false,
+    "note": null
+  },
+  "spamicide": {
+    "vetted": false,
+    "note": null
+  },
+  "spamspan": {
+    "vetted": false,
+    "note": null
+  },
+  "sparkpost": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/acquia_search_solr module."
+  },
+  "special_menu_items": {
+    "vetted": false,
+    "note": "The Special menu items module is obsolete because non-link menu items can now be specified using `route:<nolink>`."
+  },
+  "special_taxonomy_tagging_in_body": {
+    "vetted": false,
+    "note": null
+  },
+  "speedboxes": {
+    "vetted": false,
+    "note": null
+  },
+  "sqlsrv": {
+    "vetted": true,
+    "note": null
+  },
+  "sqrl": {
+    "vetted": false,
+    "note": null
+  },
+  "square_bracket_superscripter": {
+    "vetted": false,
+    "note": null
+  },
+  "squawk": {
+    "vetted": false,
+    "note": null
+  },
+  "stage_file_proxy": {
+    "vetted": false,
+    "note": null
+  },
+  "standalone": {
+    "vetted": false,
+    "note": null
+  },
+  "starrating": {
+    "vetted": false,
+    "note": null
+  },
+  "state_machine": {
+    "vetted": false,
+    "note": null
+  },
+  "static_page": {
+    "vetted": false,
+    "note": null
+  },
+  "statistics": {
+    "vetted": true,
+    "note": null
+  },
+  "stepbystep": {
+    "vetted": false,
+    "note": null
+  },
+  "sticky_sharrre_bar": {
+    "vetted": false,
+    "note": null
+  },
+  "stop_admin": {
+    "vetted": false,
+    "note": null
+  },
+  "stop_broken_link_in_body": {
+    "vetted": false,
+    "note": null
+  },
+  "stop_spam_regs": {
+    "vetted": false,
+    "note": null
+  },
+  "storychief": {
+    "vetted": false,
+    "note": null
+  },
+  "stringoverrides": {
+    "vetted": false,
+    "note": null
+  },
+  "stripe": {
+    "vetted": false,
+    "note": null
+  },
+  "stripe_api": {
+    "vetted": false,
+    "note": null
+  },
+  "strongarm": {
+    "vetted": true,
+    "note": "The Strongarm module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "structured_data": {
+    "vetted": false,
+    "note": null
+  },
+  "styled_google_map": {
+    "vetted": false,
+    "note": null
+  },
+  "styleguide": {
+    "vetted": true,
+    "note": null
+  },
+  "styleswitcher": {
+    "vetted": true,
+    "note": null
+  },
+  "subpathauto": {
+    "vetted": false,
+    "note": null
+  },
+  "subprofiles": {
+    "vetted": false,
+    "note": null
+  },
+  "subscriptions": {
+    "vetted": false,
+    "note": null
+  },
+  "suggest_similar_titles": {
+    "vetted": false,
+    "note": null
+  },
+  "suggestion": {
+    "vetted": false,
+    "note": null
+  },
+  "super_login": {
+    "vetted": false,
+    "note": null
+  },
+  "superfish": {
+    "vetted": true,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/superfish. Also, the placed Drupal 7 Superfish blocks are not migrated to Drupal 9, because the Drupal 9 port of this module provides one block per menu that is ready for you to be placed. Migrating the detailed settings of the Drupal 7 block is pointless, because those depend on the theme, which you will have to port manually. In other words: all functionality is available to you, but a complete migration makes no sense."
+  },
+  "supersaas": {
+    "vetted": false,
+    "note": null
+  },
+  "svg_embed": {
+    "vetted": false,
+    "note": null
+  },
+  "svg_image": {
+    "vetted": false,
+    "note": null
+  },
+  "svg_sanitizer": {
+    "vetted": false,
+    "note": null
+  },
+  "swagger_ui_formatter": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/swagger_ui_formatter for instructions."
+  },
+  "swiftmailer": {
+    "vetted": false,
+    "note": "Swiftmailer library will stop being maintained at the end of November 2021 - see https://www.drupal.org/project/swiftmailer/issues/3232819 and https://symfony.com/blog/the-end-of-swiftmailer."
+  },
+  "synonyms": {
+    "vetted": false,
+    "note": null
+  },
+  "syslog": {
+    "vetted": true,
+    "note": null
+  },
+  "system": {
+    "vetted": true,
+    "note": "This module is required for all Drupal sites."
+  },
+  "system_status": {
+    "vetted": false,
+    "note": null
+  },
+  "system_stream_wrapper": {
+    "vetted": false,
+    "note": null
+  },
+  "system_user": {
+    "vetted": false,
+    "note": null
+  },
+  "taarikh": {
+    "vetted": false,
+    "note": null
+  },
+  "tab_toolbar": {
+    "vetted": false,
+    "note": null
+  },
+  "table_bs_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "table_of_contents": {
+    "vetted": false,
+    "note": null
+  },
+  "tablefield": {
+    "vetted": true,
+    "note": null
+  },
+  "tablesorter": {
+    "vetted": false,
+    "note": null
+  },
+  "tabtamer": {
+    "vetted": false,
+    "note": null
+  },
+  "tac_lite": {
+    "vetted": false,
+    "note": null
+  },
+  "tag1quo": {
+    "vetted": false,
+    "note": null
+  },
+  "tagclouds": {
+    "vetted": false,
+    "note": null
+  },
+  "tamper": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy": {
+    "vetted": true,
+    "note": null
+  },
+  "taxonomy_access_fix": {
+    "vetted": true,
+    "note": null
+  },
+  "taxonomy_bootstrap_accordion": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_container": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_entity_index": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_machine_name": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_manager": {
+    "vetted": true,
+    "note": null
+  },
+  "taxonomy_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_multidelete_terms": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_protect": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_replace": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_term_depth": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_title": {
+    "vetted": true,
+    "note": "The Taxonomy Title module is obsolete, because the Taxonomy term page is a view in Drupal core now, whose title can easily be modified."
+  },
+  "taxonomy_unique": {
+    "vetted": false,
+    "note": null
+  },
+  "tb_megamenu": {
+    "vetted": false,
+    "note": null
+  },
+  "tca": {
+    "vetted": false,
+    "note": null
+  },
+  "tcmb": {
+    "vetted": false,
+    "note": null
+  },
+  "teamleader": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/acquia_search_solr module."
+  },
+  "telegram": {
+    "vetted": false,
+    "note": null
+  },
+  "telephone": {
+    "vetted": true,
+    "note": null
+  },
+  "telephone_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "telephone_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "tellstick": {
+    "vetted": false,
+    "note": null
+  },
+  "tenon_io": {
+    "vetted": false,
+    "note": null
+  },
+  "term_level": {
+    "vetted": false,
+    "note": null
+  },
+  "term_merge": {
+    "vetted": false,
+    "note": null
+  },
+  "term_merge_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "term_reference_tree": {
+    "vetted": false,
+    "note": null
+  },
+  "termcase": {
+    "vetted": false,
+    "note": null
+  },
+  "terms_of_use": {
+    "vetted": false,
+    "note": null
+  },
+  "tether_stats": {
+    "vetted": false,
+    "note": null
+  },
+  "text": {
+    "vetted": true,
+    "note": null
+  },
+  "text_resize": {
+    "vetted": false,
+    "note": null
+  },
+  "text_summary_options": {
+    "vetted": false,
+    "note": null
+  },
+  "textarea_widget_for_text": {
+    "vetted": false,
+    "note": null
+  },
+  "textimage": {
+    "vetted": false,
+    "note": null
+  },
+  "tfa": {
+    "vetted": false,
+    "note": null
+  },
+  "tft": {
+    "vetted": false,
+    "note": null
+  },
+  "thank_you_commenter": {
+    "vetted": false,
+    "note": null
+  },
+  "theme_color_meta_tag": {
+    "vetted": false,
+    "note": null
+  },
+  "theme_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "thermometer": {
+    "vetted": false,
+    "note": null
+  },
+  "third_party_wrappers": {
+    "vetted": false,
+    "note": null
+  },
+  "thumbor_effects": {
+    "vetted": false,
+    "note": null
+  },
+  "ticket": {
+    "vetted": false,
+    "note": null
+  },
+  "tile": {
+    "vetted": false,
+    "note": null
+  },
+  "time_spent": {
+    "vetted": false,
+    "note": null
+  },
+  "timefield": {
+    "vetted": false,
+    "note": null
+  },
+  "timezone_detect": {
+    "vetted": false,
+    "note": null
+  },
+  "tinglejs": {
+    "vetted": false,
+    "note": null
+  },
+  "tinypng": {
+    "vetted": false,
+    "note": null
+  },
+  "title": {
+    "vetted": true,
+    "note": "The Title module is largely obsolete, because entity titles are translatable out of the box in Drupal 9. Only the ability to control the rendering of the title like any other field is not in Drupal core. See https://www.drupal.org/project/contrib_tracker/issues/2607758 for details."
+  },
+  "title_html": {
+    "vetted": false,
+    "note": null
+  },
+  "title_length": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_acclaro": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_cdt": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_deepl": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_google": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_memsource": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_morningside": {
+    "vetted": true,
+    "note": "This module is not composer installable - see https://www.drupal.org/project/tmgmt_morningside/issues/3240770"
+  },
+  "tmgmt_motaword": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_supertext": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_thebigword": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_transifex": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_wordbee": {
+    "vetted": false,
+    "note": null
+  },
+  "tns_gallup": {
+    "vetted": false,
+    "note": null
+  },
+  "toastr": {
+    "vetted": false,
+    "note": null
+  },
+  "toc_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "tocbot": {
+    "vetted": false,
+    "note": null
+  },
+  "tocify": {
+    "vetted": false,
+    "note": null
+  },
+  "token": {
+    "vetted": true,
+    "note": null
+  },
+  "token_custom": {
+    "vetted": false,
+    "note": null
+  },
+  "token_embed_views": {
+    "vetted": false,
+    "note": null
+  },
+  "token_filter": {
+    "vetted": true,
+    "note": null
+  },
+  "token_var": {
+    "vetted": false,
+    "note": null
+  },
+  "toolbar": {
+    "vetted": true,
+    "note": null
+  },
+  "tota11y": {
+    "vetted": false,
+    "note": null
+  },
+  "total_control": {
+    "vetted": false,
+    "note": null
+  },
+  "townsec_key": {
+    "vetted": false,
+    "note": null
+  },
+  "tracker": {
+    "vetted": false,
+    "note": "The Tracker migration is unfortunately not yet working correctly. Help out at https://www.drupal.org/project/drupal/issues/3204511."
+  },
+  "trailing_slash": {
+    "vetted": false,
+    "note": null
+  },
+  "translation": {
+    "vetted": true,
+    "note": null
+  },
+  "transliterate": {
+    "vetted": false,
+    "note": null
+  },
+  "transliteration": {
+    "vetted": true,
+    "note": "This module provides transliteration for machine names and file names for a Drupal 7 site. Drupal core now contains a some of its functionality, but not file name transliteration. For that, an additional module must be installed: https://www.drupal.org/project/transliterate_filenames. Transliteration of filenames used to be necessary for compatibility, but nowadays all browsers and operating systems support unicode filenames. So it is most likely unnecessary."
+  },
+  "trigger": {
+    "vetted": true,
+    "note": "The trigger module was removed from Drupal core and does not have a recommended replacement at this time."
+  },
+  "trim": {
+    "vetted": false,
+    "note": null
+  },
+  "trim_html": {
+    "vetted": false,
+    "note": null
+  },
+  "tripadvisor_integration": {
+    "vetted": false,
+    "note": null
+  },
+  "trumba": {
+    "vetted": false,
+    "note": null
+  },
+  "trusted_proxy_headers_debug": {
+    "vetted": false,
+    "note": null
+  },
+  "tugboat": {
+    "vetted": false,
+    "note": null
+  },
+  "tupas": {
+    "vetted": false,
+    "note": null
+  },
+  "tvi": {
+    "vetted": false,
+    "note": null
+  },
+  "tweet_feed": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/socialfeed module."
+  },
+  "twig": {
+    "vetted": false,
+    "note": null
+  },
+  "twilio": {
+    "vetted": false,
+    "note": null
+  },
+  "twitter_block": {
+    "vetted": false,
+    "note": null
+  },
+  "twitter_profile_widget": {
+    "vetted": false,
+    "note": null
+  },
+  "twitter_username": {
+    "vetted": false,
+    "note": null
+  },
+  "typed_entity": {
+    "vetted": false,
+    "note": null
+  },
+  "typekit": {
+    "vetted": false,
+    "note": null
+  },
+  "typekit_integration": {
+    "vetted": false,
+    "note": null
+  },
+  "typogrify": {
+    "vetted": true,
+    "note": null
+  },
+  "tzfield": {
+    "vetted": true,
+    "note": null
+  },
+  "uc_pdf_invoice_mail": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/uc_pdf_invoice_mail/issues/3241226 for instructions."
+  },
+  "ueditor": {
+    "vetted": false,
+    "note": null
+  },
+  "uikit_components": {
+    "vetted": false,
+    "note": null
+  },
+  "ultimate_cron": {
+    "vetted": false,
+    "note": null
+  },
+  "ultimenu": {
+    "vetted": false,
+    "note": null
+  },
+  "unix_time_conversion": {
+    "vetted": false,
+    "note": null
+  },
+  "unpublished_404": {
+    "vetted": false,
+    "note": null
+  },
+  "unpublished_nodes_redirect": {
+    "vetted": false,
+    "note": null
+  },
+  "unused_modules": {
+    "vetted": false,
+    "note": null
+  },
+  "update": {
+    "vetted": true,
+    "note": null
+  },
+  "updated": {
+    "vetted": false,
+    "note": null
+  },
+  "upgrade_status": {
+    "vetted": false,
+    "note": null
+  },
+  "upload_replace": {
+    "vetted": false,
+    "note": null
+  },
+  "uptime_widget": {
+    "vetted": false,
+    "note": null
+  },
+  "url_alias_permissions": {
+    "vetted": false,
+    "note": null
+  },
+  "urllogin": {
+    "vetted": false,
+    "note": null
+  },
+  "usajobs": {
+    "vetted": false,
+    "note": null
+  },
+  "user": {
+    "vetted": true,
+    "note": null
+  },
+  "user_activity_log": {
+    "vetted": false,
+    "note": null
+  },
+  "user_bundle": {
+    "vetted": false,
+    "note": null
+  },
+  "user_disk_quota": {
+    "vetted": false,
+    "note": null
+  },
+  "user_email_verification": {
+    "vetted": false,
+    "note": null
+  },
+  "user_expire": {
+    "vetted": false,
+    "note": null
+  },
+  "user_external_invite": {
+    "vetted": false,
+    "note": null
+  },
+  "user_hash": {
+    "vetted": true,
+    "note": null
+  },
+  "user_prune": {
+    "vetted": false,
+    "note": null
+  },
+  "user_pwreset_timeout": {
+    "vetted": false,
+    "note": null
+  },
+  "user_reference": {
+    "vetted": true,
+    "note": "This module provides a field type for a Drupal 7 site. Drupal core now contains a superset of its functionality."
+  },
+  "user_referral": {
+    "vetted": false,
+    "note": null
+  },
+  "user_registrationpassword": {
+    "vetted": false,
+    "note": null
+  },
+  "usermerge": {
+    "vetted": false,
+    "note": null
+  },
+  "username_enumeration_prevention": {
+    "vetted": true,
+    "note": null
+  },
+  "username_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "userpoints": {
+    "vetted": false,
+    "note": null
+  },
+  "userprotect": {
+    "vetted": false,
+    "note": null
+  },
+  "userreference_url": {
+    "vetted": false,
+    "note": null
+  },
+  "usersnap": {
+    "vetted": false,
+    "note": null
+  },
+  "usfedgov_google_analytics": {
+    "vetted": false,
+    "note": null
+  },
+  "uswds_paragraphs": {
+    "vetted": false,
+    "note": null
+  },
+  "uuid": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "varbase_editor": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/varbase_editor/issues/3186421 for instructions."
+  },
+  "vardumper": {
+    "vetted": false,
+    "note": null
+  },
+  "variable": {
+    "vetted": true,
+    "note": "The Variable module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "variable_admin": {
+    "vetted": true,
+    "note": "The Variable admin submodule of the Variable module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "variable_realm": {
+    "vetted": true,
+    "note": "The Variable realm submodule of the Variable module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "variable_store": {
+    "vetted": true,
+    "note": "The Variable store submodule of the Variable module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "variable_views": {
+    "vetted": true,
+    "note": "The Variable views submodule of the Variable module is obsolete, because Drupal core now has a Configuration System built in."
+  },
+  "varnishvanish": {
+    "vetted": false,
+    "note": null
+  },
+  "vbo_export": {
+    "vetted": false,
+    "note": null
+  },
+  "vefl": {
+    "vetted": false,
+    "note": null
+  },
+  "vertical_tabs_config": {
+    "vetted": false,
+    "note": null
+  },
+  "video": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_field": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_instagram": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_panopto": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_ted": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_vidme": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_vidyard": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_youku": {
+    "vetted": false,
+    "note": null
+  },
+  "video_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "video_sitemap": {
+    "vetted": false,
+    "note": null
+  },
+  "view_mode_page": {
+    "vetted": false,
+    "note": null
+  },
+  "view_mode_selector": {
+    "vetted": false,
+    "note": null
+  },
+  "view_modes_display": {
+    "vetted": false,
+    "note": null
+  },
+  "view_profiles_perms": {
+    "vetted": false,
+    "note": null
+  },
+  "view_unpublished": {
+    "vetted": true,
+    "note": null
+  },
+  "viewfield": {
+    "vetted": false,
+    "note": null
+  },
+  "viewportchecker": {
+    "vetted": false,
+    "note": null
+  },
+  "viewreference": {
+    "vetted": false,
+    "note": null
+  },
+  "views": {
+    "vetted": false,
+    "note": null
+  },
+  "views_accordion": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_add_button": {
+    "vetted": false,
+    "note": null
+  },
+  "views_adjustable_table": {
+    "vetted": false,
+    "note": null
+  },
+  "views_aggregator": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_ajax_get": {
+    "vetted": false,
+    "note": null
+  },
+  "views_ajax_history": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_all_fields": {
+    "vetted": false,
+    "note": null
+  },
+  "views_autocomplete_api": {
+    "vetted": false,
+    "note": null
+  },
+  "views_autocomplete_filters": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_base_url": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_block_area": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_block_filter_block": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_bootstrap": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_bulk_operations": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "views_cache_bully": {
+    "vetted": false,
+    "note": null
+  },
+  "views_complex_grouping": {
+    "vetted": false,
+    "note": null
+  },
+  "views_conditional": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_contact_form": {
+    "vetted": false,
+    "note": null
+  },
+  "views_content": {
+    "vetted": true,
+    "note": "The Views content panes submodule of the CTools module is obsolete, because Drupal core now has a rich block system, every view can be exposed as a block and combined with the Drupal 9 Layout Builder can do much more."
+  },
+  "views_content_cache": {
+    "vetted": true,
+    "note": "Views in Drupal 9 are efficiently cached and guarantee instantaneous updates, out of the box, no extra modules needed."
+  },
+  "views_contextual_filters_or": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_cumulative_field": {
+    "vetted": false,
+    "note": null
+  },
+  "views_current_path": {
+    "vetted": false,
+    "note": null
+  },
+  "views_data_export": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_data_export_phpspreadsheet": {
+    "vetted": false,
+    "note": null
+  },
+  "views_database_connector": {
+    "vetted": false,
+    "note": null
+  },
+  "views_delimited_list": {
+    "vetted": false,
+    "note": null
+  },
+  "views_ef_fieldset": {
+    "vetted": false,
+    "note": null
+  },
+  "views_entity_embed": {
+    "vetted": false,
+    "note": null
+  },
+  "views_evi": {
+    "vetted": false,
+    "note": null
+  },
+  "views_exposed_groups": {
+    "vetted": false,
+    "note": null
+  },
+  "views_field_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "views_field_view": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_fields_on_off": {
+    "vetted": false,
+    "note": null
+  },
+  "views_fieldsets": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_filters_populate": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_filters_summary": {
+    "vetted": false,
+    "note": null
+  },
+  "views_flipped_table": {
+    "vetted": false,
+    "note": null
+  },
+  "views_fractionslider": {
+    "vetted": false,
+    "note": null
+  },
+  "views_geojson": {
+    "vetted": false,
+    "note": null
+  },
+  "views_ical": {
+    "vetted": false,
+    "note": null
+  },
+  "views_index_hint": {
+    "vetted": false,
+    "note": null
+  },
+  "views_infinite_scroll": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_json": {
+    "vetted": true,
+    "note": "The Views JSON module is obsolete, because Drupal core now contains a superset of its functionality in its REST and JSON:API modules. When installing the REST module along with Views in Drupal 9, you can create 'REST Export' displays that output not HTML but JSON. An even better choice is to not use JSON-generating views (because there are significant limitations), but instead install the built-in JSON:API module. Install the JSON:API module in case you want to access entity data directly, install the REST module in case you want to apply various transformations from within Views first. See https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/jsonapi-vs-cores-rest-module."
+  },
+  "views_linkarea": {
+    "vetted": false,
+    "note": null
+  },
+  "views_list_sort": {
+    "vetted": false,
+    "note": null
+  },
+  "views_litepager": {
+    "vetted": true,
+    "note": "Drupal core includes this optimized pager implementation as the 'mini pager' since https://www.drupal.org/project/drupal/issues/1901290."
+  },
+  "views_load_more": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_menu_children_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "views_merge_rows": {
+    "vetted": false,
+    "note": null
+  },
+  "views_natural_sort": {
+    "vetted": false,
+    "note": null
+  },
+  "views_negate": {
+    "vetted": false,
+    "note": null
+  },
+  "views_nodejs": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/views_nodejs/issues/3242233."
+  },
+  "views_numeric_range_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "views_oai_pmh": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/views_oai_pmh/issues/3242223."
+  },
+  "views_parity_row": {
+    "vetted": false,
+    "note": null
+  },
+  "views_php": {
+    "vetted": true,
+    "note": "Convert the PHP code you've entered in the Views PHP module to views plugins in Drupal 9 — this will make your site more maintainable and secure too! See https://api.drupal.org/api/drupal/core%21modules%21views%21views.api.php/group/views_plugins/9.2.x."
+  },
+  "views_private_access": {
+    "vetted": false,
+    "note": null
+  },
+  "views_published_or_roles": {
+    "vetted": false,
+    "note": null
+  },
+  "views_queue": {
+    "vetted": true,
+    "note": "The Views Queue module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "views_random_seed": {
+    "vetted": false,
+    "note": null
+  },
+  "views_responsive_grid": {
+    "vetted": true,
+    "note": "This module is obsolete in Drupal 8|9 - see https://www.drupal.org/project/views/issues/1903746."
+  },
+  "views_role_based_global_text": {
+    "vetted": false,
+    "note": null
+  },
+  "views_row_insert": {
+    "vetted": false,
+    "note": null
+  },
+  "views_rows_wrapper": {
+    "vetted": false,
+    "note": null
+  },
+  "views_rss": {
+    "vetted": false,
+    "note": null
+  },
+  "views_rss_media": {
+    "vetted": false,
+    "note": null
+  },
+  "views_save": {
+    "vetted": false,
+    "note": null
+  },
+  "views_secondary_row": {
+    "vetted": false,
+    "note": null
+  },
+  "views_send": {
+    "vetted": false,
+    "note": null
+  },
+  "views_show_more": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "views_slideshow": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "views_slideshow_cycle": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "views_slideshow_jcarousel": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/views_slideshow_jcarousel for instructions."
+  },
+  "views_sort_null_field": {
+    "vetted": false,
+    "note": null
+  },
+  "views_summarize": {
+    "vetted": false,
+    "note": null
+  },
+  "views_table_filter": {
+    "vetted": false,
+    "note": null
+  },
+  "views_table_rowspan": {
+    "vetted": false,
+    "note": null
+  },
+  "views_term_hierarchy_weight_field": {
+    "vetted": false,
+    "note": null
+  },
+  "views_timelinejs": {
+    "vetted": false,
+    "note": null
+  },
+  "views_tools": {
+    "vetted": false,
+    "note": null
+  },
+  "views_tree": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
+  "views_ui": {
+    "vetted": true,
+    "note": null
+  },
+  "views_url_path_arguments": {
+    "vetted": false,
+    "note": null
+  },
+  "views_vcards": {
+    "vetted": false,
+    "note": null
+  },
+  "vimeo_link_formatter": {
+    "vetted": true,
+    "note": "No port is available, help in https://www.drupal.org/project/vimeo_link_formatter/issues/2697659. Better still: migrate this 'link field' data into media entities, to make them available in the Media Library: https://www.drupal.org/project/media_migration/issues/3247422."
+  },
+  "virustotal": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/virustotal/issues/3241229."
+  },
+  "visitor_actions": {
+    "vetted": false,
+    "note": null
+  },
+  "visitor_actions_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "visitors": {
+    "vetted": false,
+    "note": null
+  },
+  "visual_website_optimizer": {
+    "vetted": false,
+    "note": null
+  },
+  "visually_impaired_module": {
+    "vetted": false,
+    "note": null
+  },
+  "vitals": {
+    "vetted": false,
+    "note": null
+  },
+  "vote_up_down": {
+    "vetted": false,
+    "note": null
+  },
+  "votingapi": {
+    "vetted": true,
+    "note": null
+  },
+  "vppr": {
+    "vetted": false,
+    "note": null
+  },
+  "vspfo": {
+    "vetted": false,
+    "note": null
+  },
+  "vuejs": {
+    "vetted": false,
+    "note": null
+  },
+  "w3c_validator": {
+    "vetted": false,
+    "note": null
+  },
+  "warden": {
+    "vetted": false,
+    "note": null
+  },
+  "watchdog_event_extras": {
+    "vetted": false,
+    "note": null
+  },
+  "weather": {
+    "vetted": false,
+    "note": null
+  },
+  "webcomponents": {
+    "vetted": false,
+    "note": null
+  },
+  "webform": {
+    "vetted": true,
+    "note": null
+  },
+  "webform_calculation": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_civicrm": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_clear": {
+    "vetted": true,
+    "note": "This module allows not storing webform submissions in Drupal 7. The Drupal 8|9 Webform module contains a superset of its functionality. See https://www.drupal.org/project/webform_clear/issues/3252072."
+  },
+  "webform_encrypt": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_invitation": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has version requirement conflict with drupal/webform module."
+  },
+  "webform_javascript_field": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_mailchimp": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_mass_email": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_password": {
+    "vetted": true,
+    "note": "The Webform Password Field module never had any release in Drupal 7, and never even left the experimental sandbox phase. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "webform_remote_post": {
+    "vetted": true,
+    "note": "The Webform Remote Post module is obsolete in Drupal 9; use Webform's built-in 'Remote post' handler."
+  },
+  "webform_rut": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_shs": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_submission_anonymisation": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_term_opts": {
+    "vetted": true,
+    "note": "In the Drupal-9 compatible version of Webform, entity references are natively supported."
+  },
+  "webform_validation": {
+    "vetted": false,
+    "note": null
+  },
+  "webpay": {
+    "vetted": false,
+    "note": null
+  },
+  "website_toolbox_forum": {
+    "vetted": false,
+    "note": null
+  },
+  "webtexttool": {
+    "vetted": false,
+    "note": null
+  },
+  "webtrees": {
+    "vetted": false,
+    "note": null
+  },
+  "weight": {
+    "vetted": true,
+    "note": null
+  },
+  "welcome_mail": {
+    "vetted": false,
+    "note": null
+  },
+  "welcome_username": {
+    "vetted": false,
+    "note": null
+  },
+  "wfm": {
+    "vetted": true,
+    "note": "The Webform Multiple module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "whatsappshare": {
+    "vetted": false,
+    "note": null
+  },
+  "whitelabel": {
+    "vetted": false,
+    "note": null
+  },
+  "widget_block": {
+    "vetted": false,
+    "note": null
+  },
+  "wikiloc": {
+    "vetted": false,
+    "note": null
+  },
+  "wordpress_migrate": {
+    "vetted": false,
+    "note": null
+  },
+  "workbench": {
+    "vetted": false,
+    "note": null
+  },
+  "workbench_access": {
+    "vetted": false,
+    "note": null
+  },
+  "workbench_email": {
+    "vetted": false,
+    "note": null
+  },
+  "workbench_moderation": {
+    "vetted": true,
+    "note": "The Workbench Moderation module was replaced by Workflows and Content Moderation in Drupal core. The migration of the corresponding moderation flows and the actual revision moderation state is handled by Workbench Moderation Migrate"
+  },
+  "workflow": {
+    "vetted": false,
+    "note": null
+  },
+  "workout": {
+    "vetted": false,
+    "note": null
+  },
+  "wsdata": {
+    "vetted": false,
+    "note": null
+  },
+  "wsdl_docs": {
+    "vetted": false,
+    "note": null
+  },
+  "wysiwyg": {
+    "vetted": true,
+    "note": "This module provides WYSIWYG editing for rich text fields using various WYSIWYG editors for a Drupal 7 site. Drupal core now contains a superset of its functionality, in the Text Editors module."
+  },
+  "wysiwyg_filter": {
+    "vetted": false,
+    "note": "This module allows configuring a text format and text editor to apply the same restrictions on a Drupal 7 site. Drupal core now contains a superset of its functionality, in the Text Editors module."
+  },
+  "wysiwyg_linebreaks": {
+    "vetted": false,
+    "note": null
+  },
+  "wysiwyg_mediaembed": {
+    "vetted": false,
+    "note": "Drupal core now has a media library with text editor integration out-of-the-box. But the migration from the Wysiwyg Media Embed module does not exist yet. Help out at https://www.drupal.org/project/media_migration/issues/3188704."
+  },
+  "wysiwyg_template": {
+    "vetted": true,
+    "note": "This module must be installed manually — see https://www.drupal.org/project/wysiwyg_template for instructions."
+  },
+  "x_originating_ip": {
+    "vetted": false,
+    "note": null
+  },
+  "xautoload": {
+    "vetted": true,
+    "note": "The X Autoload for Drupal 7 was simply a backport of functionality in Drupal 8."
+  },
+  "xbbcode": {
+    "vetted": false,
+    "note": null
+  },
+  "xero": {
+    "vetted": false,
+    "note": null
+  },
+  "xhprof": {
+    "vetted": false,
+    "note": null
+  },
+  "xmlsitemap": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_custom": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_engines": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_i18n": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_menu": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_modal": {
+    "vetted": true,
+    "note": "The XML sitemap modal UI module was always hidden in Drupal 7, and is part of the main XML Sitemap module in Drupal 9."
+  },
+  "xmlsitemap_node": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_taxonomy": {
+    "vetted": true,
+    "note": null
+  },
+  "xmlsitemap_user": {
+    "vetted": true,
+    "note": null
+  },
+  "xsendfile": {
+    "vetted": false,
+    "note": null
+  },
+  "xsl_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "xssprotection": {
+    "vetted": true,
+    "note": "This module does not have 8|9 port. Nearest module having similar feature is https://www.drupal.org/project/xss_prevention"
+  },
+  "yamaps": {
+    "vetted": false,
+    "note": null
+  },
+  "yandexdisk": {
+    "vetted": false,
+    "note": null
+  },
+  "ymb": {
+    "vetted": false,
+    "note": null
+  },
+  "yoast_seo": {
+    "vetted": false,
+    "note": null
+  },
+  "youtrack": {
+    "vetted": false,
+    "note": null
+  },
+  "youtube": {
+    "vetted": false,
+    "note": null
+  },
+  "youtube_import": {
+    "vetted": false,
+    "note": null
+  },
+  "youtubechannel": {
+    "vetted": false,
+    "note": null
+  },
+  "zendesk_forms": {
+    "vetted": false,
+    "note": null
+  },
+  "zoomapi": {
+    "vetted": false,
+    "note": null
+  },
+  "zooming": {
+    "vetted": false,
+    "note": null
+  },
+  "zurb_clearing": {
+    "vetted": false,
+    "note": null
+  },
+  "zurb_twentytwenty": {
+    "vetted": false,
+    "note": null
+  }
+}
