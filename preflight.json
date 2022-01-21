@@ -796,7 +796,7 @@
     "note": "This module is not composer installable — see https://www.drupal.org/project/browser_refresh/issues/3241233."
   },
   "browserclass": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "browsersync": {
