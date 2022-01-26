@@ -8,6 +8,7 @@ use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\SourceDatabase;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Site\Settings;
@@ -20,6 +21,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 final class GetStarted extends ControllerBase {
+
+  /**
+   * Key of s3fs configuration step.
+   *
+   * @const string
+   */
+  const S3FS_STEP_KEY = 'configure-files-s3fs';
 
   /**
    * The Acquia Migrate Accelerate migration repository.
@@ -182,9 +190,31 @@ final class GetStarted extends ControllerBase {
         ],
       ],
     ];
+    $source_db_connection = !SourceDatabase::isConnected()
+      ? FALSE
+      : SourceDatabase::getConnection();
+    try {
+      $s3fs_status = !$source_db_connection
+        ? FALSE
+        : $source_db_connection->select('system', 's')
+          ->condition('s.type', 'module')
+          ->condition('s.name', 's3fs')
+          ->fields('s', ['status'])
+          ->execute()
+          ->fetchField();
+    }
+    catch (\Exception $e) {
+      $s3fs_status = FALSE;
+    }
+
+    $public_uses_s3 = $s3fs_status && $this->getSourceDrupal7VariableValue($source_db_connection, 's3fs_use_s3_for_public');
+    $private_uses_s3 = $s3fs_status && $this->getSourceDrupal7VariableValue($source_db_connection, 's3fs_use_s3_for_private');
+
     $source_public_files_path = Settings::get('migrate_source_base_path');
     $source_private_files_path = Settings::get('migrate_source_private_file_path');
-    $files_configured = !is_null($source_public_files_path) && file_exists($source_public_files_path) && (is_null($source_private_files_path) || file_exists($source_private_files_path));
+    $public_files_configured = (!is_null($source_public_files_path) && file_exists($source_public_files_path)) || $public_uses_s3;
+    $private_files_configured = $private_uses_s3 || is_null($source_private_files_path) || file_exists($source_private_files_path);
+    $files_configured = $public_files_configured && $private_files_configured;
     $steps['configure-files'] = [
       'completed' => $files_configured,
       'active' => !$files_configured,
@@ -204,13 +234,13 @@ final class GetStarted extends ControllerBase {
       ],
     ];
 
-    $expected_file_public_path = !SourceDatabase::isConnected() ? FALSE : unserialize(SourceDatabase::getConnection()
+    $expected_file_public_path = !$source_db_connection ? FALSE : unserialize($source_db_connection
       ->select('variable')
       ->fields(NULL, ['value'])
       ->condition('name', 'file_public_path', 'LIKE')
       ->execute()
       ->fetchField());
-    if ($expected_file_public_path && $expected_file_public_path !== 'sites/default/files') {
+    if ($files_configured && $expected_file_public_path && $expected_file_public_path !== 'sites/default/files') {
       $expected_file_public_path_exists = $expected_file_public_path !== FALSE && $files_configured && file_exists($expected_file_public_path) && is_writable($expected_file_public_path);
       $steps['create-destination-files-directory'] = [
         'completed' => $expected_file_public_path_exists,
@@ -221,6 +251,37 @@ final class GetStarted extends ControllerBase {
             '#markup' => $expected_file_public_path_exists
             ? $this->t("The source site uses a non-default directory for serving publicly accessible files. <code>@absolute-path</code> exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path])
             : $this->t("The source site uses a non-default directory for serving publicly accessible files. Ensure the <code>@absolute-path</code> directory exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path]),
+          ],
+        ],
+      ];
+    }
+
+    if ($public_uses_s3 || $private_uses_s3) {
+      $public_s3_settings_is_met = $public_uses_s3
+        ? Settings::get('s3fs.use_s3_for_public')
+        : TRUE;
+      $private_s3_settings_is_met = $private_uses_s3
+        ? Settings::get('s3fs.use_s3_for_private')
+        : TRUE;
+      $missing_lines_to_add = array_filter([
+        $public_s3_settings_is_met ? NULL : "\$settings['s3fs.use_s3_for_public'] = TRUE;",
+        $private_s3_settings_is_met ? NULL : "\$settings['s3fs.use_s3_for_private'] = TRUE;",
+      ]);
+
+      $steps[self::S3FS_STEP_KEY] = [
+        'completed' => $public_s3_settings_is_met && $private_s3_settings_is_met,
+        'active' => !$public_s3_settings_is_met || !$private_s3_settings_is_met,
+        'content' => [
+          'label' => $this->t('Configure S3 File System settings'),
+          'description' => [
+            '#markup' => $this->formatPlural(
+              count($missing_lines_to_add),
+              "The source site was configured to store public or private files on S3 File System. In Drupal 9, this configuration is stored in settings.php. You should add the following line to settings.php: \n@settings-to-add",
+              "The source site was configured to store public or private files on S3 File System. In Drupal 9, this configuration is stored in settings.php. You should add the following lines to settings.php: \n@settings-to-add",
+              [
+                '@settings-to-add' => implode("\n", $missing_lines_to_add),
+              ]
+            ),
           ],
         ],
       ];
@@ -292,6 +353,32 @@ final class GetStarted extends ControllerBase {
       ],
     ];
     return $build;
+  }
+
+  /**
+   * Returns the value of a Drupal 7 variable from the given source database.
+   *
+   * @param \Drupal\Core\Database\Connection $source_connection
+   *   The connection of the source Drupal 7 instance.
+   * @param string $variable_name
+   *   The name of the Drupal 7 variable.
+   *
+   * @return mixed|null
+   *   The (unserialized) value of the variable. If the variable is missing from
+   *   the source, a NULL will be returned.
+   */
+  protected function getSourceDrupal7VariableValue(Connection $source_connection, string $variable_name) {
+    $variable_value = $source_connection->select('variable', 'v')
+      ->fields('v', ['value'])
+      ->condition('v.name', $variable_name)
+      ->execute()
+      ->fetchField();
+
+    if ($variable_value === FALSE) {
+      return NULL;
+    }
+
+    return unserialize($variable_value);
   }
 
   /**

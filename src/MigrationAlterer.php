@@ -23,6 +23,7 @@ use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\Migration as MigrationPlugin;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\FieldMigration;
+use Drupal\migrate_drupal\Plugin\migrate\source\d7\FieldableEntity;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -1413,10 +1414,99 @@ final class MigrationAlterer {
       // Use the private file path if the scheme property is set in the source
       // plugin definition and is 'private' otherwise use the public file path.
       $scheme = $definition['source']['scheme'] ?? NULL;
-      $base_path = $scheme === 'private'
-        ? $private_files_path
-        : $public_files_path;
-      $migrations[$file_migration_plugin_id]['source']['constants']['source_base_path'] = rtrim($base_path, '/');
+      switch ($scheme) {
+        case 'public':
+          $base_path = $public_files_path;
+          break;
+
+        case 'private':
+          $base_path = $private_files_path;
+          break;
+
+        default:
+          $base_path = NULL;
+      }
+
+      if (!empty($base_path)) {
+        $migrations[$file_migration_plugin_id]['source']['constants']['source_base_path'] = rtrim($base_path, '/');
+      }
+    }
+  }
+
+  /**
+   * Adds file migration dependency to entity migrations which have file field.
+   *
+   * @param array $migrations
+   *   An associative array of migrations keyed by migration ID, the same that
+   *   is passed to hook_migration_plugins_alter() hooks.
+   */
+  public function applyFileMigrationDependencies(array $migrations): void {
+    $d7_migrations = self::getMigrationsWithTag($migrations, $this->migrationTag);
+    // Get all file migrations.
+    $d7_file_migrations = array_filter($d7_migrations, function (array $definition) {
+      return $definition['destination']['plugin'] === 'entity:file';
+    });
+    // We only care about file migrations which are scheme specific, because our
+    // file and image fields are also using a specific uri scheme for storing
+    // their file values.
+    $file_migrations_per_scheme = [];
+    foreach ($d7_file_migrations as $file_migration_id => $file_migration_def) {
+      if (!empty($file_migration_def['source']['scheme'])) {
+        $file_migrations_per_scheme[$file_migration_def['source']['scheme']][] = $file_migration_id;
+      }
+    }
+
+    // Get every file and image fields from the source.
+    try {
+      $file_storage_source = static::getSourcePlugin('d7_field');
+    }
+    catch (PluginNotFoundException $e) {
+      // There are no fields in source.
+      return;
+    }
+    assert($file_storage_source instanceof DrupalSqlBase);
+    $query = $file_storage_source->query();
+    $query->condition('fc.type', ['file', 'image'], 'IN');
+    $file_field_items = $query->execute()->fetchAllAssoc('field_name', \PDO::FETCH_ASSOC);
+    // Create a file field name => uri scheme map.
+    foreach ($file_field_items as $field_name => $raw_source) {
+      $file_field_items[$field_name] = unserialize($raw_source['data'])['settings']['uri_scheme'] ?? NULL;
+    }
+
+    // Discover migrations of fieldable entity types. We assume that these
+    // entity migrations might have file or image fields.
+    $fieldable_migrations = array_filter(
+      $d7_migrations,
+      function (array $definition) {
+        try {
+          $source_plugin = self::getSourcePlugin($definition['source']['plugin'], $definition['source']);
+        }
+        catch (\Throwable $t) {
+          $source_plugin = NULL;
+        }
+        return $source_plugin instanceof FieldableEntity;
+      }
+    );
+
+    // Check these fieldable entity migrations.
+    foreach ($fieldable_migrations as $migration_id => $migration_def) {
+      $file_fields = array_intersect_key($file_field_items, $migration_def['process'] ?? []);
+      // '$file_fields' contains the uri schemes used by the file fields of the
+      // actual fieldable entity migration. These schemes are keyed by the field
+      // name.
+      foreach (array_unique(array_values($file_fields)) as $scheme) {
+        if (!isset($file_migrations_per_scheme[$scheme])) {
+          continue;
+        }
+        $migrations[$migration_id]['migration_dependencies']['optional'] = array_unique(
+          array_merge(
+            array_values($migrations[$migration_id]['migration_dependencies']['optional'] ?? []),
+            // We add the file migrations which migrate files with the matching
+            // scheme.
+            $file_migrations_per_scheme[$scheme]
+          )
+        );
+      }
     }
   }
 

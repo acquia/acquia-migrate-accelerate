@@ -212,7 +212,6 @@ final class Recommendations {
     $modules[] = 'migrate_drupal';
     $modules[] = 'migrate';
     $modules[] = 'migrate_plus';
-    $modules[] = 'migrate_tools';
 
     return $modules;
   }
