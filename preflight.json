@@ -27,9 +27,17 @@
     "vetted": true,
     "note": "The Accessibility module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
   },
+  "accessibility_tool": {
+    "vetted": false,
+    "note": null
+  },
   "accessible_content": {
     "vetted": true,
     "note": "The Accessible Content module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "accordion_blocks": {
+    "vetted": false,
+    "note": null
   },
   "ace_editor": {
     "vetted": true,
@@ -256,8 +264,8 @@
     "note": null
   },
   "akamai": {
-    "vetted": true,
-    "note": "This module must be installed manually as it has requirement conflict with drupal/monolog module."
+    "vetted": false,
+    "note": null
   },
   "akismet": {
     "vetted": false,
@@ -268,6 +276,10 @@
     "note": null
   },
   "alertbox": {
+    "vetted": false,
+    "note": null
+  },
+  "alerts": {
     "vetted": false,
     "note": null
   },
@@ -323,6 +335,10 @@
     "vetted": true,
     "note": "This module claims to be Drupal 9-compatible but it is not - see similar issue with earlier release also https://www.drupal.org/project/animate_css/issues/3114653."
   },
+  "animate_on_scroll": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/animate_on_scroll."
+  },
   "anonymous_login": {
     "vetted": false,
     "note": null
@@ -360,6 +376,10 @@
     "note": null
   },
   "ape": {
+    "vetted": false,
+    "note": null
+  },
+  "api": {
     "vetted": false,
     "note": null
   },
@@ -447,7 +467,15 @@
     "vetted": false,
     "note": null
   },
+  "auto_height": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/auto_height."
+  },
   "auto_image_style": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_indexer": {
     "vetted": false,
     "note": null
   },
@@ -460,6 +488,10 @@
     "note": null
   },
   "auto_retina": {
+    "vetted": false,
+    "note": null
+  },
+  "auto_username": {
     "vetted": false,
     "note": null
   },
@@ -499,6 +531,10 @@
     "vetted": false,
     "note": null
   },
+  "background_process": {
+    "vetted": false,
+    "note": null
+  },
   "backup_migrate": {
     "vetted": true,
     "note": "This migration is not yet automated and will not be, see https://www.drupal.org/project/backup_migrate/issues/2953042. This is with good reasons: when migrating, you want to ensure Drupal 7 back-ups do not get overwritten and it is recommended to revisit the backup strategy."
@@ -508,6 +544,10 @@
     "note": null
   },
   "baguettebox": {
+    "vetted": false,
+    "note": null
+  },
+  "bakery": {
     "vetted": false,
     "note": null
   },
@@ -595,6 +635,10 @@
     "vetted": true,
     "note": "The Better Formats module was never stable in Drupal 7. Most of its functionality is obsolete in Drupal 9."
   },
+  "better_messages": {
+    "vetted": false,
+    "note": null
+  },
   "better_module_dependencies": {
     "vetted": false,
     "note": null
@@ -675,6 +719,10 @@
     "vetted": false,
     "note": null
   },
+  "block_subtitle": {
+    "vetted": false,
+    "note": null
+  },
   "block_token": {
     "vetted": false,
     "note": null
@@ -702,6 +750,10 @@
   "blog": {
     "vetted": false,
     "note": "The blog module is no longer part of Drupal core."
+  },
+  "body_style_image": {
+    "vetted": false,
+    "note": null
   },
   "bontact": {
     "vetted": false,
@@ -1171,6 +1223,10 @@
     "vetted": false,
     "note": null
   },
+  "comm100_live_chat": {
+    "vetted": false,
+    "note": null
+  },
   "comment": {
     "vetted": true,
     "note": null
@@ -1212,6 +1268,10 @@
     "note": null
   },
   "commerce_affirm": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_agree_terms": {
     "vetted": false,
     "note": null
   },
@@ -1267,7 +1327,15 @@
     "vetted": false,
     "note": null
   },
+  "commerce_check": {
+    "vetted": false,
+    "note": null
+  },
   "commerce_checkout_fi": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_cib": {
     "vetted": false,
     "note": null
   },
@@ -1303,6 +1371,10 @@
     "vetted": false,
     "note": null
   },
+  "commerce_elavon": {
+    "vetted": false,
+    "note": null
+  },
   "commerce_email": {
     "vetted": false,
     "note": null
@@ -1327,6 +1399,14 @@
     "vetted": false,
     "note": null
   },
+  "commerce_fondy": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_forte": {
+    "vetted": false,
+    "note": null
+  },
   "commerce_fraud": {
     "vetted": false,
     "note": null
@@ -1340,6 +1420,14 @@
     "note": null
   },
   "commerce_gestpay": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_gocardless": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_google_analytics": {
     "vetted": false,
     "note": null
   },
@@ -1360,6 +1448,10 @@
     "note": null
   },
   "commerce_ingenico": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_instamojo": {
     "vetted": false,
     "note": null
   },
@@ -1475,6 +1567,10 @@
     "vetted": false,
     "note": null
   },
+  "commerce_product_bundle": {
+    "vetted": false,
+    "note": null
+  },
   "commerce_purchase_order": {
     "vetted": false,
     "note": null
@@ -1548,6 +1644,10 @@
     "note": null
   },
   "commerce_stock_notifications": {
+    "vetted": false,
+    "note": null
+  },
+  "commerce_stock_reserve": {
     "vetted": false,
     "note": null
   },
@@ -1683,6 +1783,10 @@
     "vetted": false,
     "note": null
   },
+  "content_callback": {
+    "vetted": false,
+    "note": null
+  },
   "content_check": {
     "vetted": false,
     "note": null
@@ -1702,10 +1806,6 @@
   "context": {
     "vetted": true,
     "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port does not yet have a stable release."
-  },
-  "context_datalayer": {
-    "vetted": false,
-    "note": null
   },
   "context_entity_field": {
     "vetted": false,
@@ -1779,6 +1879,10 @@
     "vetted": true,
     "note": "This module provides CORS (Cross-Origin Resource Sharing) support for allowing cross-domain requests to Drupal. Drupal core now contains a superset of its functionality. It can be configured in your site's services.yml file, under 'cors.config'."
   },
+  "counter": {
+    "vetted": false,
+    "note": null
+  },
   "country_path": {
     "vetted": false,
     "note": null
@@ -1843,8 +1947,16 @@
     "vetted": true,
     "note": "The Custom content panes submodule of the CTools module is obsolete, because Drupal core now has a rich block system, which combined with the Drupal 9 Layout Builder can do much more."
   },
+  "cura": {
+    "vetted": false,
+    "note": null
+  },
   "currency": {
     "vetted": false,
+    "note": null
+  },
+  "currency_taxonomy": {
+    "vetted": true,
     "note": null
   },
   "current_year": {
@@ -2011,7 +2123,19 @@
     "vetted": true,
     "note": null
   },
+  "dblog_api": {
+    "vetted": false,
+    "note": null
+  },
+  "dblog_ban": {
+    "vetted": false,
+    "note": null
+  },
   "dblog_pager": {
+    "vetted": false,
+    "note": null
+  },
+  "dc_ajax_add_cart": {
     "vetted": false,
     "note": null
   },
@@ -2087,6 +2211,10 @@
     "vetted": true,
     "note": null
   },
+  "devel_contrib": {
+    "vetted": false,
+    "note": null
+  },
   "devel_debug_log": {
     "vetted": false,
     "note": null
@@ -2129,6 +2257,10 @@
   },
   "diff": {
     "vetted": true,
+    "note": null
+  },
+  "digitallocker": {
+    "vetted": false,
     "note": null
   },
   "dimension": {
@@ -2196,6 +2328,10 @@
     "note": null
   },
   "double_field": {
+    "vetted": false,
+    "note": null
+  },
+  "download_count": {
     "vetted": false,
     "note": null
   },
@@ -2336,6 +2472,10 @@
     "note": null
   },
   "ecwid_shopping_cart": {
+    "vetted": false,
+    "note": null
+  },
+  "edit_limit": {
     "vetted": false,
     "note": null
   },
@@ -2663,6 +2803,10 @@
     "vetted": false,
     "note": null
   },
+  "external": {
+    "vetted": false,
+    "note": null
+  },
   "external_link_change": {
     "vetted": false,
     "note": null
@@ -2678,6 +2822,10 @@
   "extra_field_description": {
     "vetted": false,
     "note": null
+  },
+  "extrafield_views_integration": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
   "fac": {
     "vetted": false,
@@ -2779,6 +2927,10 @@
     "vetted": true,
     "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
+  "feature_toggle": {
+    "vetted": false,
+    "note": null
+  },
   "features": {
     "vetted": true,
     "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
@@ -2792,6 +2944,10 @@
     "note": null
   },
   "feedback": {
+    "vetted": false,
+    "note": null
+  },
+  "feedbackify": {
     "vetted": false,
     "note": null
   },
@@ -2947,6 +3103,10 @@
     "vetted": false,
     "note": null
   },
+  "field_tokens": {
+    "vetted": false,
+    "note": null
+  },
   "field_tools": {
     "vetted": false,
     "note": null
@@ -2978,6 +3138,10 @@
   "file_entity": {
     "vetted": true,
     "note": "The File entity module made 404 responses much faster. Drupal core now contains a superset of its functionality."
+  },
+  "file_table_formatter": {
+    "vetted": false,
+    "note": null
   },
   "file_upload_secure_validator": {
     "vetted": false,
@@ -3267,11 +3431,27 @@
     "vetted": false,
     "note": null
   },
+  "friendly_register": {
+    "vetted": false,
+    "note": null
+  },
   "front": {
     "vetted": false,
     "note": null
   },
+  "fsa": {
+    "vetted": false,
+    "note": null
+  },
   "fullcalendar": {
+    "vetted": false,
+    "note": null
+  },
+  "fullcalendar_api": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/fullcalendar_api."
+  },
+  "fullscreen_gallery": {
     "vetted": false,
     "note": null
   },
@@ -3319,6 +3499,10 @@
     "vetted": false,
     "note": null
   },
+  "gbif2": {
+    "vetted": false,
+    "note": null
+  },
   "gdoc_field": {
     "vetted": false,
     "note": null
@@ -3344,6 +3528,10 @@
     "note": null
   },
   "geocoder": {
+    "vetted": false,
+    "note": null
+  },
+  "geocoder_autocomplete": {
     "vetted": false,
     "note": null
   },
@@ -3376,6 +3564,10 @@
     "note": null
   },
   "git_status": {
+    "vetted": false,
+    "note": null
+  },
+  "github_connect": {
     "vetted": false,
     "note": null
   },
@@ -3432,6 +3624,10 @@
     "note": null
   },
   "google_analytics": {
+    "vetted": false,
+    "note": null
+  },
+  "google_analytics_et": {
     "vetted": false,
     "note": null
   },
@@ -3523,6 +3719,10 @@
     "vetted": false,
     "note": null
   },
+  "gsislogin": {
+    "vetted": false,
+    "note": null
+  },
   "gtranslate": {
     "vetted": false,
     "note": null
@@ -3532,6 +3732,10 @@
     "note": null
   },
   "guardr_core": {
+    "vetted": false,
+    "note": null
+  },
+  "h5p": {
     "vetted": false,
     "note": null
   },
@@ -3567,6 +3771,10 @@
     "vetted": false,
     "note": null
   },
+  "header_and_footer_scripts": {
+    "vetted": false,
+    "note": null
+  },
   "headroomjs": {
     "vetted": false,
     "note": null
@@ -3585,6 +3793,10 @@
   },
   "help": {
     "vetted": true,
+    "note": null
+  },
+  "help_scout_beacon": {
+    "vetted": false,
     "note": null
   },
   "helper": {
@@ -3622,6 +3834,10 @@
   "hijri": {
     "vetted": true,
     "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "homebox": {
+    "vetted": false,
+    "note": null
   },
   "honeypot": {
     "vetted": true,
@@ -3751,6 +3967,10 @@
     "vetted": true,
     "note": "Drupal core now contains a superset of its functionality."
   },
+  "iban_field": {
+    "vetted": false,
+    "note": null
+  },
   "iban_validator": {
     "vetted": false,
     "note": null
@@ -3787,6 +4007,10 @@
     "vetted": false,
     "note": null
   },
+  "igrowl": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/igrowl."
+  },
   "image": {
     "vetted": true,
     "note": null
@@ -3805,6 +4029,10 @@
   },
   "image_captcha_refresh": {
     "vetted": true,
+    "note": null
+  },
+  "image_class": {
+    "vetted": false,
     "note": null
   },
   "image_delta_formatter": {
@@ -3827,11 +4055,23 @@
     "vetted": false,
     "note": null
   },
+  "image_formatter_link_to_image_style": {
+    "vetted": false,
+    "note": null
+  },
   "image_hotspots": {
     "vetted": false,
     "note": null
   },
   "image_lazy_loader": {
+    "vetted": false,
+    "note": null
+  },
+  "image_link_formatter": {
+    "vetted": false,
+    "note": null
+  },
+  "image_max_size_crop": {
     "vetted": false,
     "note": null
   },
@@ -3979,6 +4219,10 @@
     "vetted": false,
     "note": null
   },
+  "insert_block": {
+    "vetted": false,
+    "note": null
+  },
   "insert_view": {
     "vetted": true,
     "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
@@ -3999,6 +4243,10 @@
     "vetted": false,
     "note": null
   },
+  "instagram_without_api": {
+    "vetted": false,
+    "note": null
+  },
   "instapage": {
     "vetted": false,
     "note": null
@@ -4016,6 +4264,10 @@
     "note": null
   },
   "invite": {
+    "vetted": false,
+    "note": null
+  },
+  "ip": {
     "vetted": false,
     "note": null
   },
@@ -4079,6 +4331,10 @@
     "vetted": false,
     "note": null
   },
+  "jcarousel": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://git.drupalcode.org/project/jcarousel/-/blob/6.0.x/README.txt."
+  },
   "jira_issue_collector": {
     "vetted": false,
     "note": null
@@ -4090,6 +4346,10 @@
   "job_scheduler": {
     "vetted": true,
     "note": "There is no data to be migrated for this module, but the Drupal 7 modules implementing its hooks need to be ported to Drupal 9. See https://git.drupalcode.org/project/job_scheduler/-/blob/8.x-3.x/README.txt."
+  },
+  "jquery_autosize": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/jquery_autosize."
   },
   "jquery_calendar": {
     "vetted": true,
@@ -4132,6 +4392,10 @@
     "note": null
   },
   "jsonb": {
+    "vetted": false,
+    "note": null
+  },
+  "jsonld_simple": {
     "vetted": false,
     "note": null
   },
@@ -4179,11 +4443,23 @@
     "vetted": false,
     "note": null
   },
+  "kml": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
   "konamicode": {
     "vetted": false,
     "note": null
   },
   "kraken": {
+    "vetted": false,
+    "note": null
+  },
+  "l10n_pconfig": {
+    "vetted": false,
+    "note": null
+  },
+  "l10n_server": {
     "vetted": false,
     "note": null
   },
@@ -4199,9 +4475,13 @@
     "vetted": false,
     "note": null
   },
+  "label_help": {
+    "vetted": false,
+    "note": null
+  },
   "lagoon_logs": {
-    "vetted": true,
-    "note": "This module must be installed manually — also see https://www.drupal.org/project/lagoon_logs/issues/3184665."
+    "vetted": false,
+    "note": null
   },
   "lang_dropdown": {
     "vetted": false,
@@ -4311,10 +4591,6 @@
     "vetted": true,
     "note": "The Libraries API module is obsolete in Drupal 9."
   },
-  "library": {
-    "vetted": false,
-    "note": null
-  },
   "liftigniter": {
     "vetted": false,
     "note": null
@@ -4379,6 +4655,10 @@
     "vetted": false,
     "note": null
   },
+  "lionbridge_translation_provider": {
+    "vetted": false,
+    "note": null
+  },
   "list": {
     "vetted": true,
     "note": "This module no longer exists because its field types have been merged into Drupal core's Options module."
@@ -4391,8 +4671,16 @@
     "vetted": false,
     "note": null
   },
+  "livechat": {
+    "vetted": false,
+    "note": null
+  },
   "locale": {
     "vetted": true,
+    "note": null
+  },
+  "localizedrupalorg": {
+    "vetted": false,
     "note": null
   },
   "localizejs": {
@@ -4483,6 +4771,10 @@
     "vetted": false,
     "note": null
   },
+  "logintoboggan": {
+    "vetted": false,
+    "note": null
+  },
   "logo_image_style": {
     "vetted": false,
     "note": null
@@ -4531,6 +4823,10 @@
     "vetted": false,
     "note": null
   },
+  "mailchimp_ecommerce": {
+    "vetted": false,
+    "note": null
+  },
   "mailcontrol": {
     "vetted": false,
     "note": null
@@ -4538,6 +4834,14 @@
   "mailgun": {
     "vetted": true,
     "note": "This module must be installed manually as it has requirement conflict with other modules."
+  },
+  "mailing_list": {
+    "vetted": false,
+    "note": null
+  },
+  "mailjet": {
+    "vetted": false,
+    "note": null
   },
   "maillog": {
     "vetted": false,
@@ -4575,6 +4879,10 @@
     "vetted": false,
     "note": null
   },
+  "markdown": {
+    "vetted": false,
+    "note": null
+  },
   "markdown_exporter": {
     "vetted": false,
     "note": null
@@ -4608,6 +4916,10 @@
     "note": null
   },
   "masquerade_nominate": {
+    "vetted": false,
+    "note": null
+  },
+  "mass_contact": {
     "vetted": false,
     "note": null
   },
@@ -4847,6 +5159,10 @@
     "vetted": false,
     "note": null
   },
+  "messageclose": {
+    "vetted": false,
+    "note": null
+  },
   "metatag": {
     "vetted": true,
     "note": "This migration is fully working with the exception of global configuration. Help out at https://www.drupal.org/project/metatag/issues/2563651 to finish this."
@@ -4921,7 +5237,7 @@
   },
   "metatag_views": {
     "vetted": true,
-    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+    "note": null
   },
   "metatags_quick": {
     "vetted": false,
@@ -4983,6 +5299,10 @@
     "vetted": false,
     "note": null
   },
+  "minimal_share": {
+    "vetted": false,
+    "note": null
+  },
   "miniorange_2fa": {
     "vetted": false,
     "note": null
@@ -5010,6 +5330,10 @@
   "mixitup_views": {
     "vetted": false,
     "note": null
+  },
+  "mnc": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/mnc/issues/3256094."
   },
   "mob_queue": {
     "vetted": false,
@@ -5107,6 +5431,10 @@
     "vetted": true,
     "note": " This module's functionality is built into Drupal 9 core."
   },
+  "multicolumn": {
+    "vetted": false,
+    "note": null
+  },
   "multifield": {
     "vetted": true,
     "note": null
@@ -5136,10 +5464,6 @@
     "note": null
   },
   "mutual_credit": {
-    "vetted": false,
-    "note": null
-  },
-  "mydropwizard": {
     "vetted": false,
     "note": null
   },
@@ -5415,11 +5739,19 @@
     "vetted": false,
     "note": null
   },
+  "officialfacebookpixel": {
+    "vetted": false,
+    "note": null
+  },
   "og": {
     "vetted": false,
     "note": null
   },
   "og_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "og_sm": {
     "vetted": false,
     "note": null
   },
@@ -5444,6 +5776,10 @@
     "note": null
   },
   "openfed_social": {
+    "vetted": false,
+    "note": null
+  },
+  "openid_claveunica": {
     "vetted": false,
     "note": null
   },
@@ -5472,6 +5808,10 @@
     "note": null
   },
   "opigno_tincan_api": {
+    "vetted": false,
+    "note": null
+  },
+  "ops": {
     "vetted": false,
     "note": null
   },
@@ -5667,6 +6007,10 @@
     "vetted": false,
     "note": null
   },
+  "parallax_bg": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/parallax_bg."
+  },
   "parameter_message": {
     "vetted": false,
     "note": null
@@ -5692,6 +6036,10 @@
     "note": null
   },
   "password_field": {
+    "vetted": false,
+    "note": null
+  },
+  "password_notification": {
     "vetted": false,
     "note": null
   },
@@ -5835,6 +6183,10 @@
     "vetted": false,
     "note": null
   },
+  "personal_notes": {
+    "vetted": false,
+    "note": null
+  },
   "personalize": {
     "vetted": false,
     "note": null
@@ -5899,15 +6251,15 @@
     "vetted": false,
     "note": null
   },
-  "pingdom_rum": {
-    "vetted": false,
-    "note": null
-  },
   "pirate": {
     "vetted": false,
     "note": null
   },
   "piwik_noscript": {
+    "vetted": false,
+    "note": null
+  },
+  "planyo_reservation_system": {
     "vetted": false,
     "note": null
   },
@@ -5932,6 +6284,10 @@
     "note": null
   },
   "popup_field_group": {
+    "vetted": false,
+    "note": null
+  },
+  "popup_message": {
     "vetted": false,
     "note": null
   },
@@ -6039,10 +6395,6 @@
     "vetted": false,
     "note": null
   },
-  "propellerads": {
-    "vetted": false,
-    "note": null
-  },
   "protected_pages": {
     "vetted": false,
     "note": null
@@ -6075,6 +6427,10 @@
     "vetted": false,
     "note": null
   },
+  "pwa_firebase": {
+    "vetted": false,
+    "note": null
+  },
   "qbank_dam": {
     "vetted": false,
     "note": null
@@ -6098,6 +6454,10 @@
   "queue_unique": {
     "vetted": false,
     "note": null
+  },
+  "quick_cache_cleaner": {
+    "vetted": true,
+    "note": "This module provides support for manually flushing caches. In Drupal 7 this was frequently necessary. But this is unnecessary in Drupal 9 thanks to cache tags: they ensure all pages are always up-to-date."
   },
   "quick_data": {
     "vetted": false,
@@ -6169,6 +6529,10 @@
   },
   "rdf": {
     "vetted": true,
+    "note": null
+  },
+  "read_time": {
+    "vetted": false,
     "note": null
   },
   "readmore": {
@@ -6403,6 +6767,10 @@
     "vetted": true,
     "note": "Drupal core is now shipped with the JSON:API and REST modules. In most cases, these completely replace the functionality of the REST Server module."
   },
+  "restrict_by_ip": {
+    "vetted": false,
+    "note": null
+  },
   "restrict_ip": {
     "vetted": false,
     "note": null
@@ -6412,6 +6780,10 @@
     "note": null
   },
   "restrict_role_login_by_ip": {
+    "vetted": false,
+    "note": null
+  },
+  "revechat_livechat_solution": {
     "vetted": false,
     "note": null
   },
@@ -6611,11 +6983,19 @@
     "vetted": false,
     "note": null
   },
+  "schema": {
+    "vetted": false,
+    "note": null
+  },
   "schema_metatag": {
     "vetted": false,
     "note": null
   },
   "schemaapp": {
+    "vetted": false,
+    "note": null
+  },
+  "schemadata": {
     "vetted": false,
     "note": null
   },
@@ -6731,6 +7111,10 @@
     "vetted": false,
     "note": null
   },
+  "search_exclude_nid": {
+    "vetted": false,
+    "note": null
+  },
   "search_log": {
     "vetted": false,
     "note": null
@@ -6772,6 +7156,10 @@
     "note": null
   },
   "select_or_other": {
+    "vetted": false,
+    "note": null
+  },
+  "select_registration_roles": {
     "vetted": false,
     "note": null
   },
@@ -6895,6 +7283,10 @@
     "vetted": false,
     "note": null
   },
+  "short_scale_formatter": {
+    "vetted": false,
+    "note": null
+  },
   "shortcode": {
     "vetted": true,
     "note": null
@@ -6905,6 +7297,10 @@
   },
   "shortcut": {
     "vetted": true,
+    "note": null
+  },
+  "shortcutperrole": {
+    "vetted": false,
     "note": null
   },
   "shorten": {
@@ -7199,6 +7595,10 @@
     "vetted": false,
     "note": null
   },
+  "smsc": {
+    "vetted": false,
+    "note": null
+  },
   "smsframework": {
     "vetted": false,
     "note": null
@@ -7335,11 +7735,19 @@
     "vetted": true,
     "note": null
   },
+  "statistics_counter": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
   "stepbystep": {
     "vetted": false,
     "note": null
   },
   "sticky_sharrre_bar": {
+    "vetted": false,
+    "note": null
+  },
+  "stickynav": {
     "vetted": false,
     "note": null
   },
@@ -7418,6 +7826,10 @@
   "superfish": {
     "vetted": true,
     "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/superfish. Also, the placed Drupal 7 Superfish blocks are not migrated to Drupal 9, because the Drupal 9 port of this module provides one block per menu that is ready for you to be placed. Migrating the detailed settings of the Drupal 7 block is pointless, because those depend on the theme, which you will have to port manually. In other words: all functionality is available to you, but a complete migration makes no sense."
+  },
+  "supermonitoring": {
+    "vetted": false,
+    "note": null
   },
   "supersaas": {
     "vetted": false,
@@ -7523,6 +7935,10 @@
     "vetted": false,
     "note": null
   },
+  "taxonomy_breadcrumb": {
+    "vetted": false,
+    "note": null
+  },
   "taxonomy_container": {
     "vetted": false,
     "note": null
@@ -7540,6 +7956,10 @@
     "note": null
   },
   "taxonomy_menu": {
+    "vetted": false,
+    "note": null
+  },
+  "taxonomy_menu_trails": {
     "vetted": false,
     "note": null
   },
@@ -7572,6 +7992,10 @@
     "note": null
   },
   "tca": {
+    "vetted": false,
+    "note": null
+  },
+  "tckn_kontrol": {
     "vetted": false,
     "note": null
   },
@@ -7632,6 +8056,10 @@
     "note": null
   },
   "tether_stats": {
+    "vetted": false,
+    "note": null
+  },
+  "texbar": {
     "vetted": false,
     "note": null
   },
@@ -7751,6 +8179,10 @@
     "vetted": false,
     "note": null
   },
+  "tmgmt_microsoft": {
+    "vetted": false,
+    "note": null
+  },
   "tmgmt_morningside": {
     "vetted": true,
     "note": "This module is not composer installable - see https://www.drupal.org/project/tmgmt_morningside/issues/3240770"
@@ -7759,7 +8191,15 @@
     "vetted": false,
     "note": null
   },
+  "tmgmt_motionpoint": {
+    "vetted": false,
+    "note": null
+  },
   "tmgmt_supertext": {
+    "vetted": false,
+    "note": null
+  },
+  "tmgmt_textmaster": {
     "vetted": false,
     "note": null
   },
@@ -7809,6 +8249,10 @@
   },
   "token_filter": {
     "vetted": true,
+    "note": null
+  },
+  "token_modifier": {
+    "vetted": false,
     "note": null
   },
   "token_var": {
@@ -8011,6 +8455,10 @@
     "vetted": false,
     "note": null
   },
+  "user_created_by": {
+    "vetted": false,
+    "note": null
+  },
   "user_disk_quota": {
     "vetted": false,
     "note": null
@@ -8057,6 +8505,10 @@
   },
   "username_enumeration_prevention": {
     "vetted": true,
+    "note": null
+  },
+  "username_policy": {
+    "vetted": false,
     "note": null
   },
   "username_validation": {
@@ -8131,11 +8583,19 @@
     "vetted": false,
     "note": null
   },
+  "vegas": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/vegas."
+  },
   "vertical_tabs_config": {
     "vetted": false,
     "note": null
   },
   "video": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_dailymotion": {
     "vetted": false,
     "note": null
   },
@@ -8172,6 +8632,10 @@
     "note": null
   },
   "video_sitemap": {
+    "vetted": false,
+    "note": null
+  },
+  "view_custom_table": {
     "vetted": false,
     "note": null
   },
@@ -8347,6 +8811,10 @@
     "vetted": false,
     "note": null
   },
+  "views_fieldset": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
   "views_fieldsets": {
     "vetted": true,
     "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
@@ -8356,6 +8824,10 @@
     "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
   "views_filters_summary": {
+    "vetted": false,
+    "note": null
+  },
+  "views_flag_refresh": {
     "vetted": false,
     "note": null
   },
@@ -8487,6 +8959,10 @@
     "vetted": false,
     "note": null
   },
+  "views_selective_filters": {
+    "vetted": false,
+    "note": null
+  },
   "views_send": {
     "vetted": false,
     "note": null
@@ -8506,6 +8982,10 @@
   "views_slideshow_jcarousel": {
     "vetted": true,
     "note": "This module must be installed manually — see https://www.drupal.org/project/views_slideshow_jcarousel for instructions."
+  },
+  "views_sort_expression": {
+    "vetted": false,
+    "note": null
   },
   "views_sort_null_field": {
     "vetted": false,
@@ -8615,6 +9095,10 @@
     "vetted": false,
     "note": null
   },
+  "watchdog_prune": {
+    "vetted": false,
+    "note": null
+  },
   "weather": {
     "vetted": false,
     "note": null
@@ -8656,6 +9140,10 @@
     "note": null
   },
   "webform_mass_email": {
+    "vetted": false,
+    "note": null
+  },
+  "webform_node_element": {
     "vetted": false,
     "note": null
   },
@@ -8723,6 +9211,10 @@
     "vetted": false,
     "note": null
   },
+  "whiteboard": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://git.drupalcode.org/project/whiteboard/blob/8.x-1.x/README.txt."
+  },
   "whitelabel": {
     "vetted": false,
     "note": null
@@ -8732,6 +9224,10 @@
     "note": null
   },
   "wikiloc": {
+    "vetted": false,
+    "note": null
+  },
+  "wordfilter": {
     "vetted": false,
     "note": null
   },
@@ -8864,6 +9360,10 @@
     "note": null
   },
   "yandexdisk": {
+    "vetted": false,
+    "note": null
+  },
+  "yayb": {
     "vetted": false,
     "note": null
   },
