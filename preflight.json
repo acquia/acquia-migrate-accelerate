@@ -4628,7 +4628,7 @@
     "note": null
   },
   "linkchecker": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "linkchecker_summary_mail": {
