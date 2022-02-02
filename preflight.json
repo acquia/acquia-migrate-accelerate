@@ -611,6 +611,18 @@
     "vetted": true,
     "note": null
   },
+  "bean_entitycache": {
+    "vetted": true,
+    "note": null
+  },
+  "bean_usage": {
+    "vetted": true,
+    "note": null
+  },
+  "bean_uuid": {
+    "vetted": true,
+    "note": null
+  },
   "beautytips": {
     "vetted": false,
     "note": null
@@ -624,8 +636,8 @@
     "note": null
   },
   "better_exposed_filters": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
   "better_field_descriptions": {
     "vetted": false,
@@ -2217,6 +2229,10 @@
   },
   "devel_debug_log": {
     "vetted": false,
+    "note": null
+  },
+  "devel_generate": {
+    "vetted": true,
     "note": null
   },
   "devel_mail_logger": {
@@ -8543,6 +8559,18 @@
     "vetted": true,
     "note": "Drupal core now contains a superset of its functionality."
   },
+  "uuid_features": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "uuid_path": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
+  "uuid_services": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
   "varbase_editor": {
     "vetted": true,
     "note": "This module is not composer installable — see https://www.drupal.org/project/varbase_editor/issues/3186421 for instructions."
@@ -9236,7 +9264,7 @@
     "note": null
   },
   "workbench": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "workbench_access": {
