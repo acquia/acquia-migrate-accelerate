@@ -409,7 +409,17 @@ final class MacGyver {
 
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
-      $connection_info[$target]['prefix']['default'] = $prefix;
+      // Assign the computed prefix, but be careful to assign it as the default
+      // if the connection info is configured to use per-table prefixes,
+      // otherwise set it as the default prefix.
+      // NOTE: since Drupal >=9.3, the latter is the default.
+      // @see https://www.drupal.org/i/3106531
+      if (is_array($connection_info[$target]['prefix'])) {
+        $connection_info[$target]['prefix']['default'] = $prefix;
+      }
+      else {
+        $connection_info[$target]['prefix'] = $prefix;
+      }
     }
     Database::addConnectionInfo($connection_key, 'default', $connection_info['default']);
 
