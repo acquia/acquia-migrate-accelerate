@@ -385,11 +385,11 @@
   },
   "apigee_account": {
     "vetted": true,
-    "note": "Apigee says: 'Choose an SSO module compatible with Drupal 8.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+    "note": "Apigee says: 'Choose an SSO module compatible with Drupal 9.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
   },
   "apigee_checklist": {
     "vetted": true,
-    "note": "Apigee says: 'Site Status monitoring included in Drupal 8 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+    "note": "Apigee says: 'Site Status monitoring included in Drupal 9 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
   },
   "apigee_company": {
     "vetted": false,
@@ -1153,7 +1153,7 @@
   },
   "clone": {
     "vetted": true,
-    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+    "note": "The Drupal 8 and above successors of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8 and above. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
   },
   "closeblock": {
     "vetted": false,
@@ -1817,7 +1817,7 @@
   },
   "context": {
     "vetted": true,
-    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port does not yet have a stable release."
+    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it."
   },
   "context_entity_field": {
     "vetted": false,
@@ -1833,7 +1833,7 @@
   },
   "context_ui": {
     "vetted": true,
-    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port does not yet have a stable release."
+    "note": "Most of the functionality in the Context for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it."
   },
   "contextly": {
     "vetted": true,
@@ -2193,7 +2193,7 @@
   },
   "devconnect_key_value_map": {
     "vetted": true,
-    "note": "Apigee says: 'Key-Value map calls to the Edge API are not part of the Drupal 8 Edge module. You can call the Apigee API directly or open an enhancement ticket on https://github.com/apigee/apigee-client-php if needed by your organization.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+    "note": "Apigee says: 'Key-Value map calls to the Edge API are not part of the Drupal 9 Edge module. You can call the Apigee API directly or open an enhancement ticket on https://github.com/apigee/apigee-client-php if needed by your organization.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
   },
   "devconnect_mint_payment": {
     "vetted": true,
@@ -2213,7 +2213,7 @@
   },
   "devconnect_status": {
     "vetted": true,
-    "note": "Apigee says: 'Status checks are handled by the Update Manager in Drupal 8 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
+    "note": "Apigee says: 'Status checks are handled by the Update Manager in Drupal 9 Core.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
   },
   "devconnect_user": {
     "vetted": false,
@@ -2433,7 +2433,7 @@
   },
   "ds_forms": {
     "vetted": false,
-    "note": "Per the Display Suite maintainers, the Display Suite Forms submodule is obsolete in Drupal 8|9: Drupal core natively supports form modes and form displays, which combined with Drupal core's Layout Builder module allows you to do everything Display Suite Forms allowed you to do."
+    "note": "Per the Display Suite maintainers, the Display Suite Forms submodule is obsolete in Drupal 8 and above: Drupal core natively supports form modes and form displays, which combined with Drupal core's Layout Builder module allows you to do everything Display Suite Forms allowed you to do."
   },
   "ds_ui": {
     "vetted": false,
@@ -2481,7 +2481,7 @@
   },
   "easychart_wysiwyg": {
     "vetted": true,
-    "note": "This module is now obsolete because Drupal 8/9 port of the easychart module does not have WYSIWYG integration at all."
+    "note": "This module is now obsolete because Drupal 8 and above port of the easychart module does not have WYSIWYG integration at all."
   },
   "eck": {
     "vetted": false,
@@ -2925,23 +2925,23 @@
   },
   "fe_block": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "fe_block_ui": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "fe_date": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "fe_nodequeue": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "fe_profile": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "feature_toggle": {
     "vetted": false,
@@ -2949,11 +2949,11 @@
   },
   "features": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "features_extra": {
     "vetted": true,
-    "note": "Most Drupal 8|9 sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
+    "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
   },
   "feed_block": {
     "vetted": false,
@@ -5389,7 +5389,7 @@
   },
   "module_filter": {
     "vetted": true,
-    "note": "Most of the functionality in the Module Filter for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it, but the Drupal 8|9 port is not actively maintained. And no Drupal 9-compatible release is available yet. See https://www.drupal.org/project/module_filter/issues/3057277."
+    "note": "Most of the functionality in the Module Filter for Drupal 7 module has been merged into Drupal core. If you want the remaining functionality, you could install it."
   },
   "module_missing_message_fixer": {
     "vetted": true,
@@ -5549,11 +5549,11 @@
   },
   "node_clone": {
     "vetted": true,
-    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+    "note": "The Drupal 8 and above successors of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8 and above. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
   },
   "node_clone_tab": {
     "vetted": true,
-    "note": "The Drupal 8|9 successor of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8|9. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
+    "note": "The Drupal 8 and above successors of this Drupal 7 module has very different settings. It now supports all entity types, not just nodes. You need to manually reconfigure the settings, the differences make an automated migration impossible. One often used capability in Drupal 7 is to automatically unpublish clones — this does not yet exist in Drupal 8 and above. If you want that, help out at https://www.drupal.org/project/entity_clone/issues/3036068."
   },
   "node_convert": {
     "vetted": false,
@@ -5869,7 +5869,7 @@
   },
   "overlay": {
     "vetted": true,
-    "note": "The new Drupal 8 toolbar now includes a contextually aware \"back to site\" button that serves the same use-case as overlay by allowing site users to return from the admin context to the page that they were on."
+    "note": "The new Drupal 8 and above toolbar now includes a contextually aware \"back to site\" button that serves the same use-case as overlay by allowing site users to return from the admin context to the page that they were on."
   },
   "override_node_options": {
     "vetted": false,
@@ -6913,19 +6913,19 @@
   },
   "rules": {
     "vetted": false,
-    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+    "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
   },
   "rules_admin": {
     "vetted": false,
-    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+    "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
   },
   "rules_i18n": {
     "vetted": false,
-    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+    "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
   },
   "rules_scheduler": {
     "vetted": false,
-    "note": "The Rules module's port to Drupal 8|9 is still in progress. An unstable pre-release version is available though."
+    "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
   },
   "rules_session_vars": {
     "vetted": false,
@@ -7489,7 +7489,7 @@
   },
   "site_verify": {
     "vetted": false,
-    "note": "The Site Verify module never got any release for Drupal 8 or 9. Per https://www.drupal.org/project/site_verify/issues/2194861#comment-11511471, it is recommended to install the Metatag Verification submodule of the Metatag module. Unfortunately, no migration path for this exists yet. Help at https://www.drupal.org/project/metatag/issues/3251874."
+    "note": "The Site Verify module never got any release for Drupal 8 and above. Per https://www.drupal.org/project/site_verify/issues/2194861#comment-11511471, it is recommended to install the Metatag Verification submodule of the Metatag module. Unfortunately, no migration path for this exists yet. Help at https://www.drupal.org/project/metatag/issues/3251874."
   },
   "siteimprove": {
     "vetted": false,
@@ -8957,7 +8957,7 @@
   },
   "views_responsive_grid": {
     "vetted": true,
-    "note": "This module is obsolete in Drupal 8|9 - see https://www.drupal.org/project/views/issues/1903746."
+    "note": "This module is obsolete in Drupal 8 and above - see https://www.drupal.org/project/views/issues/1903746."
   },
   "views_role_based_global_text": {
     "vetted": false,
@@ -9149,7 +9149,7 @@
   },
   "webform_clear": {
     "vetted": true,
-    "note": "This module allows not storing webform submissions in Drupal 7. The Drupal 8|9 Webform module contains a superset of its functionality. See https://www.drupal.org/project/webform_clear/issues/3252072."
+    "note": "This module allows not storing webform submissions in Drupal 7. The Drupal 8 and above Webform module contains a superset of its functionality. See https://www.drupal.org/project/webform_clear/issues/3252072."
   },
   "webform_encrypt": {
     "vetted": false,
