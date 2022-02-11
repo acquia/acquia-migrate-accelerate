@@ -2596,8 +2596,8 @@
     "note": null
   },
   "encrypt": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module's configuration is not migrated automatically. The private encryption keys are stored either in Drupal 7's settings.php or on the filesystem in a secure location. Neither of those can be migrated automatically. Note: it is also recommended to reassess your data security strategy. We've preinstalled it for you though, so just go to /admin/config/system/encryption/profiles and configure it as needed."
   },
   "entity": {
     "vetted": true,
@@ -6564,7 +6564,7 @@
     "note": null
   },
   "real_aes": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "real_estate": {
@@ -7660,7 +7660,7 @@
     "note": null
   },
   "sodium": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "soembed": {
