@@ -3684,7 +3684,7 @@
     "note": null
   },
   "google_tag": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "google_translator": {
