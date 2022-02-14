@@ -7048,8 +7048,8 @@
     "note": null
   },
   "search_api": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "An automatic migration of settings does not make sense for this module. Migrating it as-is could also affect the (production) Drupal 7 site. Furthermore, the new search indexes likely need to be different. See https://www.drupal.org/docs/contributed-modules/search-api."
   },
   "search_api_algolia": {
     "vetted": false,
@@ -7063,8 +7063,16 @@
     "vetted": false,
     "note": null
   },
+  "search_api_db": {
+    "vetted": false,
+    "note": null
+  },
   "search_api_exclude": {
     "vetted": true,
+    "note": null
+  },
+  "search_api_facetapi": {
+    "vetted": false,
     "note": null
   },
   "search_api_fast": {
