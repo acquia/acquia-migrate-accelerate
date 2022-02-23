@@ -2772,7 +2772,7 @@
     "note": null
   },
   "eu_cookie_compliance": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "eu_cookie_compliance_gtm": {
