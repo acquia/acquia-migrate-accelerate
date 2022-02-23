@@ -9296,8 +9296,8 @@
     "note": "In the Drupal-9 compatible version of Webform, entity references are natively supported."
   },
   "webform_validation": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "Some of the features from drupal 7 are now merged in the webform module, only equal values validator's migration is supported through webform_migrate module."
   },
   "webpay": {
     "vetted": false,
