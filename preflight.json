@@ -671,6 +671,10 @@
     "vetted": false,
     "note": null
   },
+  "big_pipe": {
+    "vetted": true,
+    "note": null
+  },
   "bigint": {
     "vetted": false,
     "note": null
@@ -990,6 +994,10 @@
   "certificate": {
     "vetted": false,
     "note": null
+  },
+  "chain_menu_access": {
+    "vetted": true,
+    "note": "Chain Menu Access API allows your module to chain its own menu access callback functions into other module's menu router entries. Drupal core now contains a superset of its functionality."
   },
   "change_pwd_page": {
     "vetted": false,
@@ -1787,6 +1795,10 @@
     "vetted": true,
     "note": null
   },
+  "contact_forms": {
+    "vetted": false,
+    "note": null
+  },
   "contact_permissions": {
     "vetted": false,
     "note": null
@@ -2504,8 +2516,8 @@
     "note": null
   },
   "editableviews": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
   "editor_note": {
     "vetted": false,
@@ -3883,6 +3895,10 @@
     "vetted": false,
     "note": null
   },
+  "html5_tools": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
   "html_title": {
     "vetted": false,
     "note": null
@@ -4362,6 +4378,10 @@
   "job_scheduler": {
     "vetted": true,
     "note": "There is no data to be migrated for this module, but the Drupal 7 modules implementing its hooks need to be ported to Drupal 9. See https://git.drupalcode.org/project/job_scheduler/-/blob/8.x-3.x/README.txt."
+  },
+  "jqeasing": {
+    "vetted": true,
+    "note": "The library used by this module can be directly installed in Drupal 8 and above with Composer. For more information see - https://asset-packagist.org and http://lightning.acquia.com/blog/round-your-front-end-javascript-libraries-composer."
   },
   "jquery_autosize": {
     "vetted": false,
@@ -5015,6 +5035,10 @@
     "vetted": false,
     "note": null
   },
+  "media_vimeo": {
+    "vetted": true,
+    "note": "Drupal core now has built-in support for oEmbed, including YouTube."
+  },
   "media_watermark": {
     "vetted": false,
     "note": null
@@ -5371,6 +5395,10 @@
     "vetted": false,
     "note": null
   },
+  "modal_forms": {
+    "vetted": true,
+    "note": "The Modal forms (with ctools) module's functionality is built into Drupal core - see https://www.drupal.org/docs/drupal-apis/ajax-api/ajax-dialog-boxes."
+  },
   "modal_page": {
     "vetted": false,
     "note": null
@@ -5445,7 +5473,7 @@
   },
   "multiblock": {
     "vetted": true,
-    "note": " This module's functionality is built into Drupal 9 core."
+    "note": "This module's functionality is built into Drupal 9 core."
   },
   "multicolumn": {
     "vetted": false,
@@ -5454,6 +5482,10 @@
   "multifield": {
     "vetted": true,
     "note": null
+  },
+  "multiform": {
+    "vetted": true,
+    "note": "This is an API module which lets you put several forms into one <form>. Drupal core now contains a superset of its functionality. See https://www.drupal.org/node/2774077."
   },
   "multiple_fields_remove_button": {
     "vetted": true,
@@ -5478,6 +5510,14 @@
   "multiselect": {
     "vetted": false,
     "note": null
+  },
+  "multiupload_filefield_widget": {
+    "vetted": true,
+    "note": " This module's functionality is built into Drupal 9 core."
+  },
+  "multiupload_imagefield_widget": {
+    "vetted": true,
+    "note": " This module's functionality is built into Drupal 9 core."
   },
   "mutual_credit": {
     "vetted": false,
@@ -5602,6 +5642,10 @@
   "node_menus": {
     "vetted": false,
     "note": null
+  },
+  "node_page_disable": {
+    "vetted": true,
+    "note": "The page /node is a Views view on Drupal 8 and above, so this can now be achieved by disabling the \"Page\" display of the \"Frontpage\" view at /admin/structure/views/view/frontpage/edit/page_1."
   },
   "node_reference": {
     "vetted": true,
@@ -5838,6 +5882,10 @@
   "options": {
     "vetted": true,
     "note": null
+  },
+  "options_element": {
+    "vetted": true,
+    "note": "This module is obsolete in Drupal 8 and above. No known equivalent module exists; please help porting this module if it's critical for your site. See https://www.drupal.org/project/options_element/issues/2223583."
   },
   "options_table": {
     "vetted": false,
@@ -6807,6 +6855,10 @@
     "vetted": false,
     "note": null
   },
+  "revisioning": {
+    "vetted": false,
+    "note": "This module provides an API for handling drafts of revisions in Drupal 7. Drupal core now contains a superset of its functionality."
+  },
   "rfv": {
     "vetted": false,
     "note": null
@@ -6983,6 +7035,10 @@
     "vetted": false,
     "note": null
   },
+  "save_draft": {
+    "vetted": true,
+    "note": "Save Draft adds a 'Save as Draft' Button to the node_form for content types, allowing the user to click the 'Save as Draft' button to save the node as a draft. Drupal 8 and above has this UX feature in the core."
+  },
   "save_edit": {
     "vetted": false,
     "note": null
@@ -7015,6 +7071,10 @@
     "vetted": false,
     "note": null
   },
+  "schemaorg": {
+    "vetted": true,
+    "note": "This module enables the collections of schemas available at schema.org in Drupal 7. Drupal core now contains a superset of its functionality. Note that you will need to manually configure the RDF mappings. You could do this once and export the configuration to avoid having to do this multiple times."
+  },
   "scripturefilter": {
     "vetted": false,
     "note": null
@@ -7025,6 +7085,10 @@
   },
   "scroll_progress": {
     "vetted": false,
+    "note": null
+  },
+  "scroll_to_top": {
+    "vetted": true,
     "note": null
   },
   "scrollbar": {
@@ -7243,6 +7307,10 @@
     "vetted": false,
     "note": null
   },
+  "session_api": {
+    "vetted": true,
+    "note": "This module provides set of functions that extend the core sessions workings, allowing data to be stored and associated with a user's session. Developers porting their modules using Session API to Drupal 8 and above are encouraged to switch to Symfony's Session Management. See https://symfony.com/doc/current/components/http_foundation/sessions.html."
+  },
   "session_limit": {
     "vetted": true,
     "note": null
@@ -7458,6 +7526,10 @@
   "simpletest": {
     "vetted": true,
     "note": "SimpleTest has been deprecated and removed from Drupal core. PHPUnit is the officially supported testing library in Drupal 9."
+  },
+  "simplified_menu_admin": {
+    "vetted": true,
+    "note": "This module simplifies the core Menu and Shortcut modules by merging the \"List links\" and \"Edit menu\" operations into a single administration page. Drupal core now contains a superset of its functionality."
   },
   "simplify": {
     "vetted": false,
@@ -8455,6 +8527,10 @@
     "vetted": false,
     "note": null
   },
+  "url": {
+    "vetted": true,
+    "note": "Drupal core now contains a superset of its functionality."
+  },
   "url_alias_permissions": {
     "vetted": false,
     "note": null
@@ -8502,6 +8578,10 @@
   "user_hash": {
     "vetted": true,
     "note": null
+  },
+  "user_picture_field": {
+    "vetted": false,
+    "note": "This module allow you add an image field to user, and show it on user register form, after user register an account. Drupal core now contains a superset of its functionality."
   },
   "user_prune": {
     "vetted": false,
@@ -8911,6 +8991,10 @@
     "vetted": true,
     "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
+  "views_megarow": {
+    "vetted": true,
+    "note": "This module is obsolete in Drupal 8 and above - see https://www.drupal.org/project/views_megarow/issues/2492003."
+  },
   "views_menu_children_filter": {
     "vetted": false,
     "note": null
@@ -9190,6 +9274,10 @@
   "webform_remote_post": {
     "vetted": true,
     "note": "The Webform Remote Post module is obsolete in Drupal 9; use Webform's built-in 'Remote post' handler."
+  },
+  "webform_reply_to": {
+    "vetted": true,
+    "note": "This module set a custom \"Reply-To\" e-mail header in Drupal 7. The Drupal 8 and above Webform module contains a superset of its functionality."
   },
   "webform_rut": {
     "vetted": false,
