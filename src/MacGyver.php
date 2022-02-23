@@ -2,7 +2,6 @@
 
 namespace Drupal\acquia_migrate;
 
-use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use Drupal\acquia_migrate\Batch\BatchStatus;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
@@ -202,13 +201,43 @@ final class MacGyver {
   }
 
   /**
+   * Whether the source (D7) and destination (D9) database are joinable.
+   *
+   * @return bool
+   *   Whether the source and destination databases are joinable.
+   *
+   * @see \Drupal\acquia_migrate\Plugin\migrate\source\Joinable
+   */
+  private static function isJoinable(): bool {
+    $joinable_source = \Drupal::service('plugin.manager.migration')
+      ->createStubMigration([
+        'id' => 'joinable_test',
+        'source' => ['plugin' => 'joinable'],
+        'destination' => ['plugin' => 'null'],
+      ])
+      ->getSourcePlugin();
+
+    return $joinable_source->sourceAndIdMapTablesAreJoinable();
+  }
+
+  /**
    * Ensure a Sourcination is available (and delete the old Sourcination).
    *
    * @return bool
    *   TRUE when action is needed
    */
   public static function detectWhetherActionIsNeeded() : bool {
-    if (!AcquiaDrupalEnvironmentDetector::isAhEnv() && !AcquiaDrupalEnvironmentDetector::isAhIdeEnv()) {
+    if (static::isJoinable()) {
+      return FALSE;
+    }
+
+    // MacGyver was only tested with MySQL databases.
+    if (Database::getConnectionInfo('default')['default']['driver'] !== 'mysql') {
+      return FALSE;
+    }
+
+    // MacGyver should not run for AMA tests.
+    if (\Drupal::state()->get('migrate.fallback_state_key') === 'acquia_migrate_test_database') {
       return FALSE;
     }
 

@@ -76,7 +76,7 @@
   overflow: visible;
 }
 
-.ui-dialog {
+.ui-dialog.ui-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
