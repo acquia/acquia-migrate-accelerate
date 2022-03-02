@@ -1752,7 +1752,7 @@
     "note": null
   },
   "conditional_fields": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "conditional_message": {
