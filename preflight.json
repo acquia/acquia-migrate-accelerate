@@ -200,7 +200,39 @@
     "note": null
   },
   "advagg": {
-    "vetted": false,
+    "vetted": true,
+    "note": null
+  },
+  "advagg_bundler": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_css_cdn": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_css_compress": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_ext_compress": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_js_cdn": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_js_compress": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_mod": {
+    "vetted": true,
+    "note": null
+  },
+  "advagg_validator": {
+    "vetted": true,
     "note": null
   },
   "advanced_help": {
