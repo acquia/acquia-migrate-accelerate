@@ -1776,8 +1776,8 @@
     "note": "The Composer Manager module is obsolete in Drupal 9, it was only necessary in Drupal 7."
   },
   "computed_field": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "The computed fields can not be migrated automatically as Drupal 9 field is computed by PHP code that needs to be provided via hook implementations. See https://git.drupalcode.org/project/computed_field/-/blob/3.x/README.md."
   },
   "comscore_direct": {
     "vetted": false,
