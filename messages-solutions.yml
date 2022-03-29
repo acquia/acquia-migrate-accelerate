@@ -95,6 +95,9 @@ d7_field:
       location: >-
         The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
         can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+      computed: >-
+        Computed fields cannot be migrated automatically as Drupal 9 field is computed by PHP code that needs to be
+        provided via hook implementations. See https://git.drupalcode.org/project/computed_field/-/blob/3.x/README.md.
   -
     message:
       regexp: >-
@@ -117,6 +120,9 @@ d7_field_instance:
       location: >-
         The Location module has no Drupal 9 port. Community consensus is that the Address module is the successor. You
         can help finish this migration at https://www.drupal.org/project/address/issues/2974631.
+      computed: >-
+        Computed fields cannot be migrated automatically as Drupal 9 field is computed by PHP code that needs to be
+        provided via hook implementations. See https://git.drupalcode.org/project/computed_field/-/blob/3.x/README.md.
   -
     message:
       regexp: >-

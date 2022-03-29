@@ -637,7 +637,7 @@ final class MigrationAlterer {
       assert($instance_row instanceof Row);
       $source = $instance_row->getSource();
       // Only process taxonomy_term_reference fields.
-      if (empty($source['type']) || $source['type'] !== 'taxonomy_term_reference') {
+      if (empty($source['type']) || ($source['type'] !== 'taxonomy_term_reference' && $source['type'] !== 'entityreference')) {
         continue;
       }
       // The "allowed_vid" key is computed from the field storage configuration
@@ -646,24 +646,33 @@ final class MigrationAlterer {
       // add/edit the values of a taxonomy_term_reference field with only core,
       // and anyway: if it is empty, it is impossible to determine which term
       // migration we have to depend on without fetching the actual values.
-      if (empty($source['allowed_vid'])) {
-        continue;
+      $allowed_vocabulary_machine_names = [];
+      switch ($source['type']) {
+        case 'taxonomy_term_reference':
+          if (empty($source['allowed_vid'])) {
+            continue 2;
+          }
+          $allowed_vocabulary_machine_names = array_reduce($source['allowed_vid'], function (array $carry, array $item) use ($vocabulary_info) {
+            if (!empty($vocabulary_info[$item['vid']])) {
+              $carry[] = $vocabulary_info[$item['vid']];
+            }
+            return $carry;
+          }, []);
+          break;
+
+        case 'entityreference':
+          if (unserialize($source["field_definition"]["data"])['settings']['target_type'] !== 'taxonomy_term') {
+            continue 2;
+          }
+          $settings = unserialize($source["field_definition"]["data"])['settings'];
+          foreach ($settings['handler_settings']['target_bundles'] as $target_bundle) {
+            array_push($allowed_vocabulary_machine_names, $target_bundle);
+          }
+          break;
       }
-
-      $allowed_vocabulary_machine_names = array_reduce($source['allowed_vid'], function (array $carry, array $item) use ($vocabulary_info) {
-        if (!empty($vocabulary_info[$item['vid']])) {
-          $carry[] = $vocabulary_info[$item['vid']];
-        }
-        return $carry;
-      }, []);
-
-      $preexisting_bundles = isset($instances_per_entity[$source['entity_type']][$source['bundle']])
-        ? $instances_per_entity[$source['entity_type']][$source['bundle']]
-        : [];
-
+      $preexisting_bundles = $instances_per_entity[$source['entity_type']][$source['bundle']] ?? [];
       $instances_per_entity[$source['entity_type']][$source['bundle']] = array_unique(array_merge($preexisting_bundles, $allowed_vocabulary_machine_names));
     }
-
     return $instances_per_entity;
   }
 
