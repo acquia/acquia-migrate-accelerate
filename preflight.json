@@ -47,6 +47,10 @@
     "vetted": false,
     "note": null
   },
+  "acknowledgements": {
+    "vetted": false,
+    "note": null
+  },
   "acl": {
     "vetted": true,
     "note": null
@@ -86,6 +90,10 @@
   "actions_permissions": {
     "vetted": true,
     "note": "This migration is not yet automated, because the migration of views is not yet automated."
+  },
+  "activecampaign": {
+    "vetted": false,
+    "note": null
   },
   "ad_choices_link": {
     "vetted": false,
@@ -415,6 +423,10 @@
     "vetted": false,
     "note": null
   },
+  "apidrupalorg": {
+    "vetted": false,
+    "note": null
+  },
   "apigee_account": {
     "vetted": true,
     "note": "Apigee says: 'Choose an SSO module compatible with Drupal 9.' (source: https://docs.apigee.com/api-platform/publish/drupal/d7-d8-module-comparison)"
@@ -449,6 +461,10 @@
   },
   "apptiles": {
     "vetted": false,
+    "note": null
+  },
+  "area_print": {
+    "vetted": true,
     "note": null
   },
   "asciidoc": {
@@ -799,6 +815,10 @@
     "vetted": false,
     "note": "The blog module is no longer part of Drupal core."
   },
+  "body_class_by_path": {
+    "vetted": false,
+    "note": null
+  },
   "body_style_image": {
     "vetted": false,
     "note": null
@@ -943,6 +963,10 @@
     "vetted": false,
     "note": null
   },
+  "button_field": {
+    "vetted": true,
+    "note": null
+  },
   "bxslider": {
     "vetted": false,
     "note": null
@@ -1079,6 +1103,10 @@
     "vetted": false,
     "note": null
   },
+  "chunker": {
+    "vetted": false,
+    "note": null
+  },
   "cision_block": {
     "vetted": false,
     "note": null
@@ -1152,6 +1180,10 @@
     "note": null
   },
   "ckeditor_video": {
+    "vetted": false,
+    "note": null
+  },
+  "ckeditor_wiris": {
     "vetted": false,
     "note": null
   },
@@ -1289,6 +1321,10 @@
   },
   "comment_delete": {
     "vetted": false,
+    "note": null
+  },
+  "comment_fragment": {
+    "vetted": true,
     "note": null
   },
   "comment_limit": {
@@ -1596,10 +1632,14 @@
     "note": null
   },
   "commerce_paytrail": {
+    "vetted": true,
+    "note": "This module needs to be installed manually due to its dependency on PHP 8."
+  },
+  "commerce_payu": {
     "vetted": false,
     "note": null
   },
-  "commerce_payu": {
+  "commerce_pickup": {
     "vetted": false,
     "note": null
   },
@@ -1931,6 +1971,10 @@
     "vetted": false,
     "note": null
   },
+  "copyscape": {
+    "vetted": false,
+    "note": null
+  },
   "cors": {
     "vetted": true,
     "note": "This module provides CORS (Cross-Origin Resource Sharing) support for allowing cross-domain requests to Drupal. Drupal core now contains a superset of its functionality. It can be configured in your site's services.yml file, under 'cors.config'."
@@ -1948,6 +1992,10 @@
     "note": null
   },
   "course": {
+    "vetted": false,
+    "note": null
+  },
+  "course_credit": {
     "vetted": false,
     "note": null
   },
@@ -2447,6 +2495,10 @@
     "vetted": false,
     "note": null
   },
+  "drupalorg_crosssite": {
+    "vetted": false,
+    "note": null
+  },
   "drush_entity": {
     "vetted": false,
     "note": null
@@ -2775,6 +2827,10 @@
     "vetted": false,
     "note": null
   },
+  "entityreference_rendered_widget": {
+    "vetted": false,
+    "note": null
+  },
   "environment_indicator": {
     "vetted": true,
     "note": "This module's configuration does not make sense to migrate identically, because you may have a different development strategy and are very likely to have different hostnames. We've preinstalled it for you though, so just go to /admin/config/development/environment-indicator and configure it as you please."
@@ -2943,6 +2999,10 @@
     "vetted": false,
     "note": null
   },
+  "farm_rei": {
+    "vetted": false,
+    "note": null
+  },
   "fast_404": {
     "vetted": true,
     "note": "The Fast 404 module sped up 'Page not Found' responses in Drupal 7. Most of its functionality is obsolete in Drupal 9."
@@ -3095,6 +3155,10 @@
     "vetted": true,
     "note": null
   },
+  "field_group_ajaxified_multipage": {
+    "vetted": false,
+    "note": null
+  },
   "field_group_background_image": {
     "vetted": false,
     "note": null
@@ -3120,6 +3184,10 @@
     "note": null
   },
   "field_ipaddress": {
+    "vetted": false,
+    "note": null
+  },
+  "field_label_plurals": {
     "vetted": false,
     "note": null
   },
@@ -3400,6 +3468,10 @@
     "note": null
   },
   "footable": {
+    "vetted": false,
+    "note": null
+  },
+  "footer_message": {
     "vetted": false,
     "note": null
   },
@@ -3703,6 +3775,10 @@
     "vetted": false,
     "note": null
   },
+  "google_books": {
+    "vetted": false,
+    "note": null
+  },
   "google_chart_tools": {
     "vetted": false,
     "note": null
@@ -3748,6 +3824,10 @@
     "note": null
   },
   "gpx_track_elevation": {
+    "vetted": false,
+    "note": null
+  },
+  "graphapi": {
     "vetted": false,
     "note": null
   },
@@ -3849,7 +3929,7 @@
   },
   "heisencache": {
     "vetted": true,
-    "note": "This module needs to be installed manually due to its dependency on php 8."
+    "note": "This module needs to be installed manually due to its dependency on PHP 8."
   },
   "help": {
     "vetted": true,
@@ -4127,6 +4207,10 @@
     "vetted": false,
     "note": null
   },
+  "image_hover_effects": {
+    "vetted": false,
+    "note": null
+  },
   "image_lazy_loader": {
     "vetted": false,
     "note": null
@@ -4399,6 +4483,10 @@
     "vetted": false,
     "note": "This module needs an asset library that must be installed manually — see https://git.drupalcode.org/project/jcarousel/-/blob/6.0.x/README.txt."
   },
+  "jeditable": {
+    "vetted": false,
+    "note": null
+  },
   "jira_issue_collector": {
     "vetted": false,
     "note": null
@@ -4659,6 +4747,10 @@
     "vetted": true,
     "note": "The Libraries API module is obsolete in Drupal 9."
   },
+  "librejs": {
+    "vetted": true,
+    "note": null
+  },
   "liftigniter": {
     "vetted": false,
     "note": null
@@ -4733,7 +4825,7 @@
   },
   "listjs": {
     "vetted": true,
-    "note": "This module must be installed manually — see https://www.drupal.org/project/listjs and https://www.drupal.org/project/listjs/issues/3241227."
+    "note": "This module must be installed manually — see https://www.drupal.org/project/listjs."
   },
   "live_person": {
     "vetted": false,
@@ -4981,6 +5073,10 @@
   },
   "masquerade": {
     "vetted": true,
+    "note": null
+  },
+  "masquerade_as_role": {
+    "vetted": false,
     "note": null
   },
   "masquerade_nominate": {
@@ -5403,6 +5499,14 @@
     "vetted": false,
     "note": null
   },
+  "mixpanel": {
+    "vetted": false,
+    "note": null
+  },
+  "mmenu": {
+    "vetted": false,
+    "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/mmenu."
+  },
   "mnc": {
     "vetted": true,
     "note": "This module is not composer installable — see https://www.drupal.org/project/mnc/issues/3256094."
@@ -5491,6 +5595,10 @@
     "vetted": false,
     "note": null
   },
+  "most_viewed": {
+    "vetted": false,
+    "note": null
+  },
   "mothermayi": {
     "vetted": false,
     "note": null
@@ -5518,6 +5626,10 @@
   "multiform": {
     "vetted": true,
     "note": "This is an API module which lets you put several forms into one <form>. Drupal core now contains a superset of its functionality. See https://www.drupal.org/node/2774077."
+  },
+  "multiple_email": {
+    "vetted": false,
+    "note": null
   },
   "multiple_fields_remove_button": {
     "vetted": true,
@@ -5795,6 +5907,10 @@
     "vetted": false,
     "note": null
   },
+  "oauth2": {
+    "vetted": false,
+    "note": null
+  },
   "oauth2_client": {
     "vetted": false,
     "note": null
@@ -5854,6 +5970,10 @@
   "onepass": {
     "vetted": false,
     "note": null
+  },
+  "onesignal": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has a requirement conflict with drupal/acquia_search_solr's dependency on php-http/guzzle6-adapter."
   },
   "onlyone": {
     "vetted": false,
@@ -6014,6 +6134,10 @@
   "panels": {
     "vetted": false,
     "note": "This migration is not yet automated, feel free to help in https://www.drupal.org/project/panels/issues/2296443."
+  },
+  "panels_breadcrumbs": {
+    "vetted": false,
+    "note": null
   },
   "panels_everywhere": {
     "vetted": false,
@@ -6248,8 +6372,8 @@
     "note": null
   },
   "pdf_html": {
-    "vetted": true,
-    "note": "This module must be installed manually — see https://www.drupal.org/project/pdf_html/issues/3240772"
+    "vetted": false,
+    "note": null
   },
   "pdf_reader": {
     "vetted": false,
@@ -6535,6 +6659,10 @@
     "vetted": false,
     "note": null
   },
+  "quantcast": {
+    "vetted": false,
+    "note": null
+  },
   "quantcdn": {
     "vetted": false,
     "note": null
@@ -6680,6 +6808,10 @@
     "note": null
   },
   "recurly": {
+    "vetted": false,
+    "note": null
+  },
+  "redacted_showcase": {
     "vetted": false,
     "note": null
   },
@@ -7003,6 +7135,10 @@
     "vetted": false,
     "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
   },
+  "rules_http_client": {
+    "vetted": false,
+    "note": null
+  },
   "rules_i18n": {
     "vetted": false,
     "note": "The Rules module's port to Drupal 8 and above is still in progress. An unstable pre-release version is available though."
@@ -7187,10 +7323,6 @@
     "vetted": false,
     "note": null
   },
-  "search_api_location": {
-    "vetted": false,
-    "note": null
-  },
   "search_api_page": {
     "vetted": false,
     "note": null
@@ -7356,6 +7488,10 @@
     "note": null
   },
   "setka_editor": {
+    "vetted": false,
+    "note": null
+  },
+  "setmore_drupal": {
     "vetted": false,
     "note": null
   },
@@ -8131,6 +8267,10 @@
     "vetted": false,
     "note": null
   },
+  "tcpdf": {
+    "vetted": true,
+    "note": "This module must be installed manually as it has a requirement conflict with drupal/webform_civicrm's dependency on tecnickcom/tcpdf."
+  },
   "teamleader": {
     "vetted": true,
     "note": "This module must be installed manually as it has requirement conflict with drupal/acquia_search_solr module."
@@ -8323,6 +8463,10 @@
     "vetted": false,
     "note": null
   },
+  "tmgmt_mygengo": {
+    "vetted": false,
+    "note": null
+  },
   "tmgmt_supertext": {
     "vetted": false,
     "note": null
@@ -8471,6 +8615,10 @@
     "vetted": false,
     "note": null
   },
+  "twilio_flex": {
+    "vetted": false,
+    "note": null
+  },
   "twitter_block": {
     "vetted": false,
     "note": null
@@ -8567,6 +8715,10 @@
     "vetted": false,
     "note": null
   },
+  "urlicon": {
+    "vetted": false,
+    "note": null
+  },
   "urllogin": {
     "vetted": false,
     "note": null
@@ -8632,6 +8784,10 @@
     "note": null
   },
   "user_registrationpassword": {
+    "vetted": false,
+    "note": null
+  },
+  "user_visits": {
     "vetted": false,
     "note": null
   },
@@ -8756,6 +8912,10 @@
     "note": null
   },
   "video_embed_panopto": {
+    "vetted": false,
+    "note": null
+  },
+  "video_embed_soundcloud": {
     "vetted": false,
     "note": null
   },
@@ -8927,6 +9087,10 @@
     "vetted": false,
     "note": null
   },
+  "views_date_format_sql": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
+  },
   "views_delimited_list": {
     "vetted": false,
     "note": null
@@ -8990,6 +9154,10 @@
   "views_geojson": {
     "vetted": false,
     "note": null
+  },
+  "views_html_tags": {
+    "vetted": true,
+    "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
   "views_ical": {
     "vetted": false,
@@ -9223,10 +9391,6 @@
     "vetted": true,
     "note": null
   },
-  "vppr": {
-    "vetted": false,
-    "note": null
-  },
   "vspfo": {
     "vetted": false,
     "note": null
@@ -9248,6 +9412,10 @@
     "note": null
   },
   "watchdog_prune": {
+    "vetted": false,
+    "note": null
+  },
+  "watchdog_slack": {
     "vetted": false,
     "note": null
   },
@@ -9362,6 +9530,10 @@
   "wfm": {
     "vetted": true,
     "note": "The Webform Multiple module was never stable in Drupal 7, and has been unsupported for a long time. It is recommended to use a different module both on Drupal 7 and 9."
+  },
+  "whatsapp": {
+    "vetted": false,
+    "note": null
   },
   "whatsappshare": {
     "vetted": false,
