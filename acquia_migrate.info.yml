@@ -14,3 +14,4 @@ dependencies:
   - drupal:syslog
   - migmag:migmag_menu_link_migrate
   - migmag:migmag_rollbackable_replace
+  - migmag:migmag_process_lookup_replace

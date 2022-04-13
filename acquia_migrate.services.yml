@@ -135,11 +135,6 @@ services:
     parent: logger.channel_base
     arguments: ['acquia_migrate_silenced_broken_code']
 
-  # Enhanced migration stub.
-  acquia_migrate.stub:
-    class: Drupal\acquia_migrate\AcquiaMigrateMigrateStub
-    arguments: ['@plugin.manager.migration']
-
   # Event subscribers.
   acquia_migrate.sourcination.registerer:
     class: \Drupal\acquia_migrate\EventSubscriber\SourcinationRegisterer

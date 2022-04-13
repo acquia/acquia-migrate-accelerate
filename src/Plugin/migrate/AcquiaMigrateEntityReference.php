@@ -36,7 +36,7 @@ class AcquiaMigrateEntityReference extends EntityReference {
             'method' => 'process',
           ],
           [
-            'plugin' => 'acquia_migrate_migration_lookup',
+            'plugin' => 'migmag_lookup',
             'migration' => 'd7_node_complete',
           ],
           [

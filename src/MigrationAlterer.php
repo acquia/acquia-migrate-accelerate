@@ -640,6 +640,11 @@ final class MigrationAlterer {
       if (empty($source['type']) || ($source['type'] !== 'taxonomy_term_reference' && $source['type'] !== 'entityreference')) {
         continue;
       }
+      // Skipping adding dependencies to User migrations to avoid circular
+      // dependencies.
+      if ($source['entity_type'] === 'user') {
+        continue;
+      }
       // The "allowed_vid" key is computed from the field storage configuration
       // by Drupal\field\Plugin\migrate\source\d7\FieldInstance::prepareRow().
       // Without an explicitly set allowed vocabulary, it is impossible to
@@ -1129,6 +1134,12 @@ final class MigrationAlterer {
         return FALSE;
       }
 
+      // Skipping adding dependencies to User migrations to avoid circular
+      // dependencies.
+      if ($parts[1] === 'user') {
+        return FALSE;
+      }
+
       $migration_deps = array_unique(array_merge(
         array_values($migration_definition['migration_dependencies']['required'] ?? []),
         array_values($migration_definition['migration_dependencies']['optional'] ?? [])
@@ -1358,8 +1369,6 @@ final class MigrationAlterer {
    * @see \Drupal\migrate_drupal\Plugin\MigrationWithFollowUpInterface
    * @see \Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateEntityReference
    * @see \Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateNodeReference
-   * @see \Drupal\acquia_migrate\Plugin\migrate\process\AcquiaMigrateMigrationLookup
-   * @see \Drupal\acquia_migrate\AcquiaMigrateMigrateStub
    * @see acquia_migrate_migrate_field_info_alter()
    */
   public function removeFollowupMigrations(array &$migrations) {

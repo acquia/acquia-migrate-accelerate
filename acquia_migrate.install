@@ -444,3 +444,24 @@ function acquia_migrate_update_9205() {
     }
   }
 }
+
+/**
+ * Implements hook_update_N().
+ *
+ * Installs migmag_process_lookup_replace, succeeds AcquiaMigrateMigrateStub.
+ */
+function acquia_migrate_update_9206() {
+  $module_handler = \Drupal::moduleHandler();
+  $module_list = \Drupal::service('extension.list.module')->getList();
+  if (!in_array('migmag_process_lookup_replace', array_keys($module_list), TRUE)) {
+    throw new UpdateException(
+      'Migrate Magician Forced Lookup Process Plugin (migmag_process_lookup_replace) module is required for AMA. Make sure the module is available and try again.'
+    );
+  }
+
+  if (!$module_handler->moduleExists('migmag_process_lookup_replace')) {
+    $module_installer = \Drupal::service('module_installer');
+    assert($module_installer instanceof ModuleInstallerInterface);
+    $module_installer->install(['migmag_process_lookup_replace'], TRUE);
+  }
+}
