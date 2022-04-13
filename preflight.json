@@ -2496,8 +2496,8 @@
     "note": null
   },
   "drupalorg_crosssite": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module must be installed manually as it has dependency conflict with oauth2_client."
   },
   "drush_entity": {
     "vetted": false,
@@ -6652,8 +6652,8 @@
     "note": null
   },
   "qbank_dam": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module must be installed manually as it has requirement conflict with drupal/core 9.3.9."
   },
   "qualtricsxm": {
     "vetted": false,
