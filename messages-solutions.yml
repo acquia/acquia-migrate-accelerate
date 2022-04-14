@@ -221,6 +221,14 @@ d7_file_plain:
       tweak the configuration manually. Or, you can help improve this aspect of this migration at
       https://www.drupal.org/project/media_migration/issues/3168920.
 
+d7_user:
+  -
+    message:
+      regexp: >-
+        \[user: \d+\]: init\.0\.value=This value is not a valid email address
+    generic_solution: The required initial email address is missing for this user. This is wrong in the Drupal 7 source
+        database too, please fix it there, refresh the source database and rollback & import this migration.
+
 d7_filter_format:
   -
     message:

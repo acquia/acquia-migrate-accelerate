@@ -15,6 +15,8 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Utility\UpdateException;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 
 /**
  * Implements hook_install().
@@ -33,7 +35,7 @@ function acquia_migrate_install($is_syncing) {
 
   // Grant anonymous users the permission to view the administration theme,
   // since the "Get started" page will use that theme.
-  $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
+  $role = Role::load(RoleInterface::ANONYMOUS_ID);
   $role->grantPermission('view the administration theme');
   $role->trustData()->save();
 
@@ -44,16 +46,6 @@ function acquia_migrate_install($is_syncing) {
   \Drupal::configFactory()->getEditable('system.theme')
     ->set('admin', 'claro')
     ->save();
-
-  // Avoid sending e-mails. Modules that add more mail interfaces should
-  // behave gracefully, like webform does.
-  // @see \Drupal\webform\WebformEmailProvider::check()
-  $mail_config = \Drupal::configFactory()->getEditable('system.mail');
-  $mail_plugins = $mail_config->get('interface');
-  foreach (array_keys($mail_plugins) as $interface_name) {
-    $mail_plugins[$interface_name] = 'terrible_mail_man';
-  }
-  $mail_config->set('interface', $mail_plugins)->save();
 
   UserOneConfigurationForm::reset();
   PublicAcknowledgementForm::reset();
@@ -142,7 +134,7 @@ function acquia_migrate_uninstall($is_syncing) {
 
   // Also revoke the permission for anonymous users to view the administration
   // theme.
-  $role = \Drupal\user\Entity\Role::load(\Drupal\user\RoleInterface::ANONYMOUS_ID);
+  $role = Role::load(RoleInterface::ANONYMOUS_ID);
   $role->revokePermission('view the administration theme');
   $role->trustData()->save();
 

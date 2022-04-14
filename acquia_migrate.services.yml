@@ -242,3 +242,10 @@ services:
     class: Drupal\acquia_migrate\Config\OptimalMigrationConfigurationEnforcer
     tags:
       - { name: config.factory.override }
+
+  acquia_migrate.config.overrider:
+    class: Drupal\acquia_migrate\Config\MailPluginOverrider
+    tags:
+      - {name: config.factory.override, priority: 500}
+    arguments:
+      - '@config.factory'
