@@ -7,6 +7,7 @@ namespace Drupal\acquia_migrate\EventSubscriber;
 use Drupal\acquia_migrate\Timers;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -17,9 +18,19 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @internal
  *
- * @see \Drupal\acquia_migrate\Cache\Timers
+ * @see \Drupal\acquia_migrate\Timers
  */
 class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The query log.
+   *
+   * Since Kernel tests are executed in the same PHP process, we must be able to
+   * empty our log.
+   *
+   * @var array
+   */
+  private static $queryLog;
 
   /**
    * The current route match.
@@ -51,19 +62,17 @@ class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterfac
    *   missing data.
    */
   public static function trackQueryLog(string $key, $value = NULL) {
-    static $query_log;
-
     // Write.
     if ($value !== NULL) {
-      if (isset($query_log[$key])) {
+      if (isset(self::$queryLog[$key])) {
         throw new \LogicException('Tracked query logs cannot be overwritten');
       }
-      $query_log[$key] = $value;
+      self::$queryLog[$key] = $value;
       return;
     }
 
     // Read.
-    return $query_log[$key] ?? NULL;
+    return self::$queryLog[$key] ?? NULL;
   }
 
   /**
@@ -236,6 +245,25 @@ class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterfac
     $events[KernelEvents::RESPONSE][] = ['addServerTimingHeader', -100];
 
     return $events;
+  }
+
+  /**
+   * Drops the query log.
+   *
+   * This should be used only in Kernel tests.
+   *
+   * @see \Drupal\KernelTests\KernelTestBase::bootKernel
+   */
+  public static function dropQueryLog(): void {
+    $container = \Drupal::getContainer();
+    assert($container instanceof ContainerInterface);
+    if (
+      !$container->hasParameter('kernel.environment') ||
+      $container->getParameter('kernel.environment') !== 'testing'
+    ) {
+      throw new \LogicException('Tracked query logs can be dropped only during tests');
+    }
+    self::$queryLog = NULL;
   }
 
 }

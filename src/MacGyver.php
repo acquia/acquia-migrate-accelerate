@@ -2,6 +2,7 @@
 
 namespace Drupal\acquia_migrate;
 
+use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use Drupal\acquia_migrate\Batch\BatchStatus;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
@@ -212,7 +213,11 @@ final class MacGyver {
     $joinable_source = \Drupal::service('plugin.manager.migration')
       ->createStubMigration([
         'id' => 'joinable_test',
-        'source' => ['plugin' => 'joinable'],
+        'source' => [
+          'plugin' => 'joinable',
+          'key' => 'migrate',
+          'target' => 'default',
+        ],
         'destination' => ['plugin' => 'null'],
       ])
       ->getSourcePlugin();
@@ -221,12 +226,18 @@ final class MacGyver {
   }
 
   /**
-   * Ensure a Sourcination is available (and delete the old Sourcination).
+   * Checks whether MacGyver ought to be active on this environment.
    *
    * @return bool
-   *   TRUE when action is needed
+   *   TRUE when MacGyver ought to be active.
    */
-  public static function detectWhetherActionIsNeeded() : bool {
+  public static function isEnabled() : bool {
+    // @todo https://backlog.acquia.com/browse/AMA-97
+    $recent_info = \Drupal::state()->get(Recommendations::KEY_RECENT_INFO, []);
+    if (!AcquiaDrupalEnvironmentDetector::isAhEnv() || empty($recent_info['generated'])) {
+      return FALSE;
+    }
+
     if (static::isJoinable()) {
       return FALSE;
     }
@@ -238,6 +249,20 @@ final class MacGyver {
 
     // MacGyver should not run for AMA tests.
     if (\Drupal::state()->get('migrate.fallback_state_key') === 'acquia_migrate_test_database') {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Ensure a Sourcination is available (and delete the old Sourcination).
+   *
+   * @return bool
+   *   TRUE when action is needed.
+   */
+  public static function detectWhetherActionIsNeeded() : bool {
+    if (!static::isEnabled()) {
       return FALSE;
     }
 
@@ -449,6 +474,13 @@ final class MacGyver {
       else {
         $connection_info[$target]['prefix'] = $prefix;
       }
+    }
+    // If we already have a connection with the actual key and the prefix
+    // doesn't match, we have to remove it for kernel tests: because they are
+    // executed in the same PHP thread.
+    $actual_connection_options = Database::getAllConnectionInfo()[$connection_key]['default'] ?? NULL;
+    if ($actual_connection_options && $actual_connection_options['prefix'] !== $prefix) {
+      Database::removeConnection($connection_key);
     }
     Database::addConnectionInfo($connection_key, 'default', $connection_info['default']);
 
@@ -719,7 +751,7 @@ final class MacGyver {
       elseif (!isset($definition['fields'][$name]['size'])) {
         // Try use the provided length, if it doesn't exist default to 100. It's
         // not great but good enough for our dumps at this point.
-        $definition['fields'][$name]['length'] = isset($matches[2]) ? $matches[2] : 100;
+        $definition['fields'][$name]['length'] = $matches[2] ?? 100;
       }
 
       if (isset($row['Default'])) {
@@ -873,7 +905,7 @@ final class MacGyver {
 
     // Map the collation to a character set. For example, 'utf8mb4_general_ci'
     // (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) will be mapped to 'utf8mb4'.
-    list($charset,) = explode('_', $data['Collation'], 2);
+    [$charset] = explode('_', $data['Collation'], 2);
 
     // Set `mysql_character_set`. This will be ignored by other backends.
     $definition['mysql_character_set'] = $charset;

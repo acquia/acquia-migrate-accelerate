@@ -74,6 +74,14 @@ class MigrationRepository {
   protected $migrationsHaveBeenPreselected;
 
   /**
+   * Static cache for the discovered migrations.
+   *
+   * @var \Drupal\acquia_migrate\Migration[]
+   *   The available migrations, keyed by ID.
+   */
+  protected static $migrations;
+
+  /**
    * Constructs a new MigrationRepository.
    *
    * @param \Drupal\acquia_migrate\Clusterer\MigrationClusterer $clusterer
@@ -173,10 +181,9 @@ class MigrationRepository {
     // Static caching added only for the to-JSON:API-normalization logic,
     // because it can potentially call this many times.
     // @see \Drupal\acquia_migrate\Migration::toResourceObject()
-    static $migrations;
-    if (!$reset && isset($migrations)) {
+    if (!$reset && isset(static::$migrations)) {
       Timer::stop(Timers::CACHE_MIGRATIONS);
-      return $migrations;
+      return static::$migrations;
     }
 
     $cached = $this->cache->get(static::CID);
@@ -223,13 +230,12 @@ class MigrationRepository {
       // have also been populated.
       $this->computeVirtualInitialMigration();
     }
-    else {
-      $migrations = $cached->data;
-    }
+
+    static::$migrations = $migrations ?? $cached->data;
 
     Timer::stop(Timers::CACHE_MIGRATIONS);
 
-    return $migrations;
+    return static::$migrations;
   }
 
   /**
@@ -635,6 +641,17 @@ class MigrationRepository {
     }
 
     return $migrations;
+  }
+
+  /**
+   * Drops the static migrations cache.
+   *
+   * This should be used only in Kernel tests.
+   *
+   * @see \Drupal\KernelTests\KernelTestBase::bootKernel
+   */
+  public function dropStaticCache(): void {
+    static::$migrations = NULL;
   }
 
 }
