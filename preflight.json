@@ -6240,8 +6240,8 @@
     "note": "Drupal 7's PHP module is not recommended because it poses a severe security risk without very careful configuration and trusted users. Therefore you should not need the Paranoia module either."
   },
   "pardot": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module must be installed manually because it requires an unsupported ^4.1 version of drupal/salesforce."
   },
   "partial": {
     "vetted": false,
