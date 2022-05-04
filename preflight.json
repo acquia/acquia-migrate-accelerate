@@ -2200,11 +2200,11 @@
     "note": null
   },
   "date_repeat": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "date_repeat_field": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "date_tools": {
