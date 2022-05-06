@@ -1287,6 +1287,10 @@
     "vetted": true,
     "note": null
   },
+  "colorapi": {
+    "vetted": true,
+    "note": null
+  },
   "colorbox": {
     "vetted": true,
     "note": null
@@ -4516,7 +4520,7 @@
     "note": null
   },
   "jquery_colorpicker": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "jquery_countdown_timer": {
