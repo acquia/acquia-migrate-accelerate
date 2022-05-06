@@ -480,8 +480,8 @@
     "note": null
   },
   "at_tools": {
-    "vetted": true,
-    "note": "This module claims to be Drupal 9-compatible but it is not - see https://www.drupal.org/project/at_tools/issues/3244556."
+    "vetted": false,
+    "note": null
   },
   "atom": {
     "vetted": false,
@@ -9360,8 +9360,8 @@
     "note": "No port is available, help in https://www.drupal.org/project/vimeo_link_formatter/issues/2697659. Better still: migrate this 'link field' data into media entities, to make them available in the Media Library: https://www.drupal.org/project/media_migration/issues/3247422."
   },
   "virustotal": {
-    "vetted": true,
-    "note": "This module is not composer installable — see https://www.drupal.org/project/virustotal/issues/3241229."
+    "vetted": false,
+    "note": null
   },
   "visitor_actions": {
     "vetted": false,
