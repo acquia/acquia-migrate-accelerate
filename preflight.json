@@ -1088,7 +1088,7 @@
     "note": null
   },
   "chosen": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "chosen_ajax": {
