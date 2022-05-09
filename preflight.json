@@ -3809,7 +3809,7 @@
   },
   "google_tag": {
     "vetted": true,
-    "note": null
+    "note": "Update the source version to 7.x-2.x before running this migration."
   },
   "google_translator": {
     "vetted": false,
