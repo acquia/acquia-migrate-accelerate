@@ -76,8 +76,8 @@
     "note": "An automatic migration of settings does not make sense for this module. The Acquia Purge module is mostly 'zero configuration'; the only thing you have to do is add an 'Acquia Cloud' purger in the Purge module. See https://git.drupalcode.org/project/acquia_purge/raw/HEAD/INSTALL.md for detailed instructions."
   },
   "acquia_search": {
-    "vetted": false,
-    "note": "Acquia Search is not yet available for Drupal 9. It should be available in Q1 2021. See https://docs.acquia.com/acquia-search/release-notes/ — for more details, please contact your (Technical) Account Manager."
+    "vetted": true,
+    "note": "Acquia Search will migrate configuration and search indexes. User will have to re-index site data once migration is done.  See https://docs.acquia.com/acquia-search/activate/indexing/#re-indexing-your-website."
   },
   "acquia_spi": {
     "vetted": true,
@@ -408,12 +408,12 @@
     "note": null
   },
   "apachesolr": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "Acquia Search will migrate configuration and search indexes. User will have to re-index site data once migration is done.  See https://docs.acquia.com/acquia-search/activate/indexing/#re-indexing-your-website."
   },
   "apachesolr_search": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "Acquia Search will migrate configuration and search indexes. User will have to re-index site data once migration is done.  See https://docs.acquia.com/acquia-search/activate/indexing/#re-indexing-your-website."
   },
   "ape": {
     "vetted": false,
