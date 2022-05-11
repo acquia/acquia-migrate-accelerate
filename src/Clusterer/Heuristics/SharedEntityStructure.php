@@ -161,7 +161,18 @@ final class SharedEntityStructure implements IndependentHeuristicInterface, Heur
     // that is, if there are multiple bundles.
     $destination_definition = $this->entityTypeManager->getDefinition($expected_destination_entity_type, FALSE);
     $entity_type_has_bundles = $destination_definition && $destination_definition->getBundleEntityType() !== NULL;
-    $dependencyless = empty($migration_plugin->getMetadata('after'));
+    $dependencies = $migration_plugin->getMetadata('after');
+    // Some field types are only enabled conditionally. We do not consider the
+    // migration plugins that enable those field types dependencies *if*
+    // have a dedicated cluster of their own that is listed before this cluster
+    // in \Drupal\acquia_migrate\Clusterer\MigrationClusterer::getHeuristics().
+    if ($migration_plugin->getBaseId() === 'd7_field') {
+      $dependencies = array_diff($dependencies, [
+        // @see \Drupal\acquia_migrate\Clusterer\Heuristics\SharedColorapi
+        'enable_colorapi',
+      ]);
+    }
+    $dependencyless = empty($dependencies);
 
     if ($entity_type_has_bundles && !$dependencyless) {
       throw new \LogicException(sprintf('The currently known shared structure migrations do not have any dependencies. This assumption does not hold for %s. It depends on: %s.', $migration_plugin->id(), implode(', ', $migration_plugin->getMetadata('after'))));

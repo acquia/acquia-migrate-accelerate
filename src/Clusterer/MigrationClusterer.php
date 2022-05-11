@@ -227,6 +227,10 @@ final class MigrationClusterer {
       // dependencies in ContentEntityBundlesDependencies, and it weight should
       // be higher than Heuristics\PushedToModerationFlow's weight.
       Heuristics\ModerationFlow::class => 50,
+      // SharedColorapi enables an additional field type and its migration
+      // plugin should hence be executed before fields are migrated by
+      // SharedEntityStructure.
+      Heuristics\SharedColorapi::class => 0,
       Heuristics\SharedEntityStructure::class => 0,
       Heuristics\SharedEntityData::class => 0,
       Heuristics\SharedBookData::class => 500,
