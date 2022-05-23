@@ -65,16 +65,39 @@ final class ContentEntityTranslations implements DependentHeuristicWithComputedD
     );
 
     if (count($entity_migration_deps_required) !== 0) {
-      $default_migration = reset($entity_migration_deps_required);
+      $default_migration = static::getDefaultMigration($migration_plugin, $entity_migration_deps_required);
+
     }
     elseif (count($entity_migration_deps_required) === 0 && count($entity_migration_deps_optional) !== 0) {
-      $default_migration = reset($entity_migration_deps_optional);
+      $default_migration = static::getDefaultMigration($migration_plugin, $entity_migration_deps_optional);
     }
     else {
       throw new \LogicException();
     }
 
     return $default_migration->getMetadata('cluster');
+  }
+
+  /**
+   * Returns default migration while trying to match the destination plugin.
+   *
+   * @param \Drupal\migrate\Plugin\Migration $migration_plugin
+   *   A migration plugin that was selected by this heuristic.
+   * @param \Drupal\migrate\Plugin\Migration[] $entity_migration_deps
+   *   Migration dependencies (optional or required).
+   *
+   * @return \Drupal\migrate\Plugin\Migration
+   *   Appropriate migration plugin that is selected to provide cluster.
+   */
+  protected static function getDefaultMigration(MigrationPlugin $migration_plugin, array $entity_migration_deps): MigrationPlugin {
+    $destination_plugin = $migration_plugin->getPluginDefinition()['destination']['plugin'];
+    foreach ($entity_migration_deps as $entity_migration_dep) {
+      $migration_plugin = $entity_migration_dep;
+      if ($migration_plugin->getPluginDefinition()['destination']['plugin'] === $destination_plugin) {
+        return $entity_migration_dep;
+      }
+    }
+    return reset($entity_migration_deps);
   }
 
 }

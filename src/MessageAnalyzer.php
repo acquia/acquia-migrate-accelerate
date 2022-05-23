@@ -4,6 +4,7 @@ namespace Drupal\acquia_migrate;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\migrate\Exception\EntityValidationException;
 
 /**
  * Analyzes migration messages.
@@ -55,13 +56,40 @@ final class MessageAnalyzer {
    *
    * @param string $migration_plugin_id
    *   The migration plugin that generated the message.
+   * @param string $messages
+   *   The message to provide a solution for.
+   *
+   * @return string|null
+   *   A solution for the message, if any.
+   */
+  public function getSolution(string $migration_plugin_id, string $messages) : ?string {
+    $message_pieces = explode(EntityValidationException::MESSAGES_SEPARATOR, $messages);
+
+    foreach ($message_pieces as $message) {
+      $solutions[] = $this->doGetSolution($migration_plugin_id, $message);
+    }
+    $solutions = array_filter($solutions);
+    if (!empty($solutions)) {
+      return count($solutions) > 1
+        ? '▶ ' . implode(' ▶ ', $solutions)
+        : reset($solutions);
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Computes the solution for a given message in a given migration plugin.
+   *
+   * @param string $migration_plugin_id
+   *   The migration plugin that generated the message.
    * @param string $message
    *   The message to provide a solution for.
    *
    * @return string|null
    *   A solution for the message, if any.
    */
-  public function getSolution(string $migration_plugin_id, string $message) : ?string {
+  protected function doGetSolution(string $migration_plugin_id, string $message) : ?string {
     [$base_migration_plugin_id] = explode(':', $migration_plugin_id);
 
     $candidate_solutions = !isset($this->solutions[$base_migration_plugin_id])

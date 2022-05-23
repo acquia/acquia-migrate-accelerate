@@ -198,6 +198,11 @@ class MigrationRepository {
       // bin (except queries to the `cache_migrate` cache bin: those are
       // relevant).
       foreach ($dst_queries as $index => $query) {
+        // Drupal state calls, cache_discovery operations etc don't have caller
+        // class.
+        if (empty($query['caller']['class'])) {
+          continue;
+        }
         if ($query['caller']['class'] === DatabaseCacheTagsChecksum::class
             || ($query['caller']['class'] === DatabaseBackend::class && strpos($query['query'], 'migrate') === FALSE)) {
           unset($dst_queries[$index]);

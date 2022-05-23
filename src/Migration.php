@@ -169,7 +169,7 @@ final class Migration {
   private $supportsRollback;
 
   /**
-   * Whether all rows have been processed.
+   * Whether all rows have been fully processed, and no stubs are present.
    *
    * @var bool
    *
@@ -791,7 +791,8 @@ final class Migration {
     if (!isset($this->allRowsProcessed)) {
       $all_rows_processed = TRUE;
       foreach ($this->migrationPlugins as $migration_plugin) {
-        $all_rows_processed = $all_rows_processed && $migration_plugin->allRowsProcessed();
+        $stub_count = $migration_plugin->getIdMap()->updateCount();
+        $all_rows_processed = $all_rows_processed && $migration_plugin->allRowsProcessed() && $stub_count === 0;
         if (!$all_rows_processed) {
           break;
         }
