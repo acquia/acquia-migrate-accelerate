@@ -170,6 +170,9 @@ final class SharedEntityStructure implements IndependentHeuristicInterface, Heur
       $dependencies = array_diff($dependencies, [
         // @see \Drupal\acquia_migrate\Clusterer\Heuristics\SharedColorapi
         'enable_colorapi',
+        // @see \Drupal\acquia_migrate\Clusterer\Heuristics\SharedVoteTypeConfig
+        'd7_vote_type',
+        'fivestar_vote_type',
       ]);
     }
     $dependencyless = empty($dependencies);

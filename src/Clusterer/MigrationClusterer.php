@@ -227,6 +227,10 @@ final class MigrationClusterer {
       // dependencies in ContentEntityBundlesDependencies, and it weight should
       // be higher than Heuristics\PushedToModerationFlow's weight.
       Heuristics\ModerationFlow::class => 50,
+      // SharedVoteTypeConfig migrates vote types. Fivestar field storage config
+      // requires vote types to exist. Its migration plugins should hence be
+      // executed before fields are migrated by SharedEntityStructure.
+      Heuristics\SharedVoteTypeConfig::class => 0,
       // SharedColorapi enables an additional field type and its migration
       // plugin should hence be executed before fields are migrated by
       // SharedEntityStructure.
