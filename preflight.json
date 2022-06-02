@@ -7692,7 +7692,7 @@
     "note": "This module is not composer installable - see https://www.drupal.org/project/simplenews_scheduler/issues/3230858."
   },
   "simplesamlphp_auth": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "simpletest": {
