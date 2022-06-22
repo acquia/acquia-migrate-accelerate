@@ -69,8 +69,14 @@ trait EntityRelatedHeuristicTrait {
         $bundle = $source_config['bundle'] ?? NULL;
         break;
 
+      // This is for the (legacy) migration path provided by
+      // https://www.drupal.org/project/paragraphs.
       case 'multifield_type':
       case 'multifield_translation_settings':
+        // This is for the (improved) migration path provided by
+        // https://www.drupal.org/project/paragraphs_migration.
+      case 'pm_multifield_type':
+      case 'pm_multifield_translation_settings':
         $entity_type = 'multifield';
         break;
 
@@ -187,7 +193,7 @@ trait EntityRelatedHeuristicTrait {
     // 'entity_reference_revisions' destination plugin, but multifield uses
     // 'entity_complete' (usually used for stand-alone content entities), hence
     // the need for this additional check.
-    if ($migration->getBaseId() === 'multifield') {
+    if ($migration->getBaseId() === 'pm_multifield' || $migration->getBaseId() === 'multifield') {
       return FALSE;
     }
 

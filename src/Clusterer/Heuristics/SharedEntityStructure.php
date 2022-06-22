@@ -202,18 +202,20 @@ final class SharedEntityStructure implements IndependentHeuristicInterface, Heur
     // Drupal 9.)
     if (
       $field_entity_type_id === 'field_collection_item' ||
-      $source_config['plugin'] === 'd7_field_collection_type'
+      $source_config['plugin'] === 'd7_pm_field_collection_type' || $source_config['plugin'] === 'd7_field_collection_type'
     ) {
       $label = 'field collection items';
     }
     elseif (
       $field_entity_type_id === 'paragraphs_item' ||
-      $source_config['plugin'] === 'd7_paragraphs_type'
+      $source_config['plugin'] === 'd7_pm_paragraphs_type' || $source_config['plugin'] === 'd7_paragraphs_type'
     ) {
       $label = 'paragraphs';
     }
     elseif (
       $field_entity_type_id === 'multifield' ||
+      $source_config['plugin'] === 'pm_multifield_translation_settings' ||
+      $source_config['plugin'] === 'pm_multifield_type' ||
       $source_config['plugin'] === 'multifield_translation_settings' ||
       $source_config['plugin'] === 'multifield_type'
     ) {

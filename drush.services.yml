@@ -7,5 +7,7 @@ services:
       - '@extension.list.module'
       - '@acquia_migrate.recommendations'
       - '@plugin.manager.migrate.source'
+      - '@acquia_migrate.batch_manager'
+      - '@acquia_migrate.coordinator'
     tags:
       - { name: drush.command }

@@ -2,6 +2,7 @@
 
 namespace Drupal\acquia_migrate;
 
+use Drupal\acquia_migrate\Batch\MigrationBatchCoordinator;
 use Drupal\acquia_migrate\Clusterer\Heuristics\SharedLanguageConfig;
 use Drupal\acquia_migrate\Controller\HttpApi;
 use Drupal\acquia_migrate\Exception\RowPreviewException;
@@ -680,14 +681,21 @@ final class Migration {
 
     $urls = [];
 
+    // If this migration is not idle, do not allow any other activities, except
+    // stopping the current activity (or unsticking it if not actually running).
+    $coordinator = \Drupal::service('acquia_migrate.coordinator');
+    assert($coordinator instanceof MigrationBatchCoordinator);
+    if ($coordinator->hasActiveOperation() && !$coordinator->canModifyActiveOperation()) {
+      return [];
+    }
+
     $update_resource_url = Url::fromRoute('acquia_migrate.api.migration.patch')
       ->setRouteParameter('migration', $this->id());
 
     // If this migration is not idle, do not allow any other activities, except
     // stopping the current activity (or unsticking it if not actually running).
     if ($this->getActivity() !== self::ACTIVITY_IDLE) {
-      $migration_is_actually_executing = !\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH);
-      $operation = $migration_is_actually_executing ? 'stop' : 'unstick';
+      $operation = $coordinator->hasActiveOperation() && $coordinator->canModifyActiveOperation() ? 'stop' : 'unstick';
       $urls[$operation] = $update_resource_url;
       return $urls;
     }
@@ -943,7 +951,7 @@ final class Migration {
 
     switch ($max_migration_plugin_status) {
       case MigrationInterface::STATUS_IMPORTING:
-        if (\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH)) {
+        if (!\Drupal::service('acquia_migrate.coordinator')->hasActiveOperation()) {
           return self::ACTIVITY_STUCK;
         }
         // Refreshing is a special case of importing as far as the migration
@@ -970,6 +978,22 @@ final class Migration {
         // reflect an activity.
         return self::ACTIVITY_IDLE;
     }
+  }
+
+  /**
+   * Gets the current active migration plugin ID.
+   *
+   * @return string|null
+   *   Returns currently active migration plugin ID, if any.
+   */
+  public function getActiveMigrationPluginId(): ?string {
+    $active_migration_plugin_instances = $this->getMigrationPluginInstances();
+    foreach ($active_migration_plugin_instances as $plugin_instance) {
+      if ($plugin_instance->getStatus() !== MigrationInterface::STATUS_IDLE) {
+        return $plugin_instance->id();
+      }
+    }
+    return NULL;
   }
 
   /**

@@ -31,6 +31,10 @@ final class SharedEntityData implements IndependentHeuristicInterface, Heuristic
     'd7_paragraphs_revisions',
     'd7_field_collection',
     'd7_field_collection_revisions',
+    'd7_pm_paragraphs',
+    'd7_pm_paragraphs_revisions',
+    'd7_pm_field_collection',
+    'd7_pm_field_collection_revisions',
   ];
 
   /**

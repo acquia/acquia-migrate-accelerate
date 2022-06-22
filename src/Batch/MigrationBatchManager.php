@@ -13,7 +13,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Drupal\migrate\Event\MigrateEvents;
-use Drupal\migrate_drupal_ui\Batch\MigrateUpgradeImportBatch;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -54,7 +53,7 @@ final class MigrationBatchManager {
    * @var array[string]callable
    */
   protected static $actionCallable = [
-    'import' => [MigrateUpgradeImportBatch::class, 'run'],
+    'import' => [AcquiaMigrateUpgradeImportBatch::class, 'run'],
     'rollback' => [MigrateUpgradeRollbackBatch::class, 'run'],
     'refresh' => [__CLASS__, 'runRefresh'],
   ];
@@ -95,6 +94,13 @@ final class MigrationBatchManager {
   protected $migrationPluginManager;
 
   /**
+   * The migration batch coordinator.
+   *
+   * @var \Drupal\acquia_migrate\Batch\MigrationBatchCoordinator
+   */
+  protected $coordinator;
+
+  /**
    * Whether the current request is for a refresh operation.
    *
    * @var bool
@@ -116,13 +122,16 @@ final class MigrationBatchManager {
    *   The migration repository.
    * @param \Drupal\acquia_migrate\Plugin\MigrationPluginManager $migration_plugin_manager
    *   The migration plugin manager.
+   * @param \Drupal\acquia_migrate\Batch\MigrationBatchCoordinator $coordinator
+   *   The migration batch coordinator.
    */
-  public function __construct(HttpKernelInterface $http_kernel, BatchStorageInterface $batch_storage, $app_root, MigrationRepository $repository, MigrationPluginManager $migration_plugin_manager) {
+  public function __construct(HttpKernelInterface $http_kernel, BatchStorageInterface $batch_storage, $app_root, MigrationRepository $repository, MigrationPluginManager $migration_plugin_manager, MigrationBatchCoordinator $coordinator) {
     $this->httpKernel = $http_kernel;
     $this->batchStorage = $batch_storage;
     $this->appRoot = $app_root;
     $this->repository = $repository;
     $this->migrationPluginManager = $migration_plugin_manager;
+    $this->coordinator = $coordinator;
   }
 
   /**
@@ -220,6 +229,27 @@ final class MigrationBatchManager {
    *   Thrown if a batch for the given migration is already in flight.
    */
   public function createMigrationBatch(string $migration_id, string $action): BatchStatus {
+    $batch_tasks = $this->createMigrationBatchTasks($migration_id, $action);
+    batch_set($batch_tasks);
+    batch_process();
+    $batch = batch_get();
+    return new BatchStatus($batch['id'], 0);
+  }
+
+  /**
+   * Helper function for createMigrationBatch()
+   *
+   * @param string $migration_id
+   *   An ID for a migration, as represented in the migration UI. This is not
+   *   necessarily a migration plugin ID.
+   * @param string $action
+   *   An action type. Either static::ACTION_IMPORT, static::ACTION_ROLLBACK,
+   *   static::ACTION_ROLLBACK_AND_IMPORT, or static::ACTION_REFRESH.
+   *
+   * @return array
+   *   Returns an array of batch tasks.
+   */
+  public function createMigrationBatchTasks(string $migration_id, string $action): array {
     assert(in_array($action, [
       static::ACTION_IMPORT,
       static::ACTION_ROLLBACK,
@@ -266,14 +296,11 @@ final class MigrationBatchManager {
     $new_batch = [
       'operations' => $operations,
     ];
-    batch_set($new_batch);
-    batch_process();
-    $batch = batch_get();
-    return new BatchStatus($batch['id'], 0);
+    return $new_batch;
   }
 
   /**
-   * Decorates MigrateUpgradeImportBatch::run() to make it refresh.
+   * Decorates AcquiaMigrateUpgradeImportBatch::run() to make it refresh.
    *
    * @param int[] $initial_ids
    *   The full set of migration plugin IDs to import.
@@ -282,7 +309,7 @@ final class MigrationBatchManager {
    * @param array $context
    *   The batch context.
    *
-   * @see MigrateUpgradeImportBatch::run()
+   * @see AcquiaMigrateUpgradeImportBatch::run()
    * @see \Drupal\acquia_migrate\MigrationAlterer::addChangeTracking()
    */
   public static function runRefresh(array $initial_ids, array $config, array &$context) {
@@ -306,7 +333,7 @@ final class MigrationBatchManager {
     // new and modified content. This module does its best to ensure that that
     // change tracking is enabled for every migration plugin by altering every
     // plugin definition.
-    $callable = [MigrateUpgradeImportBatch::class, 'run'];
+    $callable = [AcquiaMigrateUpgradeImportBatch::class, 'run'];
     $arguments = [$initial_ids, $config, &$context];
     call_user_func_array($callable, $arguments);
   }
@@ -633,6 +660,14 @@ final class MigrationBatchManager {
    *   Thrown when an exception occurs during processing.
    */
   public function isMigrationBatchOngoing(int $batch_id): BatchInfo {
+    // This session must own the active operation.
+    if (!$this->coordinator->hasActiveOperation()) {
+      throw new \LogicException('There is no active operation.');
+    }
+    if (!$this->coordinator->canModifyActiveOperation()) {
+      throw new \LogicException('The active operation is not owned by this session.');
+    }
+
     // Load the queried batch from storage, if it exists.
     $batch = $this->batchStorage->load($batch_id);
     if (!$batch) {

@@ -17,7 +17,7 @@ services:
       - '@acquia_migrate.migration_fingerprinter'
       - '@acquia_migrate.recommendations'
       - '@config.factory'
-      - '@lock.persistent'
+      - '@acquia_migrate.coordinator'
 
   # Migration action supporting services: preview, mapping viewer, mapping manipulator.
   acquia_migrate.previewer:
@@ -42,6 +42,12 @@ services:
       - '@plugin.manager.migration'
 
   # Manages migration batch processes.
+  acquia_migrate.coordinator:
+    class: \Drupal\acquia_migrate\Batch\MigrationBatchCoordinator
+    arguments:
+      - '@lock.persistent'
+      - '@state'
+      - '@request_stack'
   acquia_migrate.batch_manager:
     class: \Drupal\acquia_migrate\Batch\MigrationBatchManager
     arguments:
@@ -50,6 +56,7 @@ services:
       - '@app.root'
       - '@acquia_migrate.migration_repository'
       - '@plugin.manager.migration'
+      - '@acquia_migrate.coordinator'
 
   # Migration message supporting services: analysis, more things later.
   acquia_migrate.message_analyzer:
@@ -154,7 +161,7 @@ services:
     class: Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor
     arguments:
       - '@state'
-      - '@lock.persistent'
+      - '@acquia_migrate.coordinator'
     tags:
       - { name: event_subscriber }
   acquia_migrate.post_entity_save_validator:

@@ -258,9 +258,10 @@ class ServerTimingHeaderForResponseSubscriber implements EventSubscriberInterfac
     $container = \Drupal::getContainer();
     assert($container instanceof ContainerInterface);
     if (
+      PHP_SAPI !== 'cli' && (
       !$container->hasParameter('kernel.environment') ||
       $container->getParameter('kernel.environment') !== 'testing'
-    ) {
+    )) {
       throw new \LogicException('Tracked query logs can be dropped only during tests');
     }
     self::$queryLog = NULL;

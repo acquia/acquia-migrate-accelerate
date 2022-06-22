@@ -3,6 +3,7 @@
 namespace Drupal\acquia_migrate\Controller;
 
 use Drupal\acquia_migrate\Batch\BatchUnknown;
+use Drupal\acquia_migrate\Batch\MigrationBatchCoordinator;
 use Drupal\acquia_migrate\Batch\MigrationBatchManager;
 use Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor;
 use Drupal\acquia_migrate\EventSubscriber\ServerTimingHeaderForResponseSubscriber;
@@ -35,7 +36,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -66,11 +66,6 @@ final class HttpApi {
    * The "other" category of migration messages. This is the default.
    */
   const MESSAGE_CATEGORY_OTHER = 'other';
-
-  /**
-   * The name used to identify the lock that ensures only a single active batch.
-   */
-  const ACTIVE_BATCH = 'acquia_migrate__active_batch';
 
   /**
    * Cache contexts to be added to all cacheable responses.
@@ -160,7 +155,7 @@ final class HttpApi {
   protected $repository;
 
   /**
-   * A migration bath manager.
+   * A migration batch manager.
    *
    * @var \Drupal\acquia_migrate\Batch\MigrationBatchManager
    */
@@ -230,19 +225,19 @@ final class HttpApi {
   protected $recommendations;
 
   /**
-   * The persistent lock which is used to lock across requests.
+   * The migration batch coordinator.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var \Drupal\acquia_migrate\Batch\MigrationBatchCoordinator
    */
-  protected $persistentLock;
+  protected $coordinator;
 
   /**
    * HttpApi constructor.
    *
    * @param \Drupal\acquia_migrate\MigrationRepository $repository
    *   The migration repository.
-   * @param \Drupal\acquia_migrate\Batch\MigrationBatchManager $batch_manager
-   *   A batch manager.
+   * @param \Drupal\acquia_migrate\Batch\MigrationBatchManager $migration_batch_manager
+   *   A migration batch manager.
    * @param \Drupal\Core\Database\Connection $connection
    *   A Database connection to use for reading migration messages.
    * @param \Drupal\acquia_migrate\MigrationPreviewer $migration_previewer
@@ -261,12 +256,12 @@ final class HttpApi {
    *   The recommendations.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Lock\LockBackendInterface $persistent_lock
-   *   A persistent lock backend instance.
+   * @param \Drupal\acquia_migrate\Batch\MigrationBatchCoordinator $coordinator
+   *   The migration batch coordinator.
    */
-  public function __construct(MigrationRepository $repository, MigrationBatchManager $batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, Recommendations $recommendations, ConfigFactoryInterface $config_factory, LockBackendInterface $persistent_lock) {
+  public function __construct(MigrationRepository $repository, MigrationBatchManager $migration_batch_manager, Connection $connection, MigrationPreviewer $migration_previewer, MigrationMappingViewer $migration_mapping_viewer, MigrationMappingManipulator $migration_mapping_manipulator, MessageAnalyzer $message_analyzer, ModuleAuditor $module_auditor, MigrationFingerprinter $migration_fingerprinter, Recommendations $recommendations, ConfigFactoryInterface $config_factory, MigrationBatchCoordinator $coordinator) {
     $this->repository = $repository;
-    $this->migrationBatchManager = $batch_manager;
+    $this->migrationBatchManager = $migration_batch_manager;
     $this->connection = $connection;
     $this->migrationPreviewer = $migration_previewer;
     $this->migrationMappingViewer = $migration_mapping_viewer;
@@ -276,7 +271,7 @@ final class HttpApi {
     $this->migrationFingerprinter = $migration_fingerprinter;
     $this->recommendations = $recommendations;
     $this->configFactory = $config_factory;
-    $this->persistentLock = $persistent_lock;
+    $this->coordinator = $coordinator;
   }
 
   /**
@@ -381,6 +376,17 @@ final class HttpApi {
       ],
       'meta' => [
         'sourceSyncTime' => $this->recommendations->getRecentInfoTime(),
+        // @codingStandardsIgnoreStart
+        'controllingSession' => (!$this->coordinator->hasActiveOperation() || !$this->coordinator->controllingSessionIsKnown())
+          // NULL: currently no controlling session, or not known.
+          ? NULL
+          : (
+            $this->coordinator->canModifyActiveOperation()
+            // TRUE: this session is in control.
+            ? TRUE
+            // FALSE: another session in control, and it is not drush.
+            : ($this->coordinator->controllingSessionIsDrush() ? 'drush' : FALSE)),
+        // @codingStandardsIgnoreEnd
       ],
     ];
     $bulk_update_url = Url::fromRoute('acquia_migrate.api.migrations.bulk_update')
@@ -416,7 +422,7 @@ final class HttpApi {
           "rel" => UriDefinitions::LINK_REL_STALE_DATA,
         ];
       }
-      if ($this->persistentLock->lockMayBeAvailable(static::ACTIVE_BATCH)) {
+      if (!$this->coordinator->hasActiveOperation()) {
         // First: ensure that we're always working on an optimized database.
         if (MacGyver::detectWhetherActionIsNeeded()) {
           $database_copy_url = Url::fromRoute('acquia_migrate.api.migration.database.copy')
@@ -1108,8 +1114,7 @@ final class HttpApi {
       }
 
       // @see \Drupal\acquia_migrate\EventSubscriber\InstantaneousBatchInterruptor
-      // @codingStandardsIgnoreLine
-      if (!\Drupal::service('lock.persistent')->lockMayBeAvailable(HttpApi::ACTIVE_BATCH)) {
+      if ($this->coordinator->hasActiveOperation() && $this->coordinator->canModifyActiveOperation()) {
         \Drupal::state()->set(InstantaneousBatchInterruptor::KEY, TRUE);
       }
       // When no migration is currently executing (because no lock is held), yet
@@ -1362,14 +1367,18 @@ final class HttpApi {
   /**
    * Checks if an active batch is running; if so: return error response.
    *
+   * Actually does:
+   * - check if operation can be started, if so: it starts one
+   * - check if operation is already running, if so: extends it
+   * - otherwise, returns error response.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse|null
    *   NULL when no batch is running, an error response otherwise.
    */
   private function abortIfAnotherBatchIsRunning() : ?JsonResponse {
     // This lock will extended for the duration of this batch process.
     // @see \Drupal\acquia_migrate\Controller\HttpApi::migrationProcess()
-    $lock_acquired = $this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time'));
-    if (!$lock_acquired) {
+    if ($this->coordinator->hasActiveOperation() || !$this->coordinator->startOperation()) {
       return JsonResponse::create([
         'errors' => [
           [
@@ -1516,7 +1525,7 @@ final class HttpApi {
     // Extend the lock that was already acquired. Extend it to the max execution
     // time of this batch processing request.
     // @see \Drupal\acquia_migrate\Controller\HttpApi::abortIfAnotherBatchIsRunning()
-    if (!$this->persistentLock->acquire(static::ACTIVE_BATCH, ini_get('max_execution_time'))) {
+    if (!$this->coordinator->extendActiveOperation()) {
       \Drupal::logger('acquia_migrate')->warning('Failed to extend AMA active batch lock at the start of the batch request.');
     }
     $batch_status = $this->migrationBatchManager->isMigrationBatchOngoing($process_id);
@@ -1547,12 +1556,12 @@ final class HttpApi {
       // Note: if we did not consume the entire max_execution_time during this
       // batch processing request, the this may effectively *shorten* the lock
       // duration: this is intentional.
-      if (!$this->persistentLock->acquire(static::ACTIVE_BATCH, 5)) {
+      if (!$this->coordinator->extendActiveOperation(5)) {
         \Drupal::logger('acquia_migrate')->warning('Failed to extend AMA active batch lock at the end of the batch request.');
       }
     }
     else {
-      $this->persistentLock->release(static::ACTIVE_BATCH);
+      $this->coordinator->stopOperation();
     }
     return JsonResponse::create([
       'data' => $data,
