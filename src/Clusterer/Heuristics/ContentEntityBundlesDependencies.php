@@ -126,6 +126,25 @@ final class ContentEntityBundlesDependencies implements DependentHeuristicWithCo
       $recursive_calls[$migration_plugin_id] = $migration_plugin_id;
     }
     else {
+      $base = explode(':', $migration_plugin_id)[0];
+      $paragraphs_current_rev_migrations = [
+        'd7_field_collection',
+        'd7_paragraphs',
+        'd7_pm_field_collection',
+        'd7_pm_paragraphs',
+      ];
+      if (in_array($base, $paragraphs_current_rev_migrations, TRUE)) {
+        $host_source_entity = explode(':', $migration_plugin_id)[1];
+        // We can ignore recursive dependencies of paragraphs and field
+        // collections migrations: the second entity reference level is pushed
+        // into a common "Shared data for paragraphs and field collection items"
+        // group, and all the related migration lookups are performed with
+        // "migmag_lookup", which is able to identify the right migration
+        // derivative to create and store the stub entity.
+        if (in_array($host_source_entity, SharedEntityData::PARAGRAPHS_LEGACY_ENTITY_TYPE_IDS)) {
+          return [];
+        }
+      }
       throw new \LogicException("Recursive limit reached in ::getRecursivelyRequiredMigrationDependencies() for the migration with '$migration_plugin_id' plugin ID.");
     }
 
