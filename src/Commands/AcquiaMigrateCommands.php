@@ -15,6 +15,7 @@ use Drupal\acquia_migrate\Migration;
 use Drupal\acquia_migrate\MigrationRepository;
 use Drupal\acquia_migrate\Recommendations;
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\migrate\Plugin\migrate\destination\NullDestination;
@@ -950,7 +951,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
     return (int) $val;
   }
 
-  /*
+  /**
    * Gets all stuck migrations.
    *
    * @return \Drupal\acquia_migrate\Migration[]
@@ -1173,7 +1174,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
       return;
     }
     catch (\Throwable $exception) {
-      // Cleanly stop the operation to keep AMA in a consistent state …
+      // Cleanly stop the operation to keep AMA in a consistent state.
       $this->coordinator->stopOperation();
       // … and then re-throw!
       throw $exception;
@@ -1412,6 +1413,8 @@ final class AcquiaMigrateCommands extends DrushCommands {
    */
   protected function executeMigrations(array $migration_labels) : void {
     // Create section for total progress bar.
+    // Set decorated to True explicitly to support ANSI on acquia-cli.
+    $this->output()->setDecorated(TRUE);
     $section_total_progress = $this->output()->section();
     $this->totalProgress = new ProgressBar($section_total_progress);
     ProgressBar::setFormatDefinition('custom4', "%message% [%bar%]\n\033[1;37m📈 %current% processed, %current_imported% imported of %max% total rows (memory consumption: %memory:6s%/%memory_limit:6s%)\n🏁 %remaining_better:6s% (elapsed: %elapsed:6s% for %accurate_progress% rows)\033[0m" . "\n");
@@ -1502,6 +1505,128 @@ final class AcquiaMigrateCommands extends DrushCommands {
     $this->drawProgress(TRUE);
     $this->totalProgress->clear();
     $this->coordinator->stopOperation();
+  }
+
+  /**
+   * Export migration messages as a csv.
+   *
+   * @param string|null $input
+   *   Migration label or migration plugin ID.
+   * @param string|null $messageCategory
+   *   Category of message.
+   * @param array $options
+   *   The options to pass.
+   *
+   * @command ama:messages:export
+   *
+   * @option all Export all migration messages.
+   * @option ml Migration label.
+   * @option mp Migration plugin.
+   * @option c Category of message.
+   *
+   * @usage ama:messages:export --all
+   *   Export all migration messages.
+   * @usage ama:messages:export --ml 'migration_label'
+   *   Export messages for given migration label.
+   * @usage ama:messages:export --mp 'migration_plugin'
+   *   Export messages for given migration plugin.
+   * @usage ama:messages:export --ml 'migration_label' --c 'entity_validation'
+   *   Export messages for given migration label and category.
+   * @usage ama:messages:export --mp 'migration_plugin' --c 'entity_validation'
+   *   Export messages for given migration plugin and category.
+   *
+   * @validate-module-enabled acquia_migrate
+   *
+   * @aliases amame
+   */
+  public function exportMessages(string $input = NULL, string $messageCategory = NULL, array $options = [
+    'all' => FALSE,
+    'ml' => FALSE,
+    'mp' => FALSE,
+    'c' => FALSE,
+  ]) {
+    if (!$options['all'] && empty($input))  {
+      $this->output()->writeln('⛔️ Invalid parameters, refer --help.');
+      return;
+    }   // Export all the migration messages if all flag is set.
+    if ($options['all']) {
+      $this->executeQuery();
+    }
+    // If migration label flag is set.
+    elseif ($options['ml']) {
+      $all_migrations = array_keys($this->migrationRepository->getMigrations());
+      $migration_id = Migration::generateIdFromLabel($input);
+      if (!in_array($migration_id, $all_migrations, TRUE)) {
+        $this->output()->writeln('⛔️ Invalid migration label');
+        return;
+      }
+      $this->executeQuery($migration_id, 'sourceMigration', $messageCategory);
+    }
+    // If migration plugin flag is set.
+    elseif ($options['mp']) {
+      $all_migrations = $this->migrationRepository->getMigrations();
+      $all_migration_plugin_ids = [];
+      foreach ($all_migrations as $migration) {
+        $all_migration_plugin_ids = array_merge($all_migration_plugin_ids, $migration->getMigrationPluginIds());
+      }
+      if (!in_array($input, $all_migration_plugin_ids, TRUE)) {
+        $this->output()->writeln('⛔️ Invalid migration plugin ID');
+        return;
+      }
+      $migration_plugin = $input;
+      $this->executeQuery($migration_plugin, 'sourceMigrationPlugin', $messageCategory);
+    }
+  }
+
+  /**
+   * Execute query.
+   *
+   * @param string|null $migration_or_migration_plugin
+   *   Migration label or migration plugin.
+   * @param string|null $migration_or_migration_plugin_column
+   *   switch between sourceMigration and sourceMigrationPlugin.
+   * @param string|null $messageCategory
+   *   Category if message.
+   */
+  protected function executeQuery(string $migration_or_migration_plugin = NULL, string $migration_or_migration_plugin_column = NULL, string $messageCategory = NULL) {
+    $db_connection = Database::getConnection();
+    if (!$db_connection) {
+      $this->output()->writeln('⛔️ Unable to connect to database.');
+      return;
+    }
+    $messages = $db_connection->select('acquia_migrate_messages', 'messages')
+      ->fields('messages');
+    if ($migration_or_migration_plugin) {
+      $messages->condition($migration_or_migration_plugin_column, $migration_or_migration_plugin);
+    }
+    if ($messageCategory) {
+      $messages->condition('messageCategory', $messageCategory);
+    }
+    $final_messages = $messages->execute()
+      ->fetchAll(\PDO::FETCH_ASSOC);
+    $this->writeIntoFile($final_messages);
+  }
+
+  /**
+   * Writes messages to a file.
+   *
+   * @param array $messages
+   *   Messages to write to a file.
+   */
+  private function writeIntoFile(array $messages) {
+    // Open file.
+    $f = fopen('messages.csv', 'w+');
+    if ($f === FALSE) {
+      die('Error opening the file messages.csv');
+    }
+    $header = ['timestamp', 'sourceMigration', 'sourceMigrationPlugin', 'msgid', 'source_ids_hash', 'source_id', 'messageCategory', 'severity', 'message'];
+    fputcsv($f, $header);
+    foreach ($messages as $message) {
+      fputcsv($f, $message);
+    }
+    // Close file.
+    fclose($f);
+    $this->output()->writeln('✅ Messages saved to messages.csv in the docroot.');
   }
 
   /**
