@@ -1,4 +1,8 @@
 {
+  "a11y": {
+    "vetted": false,
+    "note": null
+  },
   "abjs": {
     "vetted": false,
     "note": null
@@ -132,6 +136,10 @@
     "note": null
   },
   "addtohomescreen": {
+    "vetted": false,
+    "note": null
+  },
+  "adinsight_clarity": {
     "vetted": false,
     "note": null
   },
@@ -327,7 +335,15 @@
     "vetted": false,
     "note": null
   },
+  "alias_hierarchy": {
+    "vetted": false,
+    "note": null
+  },
   "alinks": {
+    "vetted": false,
+    "note": null
+  },
+  "alogin": {
     "vetted": false,
     "note": null
   },
@@ -504,6 +520,10 @@
     "note": null
   },
   "auditfiles": {
+    "vetted": false,
+    "note": null
+  },
+  "auth0": {
     "vetted": false,
     "note": null
   },
@@ -840,6 +860,10 @@
     "note": "This module must be installed manually due to its dependency on drupal/dynamic_entity_reference development version."
   },
   "booktree": {
+    "vetted": false,
+    "note": null
+  },
+  "boost": {
     "vetted": false,
     "note": null
   },
@@ -1240,6 +1264,10 @@
     "note": null
   },
   "cloudfront_path_invalidate": {
+    "vetted": false,
+    "note": null
+  },
+  "cloudinary": {
     "vetted": false,
     "note": null
   },
@@ -1795,10 +1823,6 @@
     "vetted": false,
     "note": null
   },
-  "commerce_worldpay": {
-    "vetted": false,
-    "note": null
-  },
   "commerce_xero": {
     "vetted": false,
     "note": null
@@ -1929,6 +1953,10 @@
   },
   "contextual": {
     "vetted": true,
+    "note": null
+  },
+  "contextual_help": {
+    "vetted": false,
     "note": null
   },
   "contextual_range_filter": {
@@ -2243,6 +2271,10 @@
     "vetted": false,
     "note": null
   },
+  "dbpedia_spotlight": {
+    "vetted": false,
+    "note": null
+  },
   "dc_ajax_add_cart": {
     "vetted": false,
     "note": null
@@ -2407,6 +2439,10 @@
     "vetted": false,
     "note": null
   },
+  "domain_301_redirect": {
+    "vetted": false,
+    "note": null
+  },
   "domain_entity": {
     "vetted": false,
     "note": null
@@ -2440,6 +2476,10 @@
     "note": null
   },
   "double_field": {
+    "vetted": false,
+    "note": null
+  },
+  "download": {
     "vetted": false,
     "note": null
   },
@@ -2579,6 +2619,10 @@
     "vetted": false,
     "note": null
   },
+  "easychart": {
+    "vetted": false,
+    "note": null
+  },
   "easychart_wysiwyg": {
     "vetted": true,
     "note": "This module is now obsolete because Drupal 8 and above port of the easychart module does not have WYSIWYG integration at all."
@@ -2588,6 +2632,10 @@
     "note": null
   },
   "ecwid_shopping_cart": {
+    "vetted": false,
+    "note": null
+  },
+  "edit_content_type_tab": {
     "vetted": false,
     "note": null
   },
@@ -2719,11 +2767,19 @@
     "vetted": false,
     "note": null
   },
+  "entity_dependency_visualizer": {
+    "vetted": false,
+    "note": null
+  },
   "entity_embed": {
     "vetted": false,
     "note": null
   },
   "entity_legal": {
+    "vetted": false,
+    "note": null
+  },
+  "entity_merge": {
     "vetted": false,
     "note": null
   },
@@ -2951,6 +3007,10 @@
     "vetted": false,
     "note": null
   },
+  "facebook_comments": {
+    "vetted": false,
+    "note": null
+  },
   "facebook_comments_block": {
     "vetted": false,
     "note": null
@@ -3031,6 +3091,10 @@
     "vetted": false,
     "note": null
   },
+  "fbl": {
+    "vetted": false,
+    "note": null
+  },
   "fe_block": {
     "vetted": true,
     "note": "Most Drupal 8 and above sites should not need Features. See \"Stop Using Features: A Guide To Drupal 8 Configuration Management\" and related material on https://www.drupal.org/project/features."
@@ -3083,11 +3147,19 @@
     "vetted": false,
     "note": null
   },
+  "feeds_plupload": {
+    "vetted": false,
+    "note": null
+  },
   "feeds_tamper": {
     "vetted": false,
     "note": null
   },
   "feeds_ui": {
+    "vetted": false,
+    "note": null
+  },
+  "feeds_xsltparser": {
     "vetted": false,
     "note": null
   },
@@ -3491,6 +3563,10 @@
     "vetted": false,
     "note": null
   },
+  "forgot_password_block": {
+    "vetted": false,
+    "note": null
+  },
   "forgot_username": {
     "vetted": false,
     "note": null
@@ -3679,6 +3755,10 @@
     "vetted": true,
     "note": "The Geofield Map module's field formatter is not available; this migration falls back to the default. If you want the nicer Map-based formatter, help out at https://www.drupal.org/project/geofield_map/issues/3249091 to automate that migration. AMA has pre-installed the module for you, to configure it manually."
   },
+  "geoip": {
+    "vetted": false,
+    "note": null
+  },
   "geolocation": {
     "vetted": false,
     "note": null
@@ -3743,6 +3823,10 @@
     "vetted": false,
     "note": "No automatic migration exists yet from the GMap module to the Geolocation module, but the community consensus is that the Geolocation module is the logical successor. Help out at https://www.drupal.org/project/location_migration/issues/3188272 to provide the migration path."
   },
+  "gmap_polygon_field": {
+    "vetted": false,
+    "note": null
+  },
   "gmap_static": {
     "vetted": false,
     "note": null
@@ -3760,6 +3844,10 @@
     "note": null
   },
   "google_analytics": {
+    "vetted": false,
+    "note": null
+  },
+  "google_analytics_counter": {
     "vetted": false,
     "note": null
   },
@@ -4347,6 +4435,10 @@
     "vetted": false,
     "note": null
   },
+  "indieauth": {
+    "vetted": false,
+    "note": null
+  },
   "inline_documentation": {
     "vetted": false,
     "note": null
@@ -4400,6 +4492,10 @@
     "note": null
   },
   "instapage": {
+    "vetted": false,
+    "note": null
+  },
+  "instapage_cms_plugin": {
     "vetted": false,
     "note": null
   },
@@ -4495,10 +4591,6 @@
     "vetted": false,
     "note": null
   },
-  "jira_rest": {
-    "vetted": false,
-    "note": null
-  },
   "job_scheduler": {
     "vetted": true,
     "note": "There is no data to be migrated for this module, but the Drupal 7 modules implementing its hooks need to be ported to Drupal 9. See https://git.drupalcode.org/project/job_scheduler/-/blob/8.x-3.x/README.txt."
@@ -4548,6 +4640,10 @@
     "note": null
   },
   "jsld": {
+    "vetted": false,
+    "note": null
+  },
+  "json_field": {
     "vetted": false,
     "note": null
   },
@@ -4979,6 +5075,10 @@
     "vetted": false,
     "note": null
   },
+  "mail_redirect": {
+    "vetted": false,
+    "note": null
+  },
   "mail_safety": {
     "vetted": false,
     "note": null
@@ -5060,6 +5160,10 @@
     "note": null
   },
   "mask_user_data": {
+    "vetted": false,
+    "note": null
+  },
+  "masked_input": {
     "vetted": false,
     "note": null
   },
@@ -5543,6 +5647,10 @@
     "vetted": false,
     "note": null
   },
+  "moderation_team": {
+    "vetted": false,
+    "note": null
+  },
   "module_builder": {
     "vetted": false,
     "note": null
@@ -5671,6 +5779,10 @@
     "vetted": false,
     "note": null
   },
+  "mytube": {
+    "vetted": false,
+    "note": null
+  },
   "n1ed": {
     "vetted": false,
     "note": null
@@ -5689,6 +5801,10 @@
   },
   "navbar": {
     "vetted": true,
+    "note": null
+  },
+  "navbar_filter": {
+    "vetted": false,
     "note": null
   },
   "neo4j": {
@@ -5823,6 +5939,10 @@
     "vetted": false,
     "note": null
   },
+  "node_usage": {
+    "vetted": false,
+    "note": null
+  },
   "node_view_permissions": {
     "vetted": false,
     "note": null
@@ -5869,6 +5989,10 @@
   },
   "noreqnewpass": {
     "vetted": true,
+    "note": null
+  },
+  "noscript_tag": {
+    "vetted": false,
     "note": null
   },
   "notes": {
@@ -5948,10 +6072,6 @@
     "note": null
   },
   "office_hours": {
-    "vetted": false,
-    "note": null
-  },
-  "officialfacebookpixel": {
     "vetted": false,
     "note": null
   },
@@ -6044,6 +6164,10 @@
     "note": "This module is obsolete in Drupal 8 and above. No known equivalent module exists; please help porting this module if it's critical for your site. See https://www.drupal.org/project/options_element/issues/2223583."
   },
   "options_table": {
+    "vetted": false,
+    "note": null
+  },
+  "oracle": {
     "vetted": false,
     "note": null
   },
@@ -6158,6 +6282,10 @@
   "panels_node": {
     "vetted": false,
     "note": "The Panel nodes submodule of the Panels module is obsolete, because Drupal core now has a rich block system, which combined with the Drupal 9 Layout Builder can do much more."
+  },
+  "panopoly_admin": {
+    "vetted": false,
+    "note": null
   },
   "panopoly_core": {
     "vetted": true,
@@ -6375,10 +6503,6 @@
     "vetted": false,
     "note": null
   },
-  "pdf_html": {
-    "vetted": false,
-    "note": null
-  },
   "pdf_reader": {
     "vetted": false,
     "note": null
@@ -6583,6 +6707,10 @@
     "vetted": true,
     "note": "The PrintFriendly & PDF module was marked as obsolete by its maintainers. It is recommended to use a different module both on Drupal 7 and 9."
   },
+  "prism": {
+    "vetted": false,
+    "note": null
+  },
   "private_files_download_permission": {
     "vetted": false,
     "note": null
@@ -6619,11 +6747,11 @@
     "vetted": false,
     "note": null
   },
-  "protected_pages": {
+  "protected_download": {
     "vetted": false,
     "note": null
   },
-  "protected_submissions": {
+  "protected_pages": {
     "vetted": false,
     "note": null
   },
@@ -6644,6 +6772,10 @@
     "note": null
   },
   "purge_users": {
+    "vetted": false,
+    "note": null
+  },
+  "pusher_api": {
     "vetted": false,
     "note": null
   },
@@ -6707,6 +6839,10 @@
     "vetted": false,
     "note": null
   },
+  "quiz_item_analysis": {
+    "vetted": false,
+    "note": null
+  },
   "quote": {
     "vetted": false,
     "note": null
@@ -6739,6 +6875,10 @@
     "vetted": false,
     "note": null
   },
+  "random_frontpage": {
+    "vetted": false,
+    "note": null
+  },
   "range": {
     "vetted": true,
     "note": null
@@ -6757,6 +6897,10 @@
   },
   "rdf": {
     "vetted": true,
+    "note": null
+  },
+  "reachedge": {
+    "vetted": false,
     "note": null
   },
   "read_time": {
@@ -7223,6 +7367,10 @@
     "vetted": false,
     "note": null
   },
+  "scheduled_maintenance": {
+    "vetted": false,
+    "note": null
+  },
   "scheduler": {
     "vetted": true,
     "note": null
@@ -7319,6 +7467,10 @@
     "vetted": true,
     "note": "This module needs to be installed manually due to its version conflicts with https://www.drupal.org/project/search_api_solr"
   },
+  "search_api_fusion": {
+    "vetted": false,
+    "note": null
+  },
   "search_api_glossary": {
     "vetted": false,
     "note": null
@@ -7382,6 +7534,10 @@
   "seckit": {
     "vetted": true,
     "note": "The security policies for a site depend on its front end and infrastructure. Also, Drupal 7 typically requires a relatively lax CSP policy because of inline scripts. Therefore migrating the configuration from Drupal 7 does not make sense. In most cases, you should be able to configure seckit to be more strict in Drupal 9 than in Drupal 7."
+  },
+  "secure_password_reset": {
+    "vetted": false,
+    "note": null
   },
   "securelogin": {
     "vetted": true,
@@ -7464,6 +7620,10 @@
     "note": null
   },
   "services_path": {
+    "vetted": false,
+    "note": null
+  },
+  "services_token": {
     "vetted": false,
     "note": null
   },
@@ -7690,6 +7850,10 @@
   "simplenews_scheduler": {
     "vetted": true,
     "note": "This module is not composer installable - see https://www.drupal.org/project/simplenews_scheduler/issues/3230858."
+  },
+  "simplerads": {
+    "vetted": false,
+    "note": null
   },
   "simplesamlphp_auth": {
     "vetted": true,
@@ -7979,11 +8143,19 @@
     "vetted": false,
     "note": null
   },
+  "stacktable": {
+    "vetted": false,
+    "note": null
+  },
   "stage_file_proxy": {
     "vetted": false,
     "note": null
   },
   "standalone": {
+    "vetted": false,
+    "note": null
+  },
+  "standwithukraine": {
     "vetted": false,
     "note": null
   },
@@ -7996,6 +8168,10 @@
     "note": null
   },
   "static_page": {
+    "vetted": false,
+    "note": null
+  },
+  "station": {
     "vetted": false,
     "note": null
   },
@@ -8055,6 +8231,10 @@
     "vetted": false,
     "note": null
   },
+  "style_library_entity": {
+    "vetted": false,
+    "note": null
+  },
   "styled_google_map": {
     "vetted": false,
     "note": null
@@ -8088,6 +8268,10 @@
     "note": null
   },
   "super_login": {
+    "vetted": false,
+    "note": null
+  },
+  "superfaktura": {
     "vetted": false,
     "note": null
   },
@@ -8243,6 +8427,10 @@
     "vetted": false,
     "note": null
   },
+  "taxonomy_set_lineage": {
+    "vetted": false,
+    "note": null
+  },
   "taxonomy_term_depth": {
     "vetted": false,
     "note": null
@@ -8312,6 +8500,10 @@
     "note": null
   },
   "term_merge_manager": {
+    "vetted": false,
+    "note": null
+  },
+  "term_name_validation": {
     "vetted": false,
     "note": null
   },
@@ -8537,6 +8729,14 @@
   },
   "toolbar": {
     "vetted": true,
+    "note": null
+  },
+  "toolbar_visibility": {
+    "vetted": false,
+    "note": null
+  },
+  "tooltip": {
+    "vetted": false,
     "note": null
   },
   "tota11y": {
@@ -8767,6 +8967,10 @@
     "vetted": true,
     "note": null
   },
+  "user_logout_confirm": {
+    "vetted": false,
+    "note": null
+  },
   "user_picture_field": {
     "vetted": false,
     "note": "This module allow you add an image field to user, and show it on user register form, after user register an account. Drupal core now contains a superset of its functionality."
@@ -8883,6 +9087,10 @@
     "vetted": false,
     "note": null
   },
+  "vat_number": {
+    "vetted": false,
+    "note": null
+  },
   "vbo_export": {
     "vetted": false,
     "note": null
@@ -8896,6 +9104,10 @@
     "note": "This module needs an asset library that must be installed manually — see https://www.drupal.org/project/vegas."
   },
   "vertical_tabs_config": {
+    "vetted": false,
+    "note": null
+  },
+  "vfd": {
     "vetted": false,
     "note": null
   },
@@ -9095,6 +9307,10 @@
     "vetted": true,
     "note": "This migration is not yet automated, because the migration of views is not yet automated. But the functionality is available, so we preinstalled it for you."
   },
+  "views_default_user_taxonomy": {
+    "vetted": false,
+    "note": null
+  },
   "views_delimited_list": {
     "vetted": false,
     "note": null
@@ -9108,6 +9324,10 @@
     "note": null
   },
   "views_evi": {
+    "vetted": false,
+    "note": null
+  },
+  "views_exclude_previous": {
     "vetted": false,
     "note": null
   },
@@ -9275,6 +9495,10 @@
     "vetted": false,
     "note": null
   },
+  "views_rss_smartnews": {
+    "vetted": false,
+    "note": null
+  },
   "views_save": {
     "vetted": false,
     "note": null
@@ -9395,6 +9619,10 @@
     "vetted": true,
     "note": null
   },
+  "vppr": {
+    "vetted": false,
+    "note": null
+  },
   "vspfo": {
     "vetted": false,
     "note": null
@@ -9423,6 +9651,10 @@
     "vetted": false,
     "note": null
   },
+  "wayback_filter": {
+    "vetted": false,
+    "note": null
+  },
   "weather": {
     "vetted": false,
     "note": null
@@ -9446,6 +9678,10 @@
   "webform_clear": {
     "vetted": true,
     "note": "This module allows not storing webform submissions in Drupal 7. The Drupal 8 and above Webform module contains a superset of its functionality. See https://www.drupal.org/project/webform_clear/issues/3252072."
+  },
+  "webform_email_reply": {
+    "vetted": false,
+    "note": null
   },
   "webform_encrypt": {
     "vetted": false,
@@ -9504,6 +9740,10 @@
     "note": "Some of the features from drupal 7 are now merged in the webform module, only equal values validator's migration is supported through webform_migrate module."
   },
   "webpay": {
+    "vetted": false,
+    "note": null
+  },
+  "webpurify": {
     "vetted": false,
     "note": null
   },
@@ -9688,10 +9928,6 @@
     "note": "This module does not have 8|9 port. Nearest module having similar feature is https://www.drupal.org/project/xss_prevention"
   },
   "yamaps": {
-    "vetted": false,
-    "note": null
-  },
-  "yandexdisk": {
     "vetted": false,
     "note": null
   },
