@@ -312,7 +312,7 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
       return FALSE;
     }
 
-    list(, $entity_type_id) = explode(':', $destination_plugin_id);
+    [, $entity_type_id] = explode(':', $destination_plugin_id);
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
     return $entity_type instanceof ContentEntityType;
@@ -539,7 +539,7 @@ final class MigrationPreviewer implements TrustedCallbackInterface {
    */
   private function getDestinationEntityTypeForMigrationPlugin(MigrationPlugin $migration_plugin) : EntityTypeInterface {
     $destination_configuration = $migration_plugin->getDestinationConfiguration();
-    list(, $entity_type_id) = explode(':', $destination_configuration['plugin']);
+    [, $entity_type_id] = explode(':', $destination_configuration['plugin']);
     try {
       return $this->entityTypeManager->getDefinition($entity_type_id);
     }

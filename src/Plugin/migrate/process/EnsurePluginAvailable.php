@@ -67,12 +67,12 @@ class EnsurePluginAvailable extends ProcessPluginBase {
       throw new MigrateException(sprintf("The 'plugin_manager_id' configuration has to be defined for the '%s' migration process plugin.", $this->getPluginId()));
     }
 
-    list(
+    [
       'plugin_manager_id' => $plugin_manager_id,
       'message_template' => $message_template,
       'message_args' => $args,
-      'source_override' => $source_override
-    ) = $this->configuration;
+      'source_override' => $source_override,
+    ] = $this->configuration;
 
     // Cannot find a service based on the provided service ID.
     if (!\Drupal::hasService($plugin_manager_id)) {

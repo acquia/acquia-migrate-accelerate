@@ -66,7 +66,7 @@ final class LocalhostToAcquiaSumologic extends SysLog {
 
     if (!isset($must_send)) {
       $env = (AcquiaDrupalEnvironmentDetector::isLocalEnv() || AcquiaDrupalEnvironmentDetector::isAhIdeEnv()) ? 'local' : 'cloud';
-      $must_send = $env === 'local' && !file_exists(__DIR__ . '/../../.git');
+      $must_send = !static::isTestEnvironment() && $env === 'local' && !file_exists(__DIR__ . '/../../.git');
       $site_config = $this->systemSiteConfig->get();
       if (empty($site_config)) {
         $site_config['uuid'] = $site_config['name'] = 'testing';
@@ -88,6 +88,16 @@ final class LocalhostToAcquiaSumologic extends SysLog {
         ]),
       ]);
     }
+  }
+
+  /**
+   * Determines whether the current environment is a CI (or local test) env.
+   *
+   * @return bool
+   *   Whether the current environment is a CI (or local test) env.
+   */
+  public static function isTestEnvironment() {
+    return !empty(getenv('CI')) || !empty(getenv('SIMPLETEST_BASE_URL'));
   }
 
 }

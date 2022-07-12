@@ -15,7 +15,7 @@ class AcquiaMigrateEntityReference extends EntityReference {
    */
   public function defineValueProcessPipeline(MigrationInterface $migration, $field_name, $data) {
     $field_definition_data_raw = $data['field_definition']['data'] ?? serialize(NULL);
-    $field_definition_data = unserialize($field_definition_data_raw);
+    $field_definition_data = unserialize($field_definition_data_raw, ['allowed_classes' => FALSE]);
     $target_type = $field_definition_data['settings']['target_type'] ?? NULL;
 
     // Only 'node' target types should be handled differently.

@@ -1631,7 +1631,7 @@ final class HttpApi {
 
     // Process any requested filters.
     foreach ($query->getAll('filter') as $parameter_value) {
-      list($field, $value, $operator) = $this->parseFilterParameter($parameter_value);
+      [$field, $value, $operator] = $this->parseFilterParameter($parameter_value);
       $message_query->condition($field, $value, static::$filterOperatorMap[$operator]);
     }
 
@@ -1742,7 +1742,7 @@ final class HttpApi {
     ];
     $source_id_values = explode('|', $message->{SqlWithCentralizedMessageStorage::COLUMN_SOURCE_ID});
     foreach ($source_id_values as $source_id_value) {
-      list($key, $value) = explode('=', $source_id_value);
+      [$key, $value] = explode('=', $source_id_value);
       $link_object['meta']['source-identifiers'][$key] = $value;
     }
     return $link_object;

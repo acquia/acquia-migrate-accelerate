@@ -193,7 +193,7 @@ final class MigrationBatchCoordinator {
       throw new \LogicException('An operation can only be extended by the session that created it. Current session ID: `' . $this->sessionId . '`, controlling session ID: `' . $this->controllingSessionId . '`.');
     }
 
-    $success = $this->persistentLock->acquire(static::ACTIVE_BATCH, isset($seconds) ? $seconds : ini_get('max_execution_time'));
+    $success = $this->persistentLock->acquire(static::ACTIVE_BATCH, $seconds ?? ini_get('max_execution_time'));
 
     // Extending an operation should always succeed. Still, race conditions are
     // not impossible (for example, a slow network), so the caller must still

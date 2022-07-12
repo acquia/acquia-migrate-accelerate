@@ -239,7 +239,7 @@ final class GetStarted extends ControllerBase {
       ->fields(NULL, ['value'])
       ->condition('name', 'file_public_path', 'LIKE')
       ->execute()
-      ->fetchField());
+      ->fetchField(), ['allowed_classes' => FALSE]);
     if ($files_configured && $expected_file_public_path && $expected_file_public_path !== 'sites/default/files') {
       $expected_file_public_path_exists = $expected_file_public_path !== FALSE && $files_configured && file_exists($expected_file_public_path) && is_writable($expected_file_public_path);
       $steps['create-destination-files-directory'] = [
@@ -378,7 +378,7 @@ final class GetStarted extends ControllerBase {
       return NULL;
     }
 
-    return unserialize($variable_value);
+    return unserialize($variable_value, ['allowed_classes' => FALSE]);
   }
 
   /**

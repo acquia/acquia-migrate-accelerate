@@ -72,7 +72,7 @@ final class MigrationMappingViewer {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   private function getEntityTypeAndFieldDefinitions(MigrationPlugin $data_migration_plugin) {
-    list(, $entity_type_id) = explode(':', $data_migration_plugin->getDestinationConfiguration()['plugin']);
+    [, $entity_type_id] = explode(':', $data_migration_plugin->getDestinationConfiguration()['plugin']);
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $destination_bundle = $entity_type_id;
     if ($entity_type->hasKey('bundle')) {
@@ -118,7 +118,7 @@ final class MigrationMappingViewer {
    * @throws \Drupal\migrate\MigrateException
    */
   public function getMappedFields(MigrationPlugin $data_migration_plugin, array &$mapped_source_columns) : array {
-    list('field_definitions' => $field_definitions) = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
+    ['field_definitions' => $field_definitions] = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
     assert(Inspector::assertAllObjects($field_definitions, FieldDefinitionInterface::class));
 
     [$overridden] = $this->migrationMappingManipulator->getProcessPipelineOverrides($data_migration_plugin);
@@ -192,7 +192,7 @@ final class MigrationMappingViewer {
    *   - sourceFieldName: a field name
    */
   public function getSourceOnlyFields(array $mapped_source_columns, MigrationPlugin $data_migration_plugin) : array {
-    list('entity_type' => $entity_type) = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
+    ['entity_type' => $entity_type] = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
     assert($entity_type instanceof ContentEntityType);
 
     [, $overridden] = $this->migrationMappingManipulator->getProcessPipelineOverrides($data_migration_plugin);
@@ -251,7 +251,7 @@ final class MigrationMappingViewer {
    *   - destinationFieldSampleValue: a sample value for this field type.
    */
   public function getDestinationOnlyFields(MigrationPlugin $data_migration_plugin) : array {
-    list('entity_type' => $entity_type, 'field_definitions' => $field_definitions) = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
+    ['entity_type' => $entity_type, 'field_definitions' => $field_definitions] = $this->getEntityTypeAndFieldDefinitions($data_migration_plugin);
     assert(Inspector::assertAllObjects($field_definitions, FieldDefinitionInterface::class));
 
     try {

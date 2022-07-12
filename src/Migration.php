@@ -576,7 +576,7 @@ final class Migration {
     // Copied from PluginBase::getBaseId().
     $get_base_plugin_id = function ($plugin_id) {
       if (strpos($plugin_id, PluginBase::DERIVATIVE_SEPARATOR)) {
-        list($plugin_id) = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+        [$plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id, 2);
       }
       return $plugin_id;
     };

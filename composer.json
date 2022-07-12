@@ -17,11 +17,19 @@
         "drupal/migrate_tools": "*"
     },
     "require-dev": {
-        "acquia/coding-standards": "dev-master",
-        "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
+        "acquia/coding-standards": "^1",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
         "ergebnis/composer-normalize": "^2.0.0",
         "phpspec/prophecy-phpunit": "^2",
         "squizlabs/php_codesniffer": "^3.0@dev"
+    },
+    "config": {
+        "allow-plugins": {
+            "cweagans/composer-patches": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true,
+            "webdriver-binary/binary-chromedriver": true
+        }
     },
     "extra": {
         "drush": {
