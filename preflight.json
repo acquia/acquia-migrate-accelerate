@@ -1232,8 +1232,8 @@
     "note": null
   },
   "clever_reach": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/clever_reach/issues/3304566."
   },
   "clientside_validation": {
     "vetted": false,
