@@ -792,8 +792,8 @@
     "note": null
   },
   "block_country": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/block_country/issues/3307981."
   },
   "block_date": {
     "vetted": false,
@@ -1092,10 +1092,6 @@
     "note": null
   },
   "charts": {
-    "vetted": false,
-    "note": null
-  },
-  "charts_google": {
     "vetted": false,
     "note": null
   },
@@ -2796,7 +2792,7 @@
     "note": null
   },
   "entity_print": {
-    "vetted": false,
+    "vetted": true,
     "note": null
   },
   "entity_reference": {
@@ -3632,8 +3628,8 @@
     "note": null
   },
   "freeagent": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/freeagent/issues/3307982."
   },
   "freelinking": {
     "vetted": false,
@@ -6308,8 +6304,8 @@
     "note": "This module is not composer installable - see https://www.drupal.org/project/panopoly/issues/3249100."
   },
   "panopoly_search": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/panopoly/issues/3307997."
   },
   "panopoly_test": {
     "vetted": true,
