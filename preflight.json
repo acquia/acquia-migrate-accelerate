@@ -7853,7 +7853,7 @@
   },
   "simplesamlphp_auth": {
     "vetted": true,
-    "note": null
+    "note": "This migration is automated by the Acquia Migrate Accelerate team, but requires manual installation because the 'drupal/simplesamlphp_auth' package depends on the 'simplesamlphp/composer-module-installer' composer plugin. This must be manually allowed in the root composer.json. Install version 3.2 of the package and apply the patch from https://www.drupal.org/project/simplesamlphp_auth/issues/3256410."
   },
   "simpletest": {
     "vetted": true,
