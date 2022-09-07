@@ -4957,7 +4957,7 @@
   },
   "location_feeds": {
     "vetted": false,
-    "note": "The patch at https://www.drupal.org/project/address/issues/2882589 adds Feeds support to the Address module."
+    "note": null
   },
   "location_gmap_find_address": {
     "vetted": false,
