@@ -320,8 +320,8 @@
     "note": null
   },
   "alb_auth": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/alb_auth/issues/3295402."
   },
   "alertbox": {
     "vetted": false,
@@ -524,8 +524,8 @@
     "note": null
   },
   "auth0": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/auth0/issues/3258312."
   },
   "auto_entitylabel": {
     "vetted": false,
@@ -624,8 +624,8 @@
     "note": null
   },
   "bankvault": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/bankvault/issues/3310429."
   },
   "barcodes": {
     "vetted": false,
@@ -1116,8 +1116,8 @@
     "note": null
   },
   "christmas_lights": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/christmas_lights/issues/3310119."
   },
   "christmas_snow": {
     "vetted": false,
@@ -1424,8 +1424,8 @@
     "note": null
   },
   "commerce_canadapost": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/commerce_canadapost/issues/3310458."
   },
   "commerce_cart_estimate": {
     "vetted": false,
@@ -1480,8 +1480,8 @@
     "note": null
   },
   "commerce_dps": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/commerce_dps/issues/3275719."
   },
   "commerce_ecpay_allinone": {
     "vetted": false,
@@ -1552,8 +1552,8 @@
     "note": null
   },
   "commerce_heidelpay": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/commerce_heidelpay/issues/3310434."
   },
   "commerce_iats": {
     "vetted": false,
@@ -1696,8 +1696,8 @@
     "note": null
   },
   "commerce_qb_webconnect": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/commerce_qb_webconnect/issues/3310452."
   },
   "commerce_quick_purchase": {
     "vetted": false,
@@ -2776,8 +2776,8 @@
     "note": null
   },
   "entity_merge": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/entity_merge/issues/3310453."
   },
   "entity_modified": {
     "vetted": true,
@@ -3080,8 +3080,8 @@
     "note": null
   },
   "fb_instant_articles": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/fb_instant_articles/issues/3300760."
   },
   "fb_likebox": {
     "vetted": false,
@@ -3508,8 +3508,8 @@
     "note": null
   },
   "focal_point_focus": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/focal_point_focus/issues/3264456"
   },
   "folder_redirect": {
     "vetted": false,
@@ -6044,8 +6044,8 @@
     "note": null
   },
   "oauth2_token_manager": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/oauth2_token_manager/issues/3310455."
   },
   "oauth_common": {
     "vetted": false,
@@ -6468,12 +6468,12 @@
     "note": null
   },
   "payment": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/payment/issues/3283847."
   },
   "paypal_payment": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/payment/issues/3283847."
   },
   "payson_checkout": {
     "vetted": false,
@@ -8060,12 +8060,12 @@
     "note": null
   },
   "social_wall": {
-    "vetted": false,
-    "note": "It is recommended to start from scratch, both for configuring this module and even whether to use this module. Consider using https://www.drupal.org/project/socialfeed instead, which has wider adoption."
+    "vetted": true,
+    "note": "It is recommended to start from scratch, both for configuring this module and even whether to use this module. Consider using https://www.drupal.org/project/socialfeed instead, which has wider adoption. Unfortunately that recommendation has become moot because PHP 7 support is ending and that module is not yet compatible with PHP 8 — see https://www.drupal.org/project/socialfeed/issues/3295588."
   },
   "socialfeed": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/socialfeed/issues/3295588."
   },
   "socrata": {
     "vetted": false,
@@ -8328,8 +8328,8 @@
     "note": null
   },
   "taarikh": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module is not yet compatible with PHP 8 — see https://www.drupal.org/project/taarikh/issues/3310459."
   },
   "tab_toolbar": {
     "vetted": false,
