@@ -161,7 +161,7 @@ function acquia_migrate_schema() {
     'description' => 'Stores the "completed" and "skipped" flags for migrations.',
     'fields' => [
       'migration_id' => [
-        'type' => 'varchar_ascii',
+        'type' => 'varchar',
         'length' => 192,
         'not null' => TRUE,
         'description' => 'A migration ID, see MigrationRepository.',
