@@ -937,7 +937,7 @@
   },
   "browser_refresh": {
     "vetted": true,
-    "note": "This module is not composer installable — see https://www.drupal.org/project/browser_refresh/issues/3241233."
+    "note": "This module is not composer installable due to its dependency on link_css — see https://www.drupal.org/project/link_css/issues/3086602."
   },
   "browserclass": {
     "vetted": true,
@@ -1640,8 +1640,8 @@
     "note": null
   },
   "commerce_payfort": {
-    "vetted": true,
-    "note": "This module claims to be Drupal 9-compatible but it is not - see https://www.drupal.org/project/commerce_payfort/issues/3229354."
+    "vetted": false,
+    "note": null
   },
   "commerce_payme": {
     "vetted": false,
@@ -4871,6 +4871,10 @@
     "vetted": true,
     "note": null
   },
+  "link_css": {
+    "vetted": true,
+    "note": "This module is not composer installable — see https://www.drupal.org/project/link_css/issues/3086602."
+  },
   "link_icons": {
     "vetted": false,
     "note": null
@@ -7844,8 +7848,8 @@
     "note": null
   },
   "simplenews_scheduler": {
-    "vetted": true,
-    "note": "This module is not composer installable - see https://www.drupal.org/project/simplenews_scheduler/issues/3230858."
+    "vetted": false,
+    "note": null
   },
   "simplerads": {
     "vetted": false,
