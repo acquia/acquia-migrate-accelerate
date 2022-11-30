@@ -4,6 +4,7 @@ declare(strict_types=1);
 declare(ticks = 1);
 namespace Drupal\acquia_migrate\Commands;
 
+use Consolidation\AnnotatedCommand\CommandError;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Drupal\acquia_migrate\Batch\AcquiaMigrateUpgradeImportBatch;
 use Drupal\acquia_migrate\Batch\MigrationBatchCoordinator;
@@ -18,6 +19,7 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\migrate\Plugin\migrate\destination\NullDestination;
 use Drupal\migrate\Plugin\migrate\id_map\NullIdMap;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -247,6 +249,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
    *   module: Module
    *   vetted: Vetted
    *   stable: Stable
+   *   version: Version
    *   has_migrations: Has Migrations
    *   alters_migrations: Alters Migrations
    *   risk: Risk
@@ -268,7 +271,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
 
     $vetted = $this->recommendations->getVettedDestinationModules();
 
-    foreach ($this->moduleExtensionList->getList() as $module) {
+    $modules = $this->moduleExtensionList->getList();
+    ksort($modules);
+    foreach ($modules as $module) {
       // Always ignore test-only modules.
       if ($module->info['package'] === 'Testing') {
         continue;
@@ -302,6 +307,7 @@ final class AcquiaMigrateCommands extends DrushCommands {
         'installed' => $installed,
         'vetted' => $is_vetted ? 'yes' : FALSE,
         'stable' => $is_stable ? 'yes' : FALSE,
+        'version' => $module->info['version'],
         'has_migrations' => $has_migrations ? 'yes' : FALSE,
         'alters_migrations' => $alters_migrations ? 'yes' : FALSE,
         'risk' => $risk,
@@ -371,6 +377,16 @@ final class AcquiaMigrateCommands extends DrushCommands {
       $options['include-needs-review'] = TRUE;
       $options['include-completed'] = TRUE;
       $options['include-skipped'] = TRUE;
+    }
+
+    if (!$this->migrationRepository->migrationsHaveBeenPreselected()) {
+      return new CommandError(
+        '⛔️ Please use the UI first to select which data to migrate: go to /acquia-migrate-accelerate/start-page.',
+        1
+      );
+    }
+    if (!empty($this->migrationRepository->getInitialMigrationPluginIdsWithRowsToProcess())) {
+      $this->output()->writeln("⚠️️  If you want to be able to inspect the migrated data at arbitrary points in time, it is strongly recommended to first let the initial import finish, by visiting /acquia-migrate-accelerate/start-page — it will start automatically there.\n");
     }
 
     $table = [];
@@ -764,8 +780,10 @@ final class AcquiaMigrateCommands extends DrushCommands {
     'i' => FALSE,
   ]) {
     if (!$this->migrationRepository->migrationsHaveBeenPreselected()) {
-      $this->output()->writeln('⛔️ Please use the UI first to select which data to migrate: go to /acquia-migrate-accelerate/start-page.');
-      exit(1);
+      return new CommandError(
+        '⛔️ Please use the UI first to select which data to migrate: go to /acquia-migrate-accelerate/start-page.',
+        1
+      );
     }
     if (!empty($this->migrationRepository->getInitialMigrationPluginIdsWithRowsToProcess())) {
       $this->output()->writeln("⚠️️  If you want to be able to inspect the migrated data at arbitrary points in time, it is strongly recommended to first let the initial import finish, by visiting /acquia-migrate-accelerate/start-page — it will start automatically there.\n");
@@ -780,7 +798,10 @@ final class AcquiaMigrateCommands extends DrushCommands {
       ini_set('memory_limit', $minimum_memory_limit_mb . 'M');
     }
 
-    pcntl_signal(SIGINT, [&$this, 'signal']);
+    // Allow to be interrupted gracefully if current PHP supports pcntl.
+    if (function_exists('pcntl_signal')) {
+      pcntl_signal(SIGINT, [&$this, 'signal']);
+    }
 
     // Stuck migrations can only be determined *before* we start the operation!
     $stuck_migrations = $this->getStuckMigrations();
@@ -1508,125 +1529,96 @@ final class AcquiaMigrateCommands extends DrushCommands {
   }
 
   /**
-   * Export migration messages as a csv.
+   * Export migration messages.
    *
-   * @param string|null $input
-   *   Migration label or migration plugin ID.
-   * @param string|null $messageCategory
-   *   Category of message.
-   * @param array $options
-   *   The options to pass.
+   * @param string|null $migration_label_or_id
+   *   (optional) A migration label or ID.
+   * @param string|null $migration_plugin_id
+   *   (optional) A migration plugin ID (one of the migration plugins in this
+   *   migration).
    *
    * @command ama:messages:export
+   * @filter-output
    *
-   * @option all Export all migration messages.
-   * @option ml Migration label.
-   * @option mp Migration plugin.
-   * @option c Category of message.
-   *
-   * @usage ama:messages:export --all
-   *   Export all migration messages.
-   * @usage ama:messages:export --ml 'migration_label'
-   *   Export messages for given migration label.
-   * @usage ama:messages:export --mp 'migration_plugin'
-   *   Export messages for given migration plugin.
-   * @usage ama:messages:export --ml 'migration_label' --c 'entity_validation'
-   *   Export messages for given migration label and category.
-   * @usage ama:messages:export --mp 'migration_plugin' --c 'entity_validation'
-   *   Export messages for given migration plugin and category.
+   * @usage ama:messages:export
+   *   Export all messages.
+   * @usage ama:messages:export --format=csv > dump.csv
+   *  Export all messages to a CSV file.
+   * @usage ama:messages:export --filter="messageCategory=other"
+   *   Export all non-entity-validation messages.
+   * @usage ama:messages:export
+   *   Export all entity-validation messages.
+   * @usage ama:messages:export "User accounts"
+   *   Export messages for the "User accounts" migration.
+   * @usage ama:messages:export "User accounts" d7_user
+   *   Export messages for the "User accounts" migration's "d7_user" migration
+   *  plugin.
+   * @usage ama:messages:export "User accounts" --filter="messageCategory=entity_validation"
+   *   Export entity validation messages for the "User accounts" migration.
+   * @usage ama:messages:export "User accounts" 'migration_plugin' --filter="messageCategory=entity_validation"
+   *   Export entity validation messages for gthe "User accounts" migration's
+   *   "d7_user" migration plugin.
    *
    * @validate-module-enabled acquia_migrate
    *
    * @aliases amame
-   */
-  public function exportMessages(string $input = NULL, string $messageCategory = NULL, array $options = [
-    'all' => FALSE,
-    'ml' => FALSE,
-    'mp' => FALSE,
-    'c' => FALSE,
-  ]) {
-    if (!$options['all'] && empty($input))  {
-      $this->output()->writeln('⛔️ Invalid parameters, refer --help.');
-      return;
-    }   // Export all the migration messages if all flag is set.
-    if ($options['all']) {
-      $this->executeQuery();
-    }
-    // If migration label flag is set.
-    elseif ($options['ml']) {
-      $all_migrations = array_keys($this->migrationRepository->getMigrations());
-      $migration_id = Migration::generateIdFromLabel($input);
-      if (!in_array($migration_id, $all_migrations, TRUE)) {
-        $this->output()->writeln('⛔️ Invalid migration label');
-        return;
-      }
-      $this->executeQuery($migration_id, 'sourceMigration', $messageCategory);
-    }
-    // If migration plugin flag is set.
-    elseif ($options['mp']) {
-      $all_migrations = $this->migrationRepository->getMigrations();
-      $all_migration_plugin_ids = [];
-      foreach ($all_migrations as $migration) {
-        $all_migration_plugin_ids = array_merge($all_migration_plugin_ids, $migration->getMigrationPluginIds());
-      }
-      if (!in_array($input, $all_migration_plugin_ids, TRUE)) {
-        $this->output()->writeln('⛔️ Invalid migration plugin ID');
-        return;
-      }
-      $migration_plugin = $input;
-      $this->executeQuery($migration_plugin, 'sourceMigrationPlugin', $messageCategory);
-    }
-  }
-
-  /**
-   * Execute query.
    *
-   * @param string|null $migration_or_migration_plugin
-   *   Migration label or migration plugin.
-   * @param string|null $migration_or_migration_plugin_column
-   *   switch between sourceMigration and sourceMigrationPlugin.
-   * @param string|null $messageCategory
-   *   Category if message.
+   * @field-labels
+   *   timestamp: Timestamp
+   *   sourceMigration: Migration
+   *   sourceMigrationPlugin: Migration plugin
+   *   msgid: Message ID
+   *   source_ids_hash: Source ID hash
+   *   source_id: Source ID
+   *   messageCategory: Message category
+   *   severity: Severity
+   *   message: Message
+   * @default-fields timestamp,msgid,sourceMigration,sourceMigrationPlugin,source_id,messageCategory,severity,message
+   *
+   * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
    */
-  protected function executeQuery(string $migration_or_migration_plugin = NULL, string $migration_or_migration_plugin_column = NULL, string $messageCategory = NULL) {
+  public function exportMessages(string $migration_label_or_id = NULL, string $migration_plugin_id = NULL) {
     $db_connection = Database::getConnection();
     if (!$db_connection) {
       $this->output()->writeln('⛔️ Unable to connect to database.');
       return;
     }
-    $messages = $db_connection->select('acquia_migrate_messages', 'messages')
-      ->fields('messages');
-    if ($migration_or_migration_plugin) {
-      $messages->condition($migration_or_migration_plugin_column, $migration_or_migration_plugin);
-    }
-    if ($messageCategory) {
-      $messages->condition('messageCategory', $messageCategory);
-    }
-    $final_messages = $messages->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC);
-    $this->writeIntoFile($final_messages);
-  }
 
-  /**
-   * Writes messages to a file.
-   *
-   * @param array $messages
-   *   Messages to write to a file.
-   */
-  private function writeIntoFile(array $messages) {
-    // Open file.
-    $f = fopen('messages.csv', 'w+');
-    if ($f === FALSE) {
-      die('Error opening the file messages.csv');
+    $query = $db_connection->select('acquia_migrate_messages', 'messages')
+      ->fields('messages');
+
+    if ($migration_label_or_id !== NULL) {
+      $migration_id = Migration::isValidMigrationId($migration_label_or_id)
+        ? $migration_label_or_id
+        : Migration::generateIdFromLabel($migration_label_or_id);
+
+      $migration = $this->migrationRepository->getMigration($migration_id);
+      assert($migration instanceof Migration);
+      // Narrow query to only the specified migration.
+      $query->condition('sourceMigration', $migration->id());
+
+      if ($migration_plugin_id !== NULL) {
+        $migration_plugin_ids = $migration->getMigrationPluginIds();
+        if (!in_array($migration_plugin_id, $migration_plugin_ids, TRUE)) {
+          throw new \Exception(sprintf("Specified migration plugin '%s' is not one of the migration plugins in this migration.", $migration_plugin_id));
+        }
+        // Narrow the query further, to the specified migration plugin.
+        $query->condition('sourceMigrationPlugin', $migration_plugin_id);
+      }
     }
-    $header = ['timestamp', 'sourceMigration', 'sourceMigrationPlugin', 'msgid', 'source_ids_hash', 'source_id', 'messageCategory', 'severity', 'message'];
-    fputcsv($f, $header);
+
+    $messages = $query->execute()->fetchAll(\PDO::FETCH_ASSOC);
+
+    $table = [];
+
+    $severity_to_log_level = RfcLogLevel::getLevels();
     foreach ($messages as $message) {
-      fputcsv($f, $message);
+      $processed_message = $message;
+      $processed_message['severity'] = $severity_to_log_level[$message['severity']];
+      $table[] = $processed_message;
     }
-    // Close file.
-    fclose($f);
-    $this->output()->writeln('✅ Messages saved to messages.csv in the docroot.');
+
+    return new RowsOfFields($table);
   }
 
   /**
@@ -1643,12 +1635,12 @@ final class AcquiaMigrateCommands extends DrushCommands {
     $definition = $migration_plugin->getPluginDefinition();
 
     // Also ensure there is no query alteration for a high water property.
-    if ($definition['source']['high_water_property']) {
+    if (isset($definition['source']['high_water_property'])) {
       unset($definition['source']['high_water_property']);
     }
 
     // Analyses should look at uncached data.
-    if ($definition['source']['cache_counts']) {
+    if (isset($definition['source']['cache_counts'])) {
       unset($definition['source']['cache_counts']);
     }
 
@@ -1678,6 +1670,9 @@ final class AcquiaMigrateCommands extends DrushCommands {
    */
   private static function isUnprocessedSourceRow(MigrateIdMapInterface $map, array $source_id_values) : bool {
     $raw_row = $map->getRowBySource($source_id_values);
+    if ($raw_row === FALSE) {
+      return TRUE;
+    }
     $is_unprocessed = $raw_row['source_row_status'] === NULL;
     return $is_unprocessed;
   }

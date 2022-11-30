@@ -5,11 +5,11 @@
  * Install, update, and uninstall functions for the Acquia Migrate module.
  */
 
-use Drupal\acquia_migrate\MigrationFingerprinter;
-use Drupal\acquia_migrate\Recommendations;
 use Drupal\acquia_migrate\Form\PublicAcknowledgementForm;
 use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
+use Drupal\acquia_migrate\MigrationFingerprinter;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
+use Drupal\acquia_migrate\Recommendations;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\MissingDependencyException;
@@ -236,8 +236,8 @@ function acquia_migrate_update_9100() {
     ],
   ];
 
-  /* @var \Drupal\Core\Database\Schema $spec */
-  $schema = \Drupal\Core\Database\Database::getConnection()->schema();
+  /** @var \Drupal\Core\Database\Schema $spec **/
+  $schema = Database::getConnection()->schema();
 
   foreach ($fingerprint_schemas as $field_name => $spec) {
     $schema->addField('acquia_migrate_migration_flags', $field_name, $spec);
@@ -378,7 +378,7 @@ function acquia_migrate_update_9203() {
  * Adds new index to the centralized messages table to improve performance.
  */
 function acquia_migrate_update_9204() {
-  $schema = \Drupal\Core\Database\Database::getConnection()->schema();
+  $schema = Database::getConnection()->schema();
   $schema->addIndex(
     SqlWithCentralizedMessageStorage::CENTRALIZED_MESSAGE_TABLE,
     'faster_migrations',

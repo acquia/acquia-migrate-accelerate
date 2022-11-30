@@ -149,8 +149,11 @@ final class MessageAnalyzer {
             return $candidate_solutions[$i]['specific_solution'][$matches[$per]];
           }
         }
-        // Otherwise suggest the generic solution.
-        if (isset($matches[$per])) {
+        // Otherwise suggest the generic solution … unless none exists.
+        if (!isset($candidate_solutions[$i]['generic_solution'])) {
+          return NULL;
+        }
+        elseif (isset($matches[$per])) {
           return str_replace("@$per", $matches[$per], $candidate_solutions[$i]['generic_solution']);
         }
         else {

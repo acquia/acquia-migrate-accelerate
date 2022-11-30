@@ -165,7 +165,7 @@ class CacheableAcquiaMigrateResponseSubscriber implements EventSubscriberInterfa
    *   The event to process.
    */
   public function invalidateAcquiaMigrateResponsesOnMutate(FilterResponseEvent $event) {
-    if (strpos($this->routeMatch->getRouteName(), 'acquia_migrate') === 0 && !$event->getRequest()->isMethodCacheable()) {
+    if (is_string($this->routeMatch->getRouteName()) && strpos($this->routeMatch->getRouteName(), 'acquia_migrate') === 0 && !$event->getRequest()->isMethodCacheable()) {
       // The cache tags array is intentionally left empty.
       // @see \Drupal\acquia_migrate\Cache\AcquiaMigrateCacheTagsInvalidator::invalidateTags()
       $this->cacheTagsInvalidator->invalidateTags([]);
@@ -183,7 +183,7 @@ class CacheableAcquiaMigrateResponseSubscriber implements EventSubscriberInterfa
    *   if the request method is cacheable, FALSE otherwise.
    */
   private function shouldAddEtag(FilterResponseEvent $event) {
-    return strpos($this->routeMatch->getRouteName(), 'acquia_migrate') === 0 && $event->getRequest()->isMethodCacheable();
+    return is_string($this->routeMatch->getRouteName()) && strpos($this->routeMatch->getRouteName(), 'acquia_migrate') === 0 && $event->getRequest()->isMethodCacheable();
   }
 
   /**

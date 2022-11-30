@@ -193,17 +193,44 @@ final class Recommendations {
     // default as vetted. The destination site will get these by default even
     // when the source site does not have them installed (which causes them to
     // not end up in the stored recommendations).
+    // Last update: drupal/core:9.4.5.
+    $modules[] = 'automated_cron';
+    $modules[] = 'big_pipe';
+    $modules[] = 'block';
     $modules[] = 'block_content';
-    $modules[] = 'color';
+    $modules[] = 'breakpoint';
+    $modules[] = 'ckeditor';
     $modules[] = 'comment';
+    $modules[] = 'config';
     $modules[] = 'contact';
+    $modules[] = 'contextual';
+    $modules[] = 'datetime';
+    $modules[] = 'dblog';
+    $modules[] = 'dynamic_page_cache';
+    $modules[] = 'editor';
+    $modules[] = 'field_ui';
     $modules[] = 'file';
+    $modules[] = 'help';
+    $modules[] = 'history';
     $modules[] = 'image';
-    $modules[] = 'media';
+    $modules[] = 'menu_link_content';
+    $modules[] = 'menu_ui';
+    $modules[] = 'node';
+    $modules[] = 'options';
+    $modules[] = 'page_cache';
     $modules[] = 'path';
     $modules[] = 'rdf';
+    $modules[] = 'search';
     $modules[] = 'shortcut';
     $modules[] = 'taxonomy';
+    $modules[] = 'toolbar';
+    $modules[] = 'tour';
+    $modules[] = 'views';
+    $modules[] = 'views_ui';
+
+    // media_migration ensures many things are migrated to the Media module, and
+    // that is also automatically installed. Special case this too.
+    $modules[] = 'media';
 
     // Analogously, explicitly mark this module and its dependencies as vetted.
     $modules[] = 'acquia_migrate';
@@ -228,6 +255,11 @@ final class Recommendations {
   public static function moduleIsStable(Extension $module) : bool {
     // Always consider core modules as stable.
     if (substr($module->getPath(), 0, 5) === 'core/') {
+      return TRUE;
+    }
+
+    // Always consider Acquia Migrate itself stable.
+    if ($module->getName() === 'acquia_migrate') {
       return TRUE;
     }
 

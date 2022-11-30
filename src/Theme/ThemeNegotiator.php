@@ -14,7 +14,7 @@ final class ThemeNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return strpos($route_match->getRouteName(), 'acquia_migrate') === 0;
+    return is_string($route_match->getRouteName()) && strpos($route_match->getRouteName(), 'acquia_migrate') === 0;
   }
 
   /**

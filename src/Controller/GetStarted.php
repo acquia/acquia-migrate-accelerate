@@ -185,8 +185,8 @@ final class GetStarted extends ControllerBase {
         ],
         'description' => [
           '#markup' => AcquiaDrupalEnvironmentDetector::isAhEnv()
-          ? $this->t("It looks like your Drupal 7 application uses a table prefix. Acquia Migrate Accelerate cannot automatically copy this from your Drupal 7 site's <code>settings.php</code>. You'll need to copy that manually, commit and push the result. See <a href='https://support.acquia.com/hc/en-us/articles/1500007166222-Adding-a-table-prefix-for-the-Acquia-Migrate-Accelerator-Environment-\'>Acquia Support Knowledgebase article</a>. If you need help, contact Acquia Support.")
-          : $this->t("Follow the link above for instructions on how to configure your source site's database in this site's <code>settings.php</code> file."),
+            ? $this->t("It looks like your Drupal 7 application uses a table prefix. Acquia Migrate Accelerate cannot automatically copy this from your Drupal 7 site's <code>settings.php</code>. You'll need to copy that manually, commit and push the result. See <a href='https://support.acquia.com/hc/en-us/articles/1500007166222-Adding-a-table-prefix-for-the-Acquia-Migrate-Accelerator-Environment-\'>Acquia Support Knowledgebase article</a>. If you need help, contact Acquia Support.")
+            : $this->t("Follow the link above for instructions on how to configure your source site's database in this site's <code>settings.php</code> file."),
         ],
       ],
     ];
@@ -249,8 +249,8 @@ final class GetStarted extends ControllerBase {
           'label' => $this->t('Create matching files directory'),
           'description' => [
             '#markup' => $expected_file_public_path_exists
-            ? $this->t("The source site uses a non-default directory for serving publicly accessible files. <code>@absolute-path</code> exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path])
-            : $this->t("The source site uses a non-default directory for serving publicly accessible files. Ensure the <code>@absolute-path</code> directory exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path]),
+              ? $this->t("The source site uses a non-default directory for serving publicly accessible files. <code>@absolute-path</code> exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path])
+              : $this->t("The source site uses a non-default directory for serving publicly accessible files. Ensure the <code>@absolute-path</code> directory exists, and is writable.", ['@absolute-path' => getcwd() . '/' . $expected_file_public_path]),
           ],
         ],
       ];

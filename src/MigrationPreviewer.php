@@ -835,7 +835,7 @@ HTML;
       $text_stream = new StringInputStream($html);
       $dom = $html5->parse($text_stream);
     }
-    $d7_base_url = rtrim($this->keyValue->get(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL), '/');
+    $d7_base_url = rtrim($this->keyValue->get(UserOneConfigurationForm::KEY_ADDITIONAL__SOURCE_SITE_BASE_URL, 'https://example.com'), '/');
     foreach ($dom->getElementsByTagName('a') as $node) {
       /** @var \DOMElement $node */
       $src = rawurldecode($node->getAttribute('href'));

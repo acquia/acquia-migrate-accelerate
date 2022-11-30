@@ -6,25 +6,26 @@
  */
 
 use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
+use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
 use Drupal\acquia_migrate\MigrationAlterer;
-use Drupal\acquia_migrate\Recommendations;
+use Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateEntityReference;
 use Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateNodeReference;
 use Drupal\acquia_migrate\Plugin\migrate\destination\AcquiaMigrateUser;
-use Drupal\acquia_migrate\Plugin\migrate\AcquiaMigrateEntityReference;
 use Drupal\acquia_migrate\Plugin\migrate\id_map\SqlWithCentralizedMessageStorage;
-use Drupal\acquia_migrate\Form\UserOneConfigurationForm;
+use Drupal\acquia_migrate\Recommendations;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Extension\ModuleInstallerInterface;
-use Drupal\Core\Logger\RfcLogLevel;
-use Drupal\Core\Url;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_toolbar().
@@ -32,7 +33,9 @@ use Drupal\Core\Session\AccountInterface;
 function acquia_migrate_toolbar() {
   $recommendations = \Drupal::service('acquia_migrate.recommendations');
   assert($recommendations instanceof Recommendations);
-  $last_source_update = \DateTime::createFromFormat(\DateTime::RFC3339, $recommendations->getRecentInfoTime());
+  $last_source_update = $recommendations->getRecentInfoTime()
+    ? \DateTime::createFromFormat(\DateTime::RFC3339, $recommendations->getRecentInfoTime())
+    : FALSE;
 
   $items['acquia_migrate'] = [
     // Set weight to be heavier than the "home" toolbar tab, but lighter than
@@ -62,7 +65,10 @@ function acquia_migrate_toolbar() {
             'title' => t('Migrations'),
             'url' => Url::fromRoute('acquia_migrate.migrations.dashboard'),
             'attributes' => [
-              'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-dashboard'],
+              'class' => [
+                'toolbar-icon',
+                'toolbar-icon-acquia-migrate-dashboard',
+              ],
             ],
           ],
           'migration-messages' => [
@@ -70,7 +76,10 @@ function acquia_migrate_toolbar() {
             'title' => t('Messages'),
             'url' => Url::fromRoute('acquia_migrate.migrations.messages'),
             'attributes' => [
-              'class' => ['toolbar-icon', 'toolbar-icon-acquia-migrate-messages'],
+              'class' => [
+                'toolbar-icon',
+                'toolbar-icon-acquia-migrate-messages',
+              ],
             ],
           ],
           'migration-module-info' => [
@@ -110,9 +119,9 @@ function acquia_migrate_toolbar() {
     ],
     '#attached' => [
       'library' => [
-        'acquia_migrate/toolbar'
-      ]
-    ]
+        'acquia_migrate/toolbar',
+      ],
+    ],
   ];
   return $items;
 }
@@ -196,9 +205,9 @@ function acquia_migrate_migrate_field_info_alter(&$definitions) {
   // These plugins are replaced with enhanced ones whose value process pipeline
   // is able to return the final target entity ID (for entity reference fields
   // with 'node' target).
-  // (Note that this only affects "node" targets because only nodes have follow-up
-  // migrations in Drupal core. In theory other entity types might need this too, but
-  // in Drupal core this is the only known case.)
+  // (Note that this only affects "node" targets because only nodes have
+  // follow-up migrations in Drupal core. In theory other entity types might
+  // need this too, but in Drupal core this is the only known case.)
   //
   // So the currently known "d*_entity_reference_translation" migrations are
   // largely replaced by:
@@ -225,12 +234,12 @@ function acquia_migrate_migrate_field_info_alter(&$definitions) {
  * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::OPERATION
  */
 function acquia_migrate_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types **/
   $entity_types['user']->setFormClass(UserOneConfigurationForm::OPERATION, UserOneConfigurationForm::class);
 }
 
 /**
- * Implements hook_entity_field_access()
+ * Implements hook_entity_field_access().
  *
  * @see acquia_migrate_install()
  * @see \Drupal\acquia_migrate\Form\UserOneConfigurationForm::reset()
@@ -387,7 +396,7 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
       // may be rendered adjacent to a viewed entity.
       // @see \Drupal\Core\Entity\Enhancer\EntityRouteEnhancer
       $entity_form = \Drupal::routeMatch()->getRouteObject()->getDefault('_entity_form');
-      if ($entity_form !== NULL && ([$entity_type_id, ] = explode('.', $entity_form)) && $entity_type_id == $affected_entity->getEntityTypeId()) {
+      if ($entity_form !== NULL && ([$entity_type_id] = explode('.', $entity_form)) && $entity_type_id == $affected_entity->getEntityTypeId()) {
         if ($base_url !== NULL) {
           $path = \Drupal::request()->getPathInfo();
           $url = Url::fromUri($base_url . $path);
@@ -408,7 +417,6 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
   }
 }
 
-
 /**
  * Submit callback for entity form.
  *
@@ -416,7 +424,7 @@ function acquia_migrate_form_alter(&$form, FormStateInterface $form_state, $form
  */
 function _acquia_migrate_entity_form_submit(array $form, FormStateInterface $form_state) {
   $entity = $form_state->getFormObject()->getEntity();
-  assert($entity instanceof \Drupal\Core\Entity\EntityInterface);
+  assert($entity instanceof EntityInterface);
   $form_state->setRebuild(TRUE);
 
   if ($entity->isNew()) {

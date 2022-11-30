@@ -87,7 +87,7 @@ final class HttpApiResponseValidator implements EventSubscriberInterface {
     $response = $event->getResponse();
 
     // Only validate Acquia Migrate API routes.
-    if (strpos($event->getRequest()->attributes->get('_route'), 'acquia_migrate.api.') !== 0) {
+    if (strpos($event->getRequest()->attributes->get('_route', ''), 'acquia_migrate.api.') !== 0) {
       return;
     }
 
