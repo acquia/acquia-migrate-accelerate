@@ -3684,8 +3684,8 @@
     "note": null
   },
   "g2": {
-    "vetted": false,
-    "note": null
+    "vetted": true,
+    "note": "This module needs to be installed manually due to its dependency on PHP 8."
   },
   "ga_login": {
     "vetted": false,
